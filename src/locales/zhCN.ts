@@ -37,6 +37,8 @@ export default {
     'folder.renameMessage':
       '输入新文件夹名，所有的笔记和子文件夹路径也将被更新.',
     'folder.renameErrorMessage': '你不能重命名该文件夹',
+    'folder.changeColor': '改变颜色',
+    'folder.changeColorMessage': '为你的文件夹选择一个颜色',
     'folder.remove': '移除文件夹',
     'folder.removeMessage': '所有笔记和子文件夹将被删除.',
 

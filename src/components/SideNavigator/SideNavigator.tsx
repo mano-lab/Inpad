@@ -286,13 +286,13 @@ export default () => {
             folderColor?: string
           ) => {
             folderConfig({
-              title: 'Change Folder Color',
-              message: 'Select a color for your folder',
+              title: t('folder.changeColor'),
+              message: t('folder.changeColorMessage'),
               iconType: DialogIconTypes.Question,
               defaultValue: {
                 color: folderColor || '',
               },
-              submitButtonLabel: 'Change Color',
+              submitButtonLabel: t('folder.changeColor'),
               onClose: async (value: FolderConfigDialogValues | null) => {
                 if (value === null) {
                   return

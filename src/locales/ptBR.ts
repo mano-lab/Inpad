@@ -40,6 +40,8 @@
     'folder.renameMessage':
       'Insira um novo nome de pasta, o caminho de cada nota e sub-pasta será também atualizado.',
     'folder.renameErrorMessage': 'Não foi possível renomear a pasta',
+    'folder.changeColor': 'Alterar a cor',
+    'folder.changeColorMessage': 'Selecione uma cor para sua pasta',
     'folder.remove': 'Remover pasta',
     'folder.removeMessage': 'Todas as notas e sub-pastas serão deletadas.',
 

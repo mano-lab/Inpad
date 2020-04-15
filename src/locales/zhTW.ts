@@ -37,6 +37,8 @@ export default {
     'folder.renameMessage':
       '請輸入新資料夾名稱，所有的筆記和子資料夾路徑也將會被更新。',
     'folder.renameErrorMessage': '無法重新命名該資料夾',
+    'folder.changeColor': '改變顏色',
+    'folder.changeColorMessage': '選擇文件的顏色',
     'folder.remove': '移除資料夾',
     'folder.removeMessage': '所有筆記和子資料夾將會被刪除。',
 

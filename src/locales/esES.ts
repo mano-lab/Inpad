@@ -40,6 +40,8 @@ export default {
     'folder.renameMessage':
       'Introduce el nuevo nombre para la carpeta, cada nota y subcarpeta también se vera afectada.',
     'folder.renameErrorMessage': 'No puede renombrar esta carpeta',
+    'folder.changeColor': 'Cambiar el color',
+    'folder.changeColorMessage': 'Selecciona un color para su carpeta',
     'folder.remove': 'Eliminar carpeta',
     'folder.removeMessage':
       'Todas las notas y subcarpetas van a ser eliminadas.',

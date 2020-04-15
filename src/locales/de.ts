@@ -39,6 +39,8 @@ export default {
     'folder.renameMessage':
       'Gib den neuen Ordnernamen an, jede Notiz und Unterordner-Pfad wird aktualisiert.',
     'folder.renameErrorMessage': 'Ordner konnte nicht umbenannt werden',
+    'folder.changeColor': 'Farbe ändern',
+    'folder.changeColorMessage': 'Wählen Sie eine Farbe für Ihren Ordner',
     'folder.remove': 'Ordner löschen',
     'folder.removeMessage': 'Alle Notizen und Unterordner werden gelöscht.',
 

@@ -38,6 +38,8 @@ export default {
     'folder.renameMessage':
       'フォルダ名を変えると、全てのノートやサブフォルダのパスも更新されます',
     'folder.renameErrorMessage': 'フォルダ名を変更できません',
+    'folder.changeColor': '色を変える',
+    'folder.changeColorMessage': 'フォルダの色を選択します',
     'folder.remove': 'フォルダを削除する',
     'folder.removeMessage': 'フォルダを削除すると全てのノートも削除されます',
 

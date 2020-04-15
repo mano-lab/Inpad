@@ -37,6 +37,8 @@ export default {
     'folder.renameMessage':
       '새 폴더명을 입력하면, 관련된 모든 노트와 하위 폴더 경로가 변경됩니다.',
     'folder.renameErrorMessage': '해당 폴더명을 변경할 수 없습니다.',
+    'folder.changeColor': '색 변경',
+    'folder.changeColorMessage': '파일 색상을 선택하십시오',
     'folder.remove': '폴더 삭제',
     'folder.removeMessage': '모든 폴더와 하위폴더가 삭제됩니다.',
 
