@@ -52,6 +52,7 @@ export type FolderDoc = {
 
 export type FolderDocEditibleProps = {
   data: JsonObject
+  color?: string
 }
 
 export type TagDoc = {

@@ -38,6 +38,8 @@ export default {
     'folder.renameMessage':
       'Enter the new folder name, every note and subfolder paths will also be updated.',
     'folder.renameErrorMessage': 'You could not rename the folder',
+    'folder.changeColor': 'Change Color',
+    'folder.changeColorMessage': 'Select a color for your folder',
     'folder.remove': 'Remove Folder',
     'folder.removeMessage': 'All notes and subfolders will be deleted.',
 

@@ -6,6 +6,7 @@ import {
   sideBarSecondaryTextColor,
   activeBackgroundColor,
   iconColor,
+  coloredIconOpacity,
 } from '../../lib/styled/styleFunctions'
 import { IconArrowSingleRight, IconArrowSingleDown } from '../icons'
 
@@ -24,6 +25,10 @@ const Container = styled.div`
       width: 30px;
       ${iconColor}
     }
+
+    button > span.colored {
+      ${coloredIconOpacity};
+    }
   }
 
   transition: 200ms background-color;
@@ -35,6 +40,10 @@ const Container = styled.div`
 
     button > span {
       ${sideBarTextColor}
+    }
+
+    button > span.colored {
+      opacity: 1;
     }
   }
   &:hover {
@@ -131,6 +140,7 @@ interface SideNaviagtorItemProps {
   className?: string
   folded?: boolean
   active?: boolean
+  colored?: boolean
   onFoldButtonClick?: (event: React.MouseEvent) => void
   onClick?: (event: React.MouseEvent) => void
   onContextMenu?: (event: React.MouseEvent) => void
@@ -148,6 +158,7 @@ const SideNaviagtorItem = ({
   className,
   folded,
   active,
+  colored,
   onFoldButtonClick,
   onClick,
   onDoubleClick,
@@ -188,7 +199,7 @@ const SideNaviagtorItem = ({
           onDoubleClick={onDoubleClick}
         >
           {icon != null && (
-            <SideNavigatorItemIconContainer>
+            <SideNavigatorItemIconContainer className={colored && 'colored'}>
               {icon}
             </SideNavigatorItemIconContainer>
           )}

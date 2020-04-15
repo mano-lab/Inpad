@@ -35,6 +35,7 @@ describe('NoteDb', () => {
         createdAt: now,
         updatedAt: now,
         data: {},
+        color: '',
       })
 
       // When
@@ -47,6 +48,7 @@ describe('NoteDb', () => {
         createdAt: now,
         updatedAt: now,
         data: {},
+        color: '',
       })
     })
 
@@ -77,6 +79,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: {},
+        color: '',
       })
 
       const doc = await noteDb.pouchDb.get(getFolderId('/test'))
@@ -86,6 +89,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: {},
+        color: '',
       })
     })
 
@@ -103,6 +107,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: {},
+        color: '',
       })
 
       const doc = await noteDb.pouchDb.get(getFolderId('/parent/test'))
@@ -112,6 +117,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: {},
+        color: '',
       })
 
       const parentDoc = await noteDb.pouchDb.get(getFolderId('/parent'))
@@ -121,6 +127,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: {},
+        color: '',
       })
     })
 
@@ -141,6 +148,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: { message: 'yolo' },
+        color: '',
       })
 
       const doc = await noteDb.pouchDb.get(getFolderId('/test'))
@@ -150,6 +158,7 @@ describe('NoteDb', () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         data: { message: 'yolo' },
+        color: '',
       })
     })
 
@@ -171,6 +180,7 @@ describe('NoteDb', () => {
         createdAt,
         updatedAt,
         data: { message: 'yolo' },
+        color: '',
       })
 
       const doc = await noteDb.pouchDb.get(getFolderId('/test'))
@@ -180,6 +190,7 @@ describe('NoteDb', () => {
         createdAt,
         updatedAt,
         data: { message: 'yolo' },
+        color: '',
       })
     })
 
@@ -197,6 +208,34 @@ describe('NoteDb', () => {
           'pathname is invalid, got `/invalid?pathname`'
         )
       }
+    })
+
+    it('create folder with given color', async () => {
+      // Given
+      const noteDb = await prepareNoteDb()
+
+      // When
+      const result = await noteDb.upsertFolder('/test', { color: '#000000' })
+
+      // Then
+      expect(result).toEqual({
+        _id: getFolderId('/test'),
+        _rev: expect.any(String),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        data: {},
+        color: '#000000',
+      })
+
+      const doc = await noteDb.pouchDb.get(getFolderId('/test'))
+      expect(doc).toEqual({
+        _id: getFolderId('/test'),
+        _rev: expect.any(String),
+        createdAt: expect.any(String),
+        updatedAt: expect.any(String),
+        data: {},
+        color: '#000000',
+      })
     })
   })
 

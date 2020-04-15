@@ -112,6 +112,7 @@ export default class NoteDb {
         _id: getFolderId(pathname),
         createdAt: now,
         data: {},
+        color: '',
       }),
       ...props,
       updatedAt: now,
@@ -123,6 +124,7 @@ export default class NoteDb {
       createdAt: folderDocProps.createdAt,
       updatedAt: folderDocProps.updatedAt,
       data: folderDocProps.data,
+      color: folderDocProps.color,
       _rev: rev,
     }
   }

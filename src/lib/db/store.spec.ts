@@ -171,6 +171,26 @@ describe('DbStore', () => {
         _id: getFolderId('/test/child folder'),
       })
     })
+
+    it('creates a folder with a color', async () => {
+      // Given
+      const { result } = prepareDbStore()
+      let storage: NoteStorage
+      await act(async () => {
+        await result.current.initialize()
+        storage = await result.current.createStorage('test')
+
+        // When
+        await result.current.createFolder(storage.id, '/test', '#000000')
+      })
+
+      // Then
+      const folderDoc = await storage!.db.getFolder('/test')
+      expect(folderDoc).toMatchObject({
+        _id: getFolderId('/test'),
+        color: '#000000',
+      })
+    })
   })
 
   describe('#removeFolder', () => {
@@ -833,6 +853,29 @@ describe('DbStore', () => {
         result.current.storageMap[storage!.id]!.noteMap[note!._id]
       ).toMatchObject({
         folderPathname: '/testok/subfolder',
+      })
+    })
+  })
+
+  describe('#changeFolderColor', () => {
+    it('change the color of a folder', async () => {
+      // Given
+      const { result } = prepareDbStore()
+      let storage: NoteStorage
+      await act(async () => {
+        await result.current.initialize()
+        storage = await result.current.createStorage('test')
+        await result.current.createFolder(storage.id, '/test')
+
+        // When
+        await result.current.changeFolderColor(storage.id, '/test', '#000000')
+      })
+
+      // Then
+      const folderDoc = await storage!.db.getFolder('/test')
+      expect(folderDoc).toMatchObject({
+        _id: getFolderId('/test'),
+        color: '#000000',
       })
     })
   })

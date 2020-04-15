@@ -4,6 +4,7 @@ import { createStoreContext } from './context'
 export enum DialogTypes {
   Prompt = 'Prompt',
   MessageBox = 'MessageBox',
+  FolderConfig = 'FolderConfig',
 }
 
 export enum DialogIconTypes {
@@ -13,24 +14,36 @@ export enum DialogIconTypes {
   Warning = 'Warning',
 }
 
-export interface MessageBoxDialogOptions {
+export interface BaseDialogOptions {
   title: string
   message: string
   iconType: DialogIconTypes
+}
+
+export type MessageBoxDialogOptions = BaseDialogOptions & {
   buttons: string[]
   defaultButtonIndex?: number
   cancelButtonIndex?: number
   onClose: (value: number | null) => void
 }
 
-export interface PromptDialogOptions {
-  title: string
-  message: string
-  iconType: DialogIconTypes
+export type PromptDialogOptions = BaseDialogOptions & {
   defaultValue?: string
   submitButtonLabel?: string
   cancelButtonLabel?: string
   onClose: (value: string | null) => void
+}
+
+export type FolderConfigDialogOptions = BaseDialogOptions & {
+  defaultValue?: FolderConfigDialogValues
+  submitButtonLabel?: string
+  cancelButtonLabel?: string
+  onClose: (value: FolderConfigDialogValues | null) => void
+}
+
+export type FolderConfigDialogValues = {
+  folderPath?: string
+  color: string
 }
 
 export interface BaseDialogData {
@@ -49,13 +62,21 @@ export type PromptDialogData = BaseDialogData &
   PromptDialogOptions & {
     type: DialogTypes.Prompt
   }
+export type FolderConfigDialogData = BaseDialogData &
+  FolderConfigDialogOptions & {
+    type: DialogTypes.FolderConfig
+  }
 
-export type DialogData = MessageBoxDialogData | PromptDialogData
+export type DialogData =
+  | MessageBoxDialogData
+  | PromptDialogData
+  | FolderConfigDialogData
 
 export interface DialogContext {
   data: DialogData | null
   prompt(options: PromptDialogOptions): void
   messageBox(options: MessageBoxDialogOptions): void
+  folderConfig(options: FolderConfigDialogOptions): void
   closeDialog(): void
 }
 
@@ -77,6 +98,13 @@ function useDialogStore(): DialogContext {
       ...options,
     })
   }, [])
+  const folderConfig = useCallback((options: FolderConfigDialogOptions) => {
+    setData({
+      id: id++,
+      type: DialogTypes.FolderConfig,
+      ...options,
+    })
+  }, [])
   const closeDialog = useCallback(() => {
     setData(null)
   }, [])
@@ -85,6 +113,7 @@ function useDialogStore(): DialogContext {
     data,
     prompt,
     messageBox,
+    folderConfig,
     closeDialog,
   }
 }

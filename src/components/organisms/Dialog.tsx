@@ -5,6 +5,7 @@ import PromptDialogBody from '../molecules/PromptDialogBody'
 import { DialogTypes, DialogData } from '../../lib/dialog'
 import { DialogContainer, DialogBackground } from '../atoms/dialog/styled'
 import MessageBoxDialogBody from '../molecules/MessageBoxDialogBody'
+import FolderConfigDialogBody from '../molecules/FolderConfigDialogBody'
 
 export default () => {
   const { data, closeDialog } = useDialog()
@@ -24,6 +25,14 @@ export default () => {
       case DialogTypes.Prompt:
         return (
           <PromptDialogBody
+            key={dialogData.id}
+            data={dialogData}
+            closeDialog={closeDialog}
+          />
+        )
+      case DialogTypes.FolderConfig:
+        return (
+          <FolderConfigDialogBody
             key={dialogData.id}
             data={dialogData}
             closeDialog={closeDialog}

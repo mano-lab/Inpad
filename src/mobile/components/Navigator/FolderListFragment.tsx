@@ -15,12 +15,17 @@ interface FolderListFragmentProps {
   storage: NoteStorage
   showPromptToCreateFolder: (folderPathname: string) => void
   showPromptToRenameFolder: (folderPathname: string) => void
+  showFormToChangeFolderColor: (
+    folderPathname: string,
+    folderColor?: string
+  ) => void
 }
 
 const FolderListFragment = ({
   storage,
   showPromptToCreateFolder,
   showPromptToRenameFolder,
+  showFormToChangeFolderColor,
 }: FolderListFragmentProps) => {
   const { removeFolder } = useDb()
   const { push } = useRouter()
@@ -55,7 +60,8 @@ const FolderListFragment = ({
 
   const createOnContextMenuHandler = (
     storageId: string,
-    folderPathname: string
+    folderPathname: string,
+    folderColor?: string
   ) => {
     return (event: React.MouseEvent) => {
       event.preventDefault()
@@ -73,6 +79,14 @@ const FolderListFragment = ({
           enabled: folderPathname !== '/',
           onClick: async () => {
             showPromptToRenameFolder(folderPathname)
+          },
+        },
+        {
+          type: MenuTypes.Normal,
+          label: 'Change Color',
+          enabled: folderPathname !== '/',
+          onClick: async () => {
+            showFormToChangeFolderColor(folderPathname, folderColor)
           },
         },
         {
@@ -135,19 +149,29 @@ const FolderListFragment = ({
         const folderIsActive =
           currentPathnameWithoutNoteId ===
           `/m/storages/${storageId}/notes${folderPathname}`
+        const folderColor = folderMap[folderPathname]!.color
+        const isColored = folderColor ? true : false
         return (
           <NavigatorItem
             key={itemId}
             folded={folded}
             depth={depth}
             active={folderIsActive}
-            icon={folderIsActive ? <IconFileOpen size='1.3em' /> : <IconFile />}
+            colored={isColored}
+            icon={
+              folderIsActive ? (
+                <IconFileOpen size='1.3em' color={folderColor} />
+              ) : (
+                <IconFile color={folderColor} />
+              )
+            }
             label={folderName}
             onClick={createOnFolderItemClickHandler(folderPathname)}
             onDoubleClick={() => showPromptToRenameFolder(folderPathname)}
             onContextMenu={createOnContextMenuHandler(
               storage.id,
-              folderPathname
+              folderPathname,
+              folderColor
             )}
             onFoldButtonClick={() => toggleSideNavOpenedItem(itemId)}
             controlComponents={[

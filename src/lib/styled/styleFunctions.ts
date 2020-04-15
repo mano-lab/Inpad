@@ -1,6 +1,6 @@
 import { BaseTheme } from './BaseTheme'
 
-interface StyledProps {
+export interface StyledProps {
   theme: BaseTheme
 }
 
@@ -28,6 +28,11 @@ transition: 200ms color;
 &:active,
 &.active {
   color: ${theme.primaryColor};
+}`
+
+export const coloredIconOpacity = ({ theme }: StyledProps) => `
+opacity: ${
+  theme.activeIconColor.match(/rgba\(\d+,\d+,\d+,(\d+|\d+\.\d+|\.\d+)\)/)![1]
 }`
 
 export const noteListIconColor = ({ theme }: StyledProps) => `

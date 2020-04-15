@@ -3,7 +3,11 @@ import { useRouter, usePathnameWithoutNoteId } from '../../lib/router'
 import { useDb } from '../../lib/db'
 import { entries } from '../../../lib/db/utils'
 import styled from '../../../lib/styled'
-import { useDialog, DialogIconTypes } from '../../../lib/dialog'
+import {
+  useDialog,
+  DialogIconTypes,
+  FolderConfigDialogValues,
+} from '../../../lib/dialog'
 import { useContextMenu, MenuTypes } from '../../../lib/contextMenu'
 import { usePreferences } from '../../../lib/preferences'
 import {
@@ -131,11 +135,12 @@ export default ({ toggle }: NavigatorProps) => {
     renameFolder,
     renameStorage,
     removeStorage,
+    changeFolderColor,
     storageMap,
     syncStorage,
   } = useDb()
   const { popup } = useContextMenu()
-  const { prompt, messageBox } = useDialog()
+  const { prompt, messageBox, folderConfig } = useDialog()
   const { push } = useRouter()
   const [[user]] = useUsers()
   const { pushMessage } = useToast()
@@ -223,25 +228,31 @@ export default ({ toggle }: NavigatorProps) => {
           const itemId = `storage:${storage.id}`
           const storageIsFolded = !sideNavOpenedItemSet.has(itemId)
           const showPromptToCreateFolder = (folderPathname: string) => {
-            prompt({
+            folderConfig({
               title: 'Create a Folder',
               message: 'Enter the path where do you want to create a folder',
               iconType: DialogIconTypes.Question,
-              defaultValue: folderPathname === '/' ? '/' : `${folderPathname}/`,
+              defaultValue: {
+                folderPath: folderPathname === '/' ? '/' : `${folderPathname}/`,
+                color: '',
+              },
               submitButtonLabel: 'Create Folder',
-              onClose: async (value: string | null) => {
-                if (value == null) {
+              onClose: async (value: FolderConfigDialogValues | null) => {
+                if (value === null || value.folderPath === undefined) {
                   return
                 }
-                if (value.endsWith('/')) {
-                  value = value.slice(0, value.length - 1)
+                if (value.folderPath.endsWith('/')) {
+                  value.folderPath = value.folderPath.slice(
+                    0,
+                    value.folderPath.length - 1
+                  )
                 }
-                await createFolder(storage.id, value)
+                await createFolder(storage.id, value.folderPath, value.color)
 
-                push(`/m/storages/${storage.id}/notes${value}`)
+                push(`/m/storages/${storage.id}/notes${value.folderPath}`)
 
                 // Open folder item
-                openSideNavFolderItemRecursively(storage.id, value)
+                openSideNavFolderItemRecursively(storage.id, value.folderPath)
               },
             })
           }
@@ -272,6 +283,26 @@ export default ({ toggle }: NavigatorProps) => {
                     description: t('folder.renameErrorMessage'),
                   })
                 }
+              },
+            })
+          }
+          const showFormToChangeFolderColor = (
+            folderPathname: string,
+            folderColor?: string
+          ) => {
+            folderConfig({
+              title: 'Change Folder Color',
+              message: 'Select the color of your folder',
+              iconType: DialogIconTypes.Question,
+              defaultValue: {
+                color: folderColor || '',
+              },
+              submitButtonLabel: 'Change Color',
+              onClose: async (value: FolderConfigDialogValues | null) => {
+                if (value === null) {
+                  return
+                }
+                await changeFolderColor(storage.id, folderPathname, value.color)
               },
             })
           }
@@ -396,6 +427,7 @@ export default ({ toggle }: NavigatorProps) => {
                     storage={storage}
                     showPromptToCreateFolder={showPromptToCreateFolder}
                     showPromptToRenameFolder={showPromptToRenameFolder}
+                    showFormToChangeFolderColor={showFormToChangeFolderColor}
                   />
                   <TagListFragment storage={storage} />
                   {/* <NavigatorItem

@@ -38,6 +38,8 @@ export default {
     'folder.renameMessage':
       "Введіть нове ім'я папки, також будуть оновлені всі шляхи, нотатки та папки.",
     'folder.renameErrorMessage': 'Ви не змогли перейменувати папку',
+    'folder.changeColor': 'Зміна кольору',
+    'folder.changeColorMessage': 'Виберіть колір для свого файлу',
     'folder.remove': 'Видалення папки',
     'folder.removeMessage': 'Усі нотатки та папки будуть видалені.',
 

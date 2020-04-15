@@ -40,6 +40,8 @@ export default {
     'folder.renameMessage':
       'Entrez le nom du nouveau dossier, toutes les notes et adresses des sous-dossiers seront également mises à jour.',
     'folder.renameErrorMessage': 'Impossible de renommer le dossier',
+    'folder.changeColor': 'Changer la couleur',
+    'folder.changeColorMessage': 'Sélectionnez une couleur pour votre dossier',
     'folder.remove': 'Supprimer dossier',
     'folder.removeMessage':
       'Toutes les notes et sous-dossiers seront supprimés.',

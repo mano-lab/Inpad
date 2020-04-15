@@ -52,11 +52,20 @@ export interface DbStore {
   queueSyncingStorage: (id: string, delay?: number) => void
   queueSyncingAllStorage: (delay?: number) => void
   cancelSyncingStorageQueue: (id: string) => void
-  createFolder: (storageName: string, pathname: string) => Promise<void>
+  createFolder: (
+    storageName: string,
+    pathname: string,
+    color?: string
+  ) => Promise<void>
   renameFolder: (
     storageName: string,
     pathname: string,
     newName: string
+  ) => Promise<void>
+  changeFolderColor: (
+    storageName: string,
+    pathname: string,
+    color?: string
   ) => Promise<void>
   removeFolder: (storageName: string, pathname: string) => Promise<void>
   createNote(
@@ -418,14 +427,14 @@ export function createDbStoreCreator(
     )
 
     const createFolder = useCallback(
-      async (storageId: string, pathname: string) => {
+      async (storageId: string, pathname: string, color?: string) => {
         const storage = storageMap[storageId]
         if (storage == null) {
           return
         }
         let folder
         try {
-          folder = await storage.db.upsertFolder(pathname)
+          folder = await storage.db.upsertFolder(pathname, { color })
         } catch (error) {
           pushMessage({
             title: 'Error',
@@ -540,6 +549,44 @@ export function createDbStoreCreator(
             })
             allFoldersToRename.forEach((aPathname) => {
               delete draft[storageId]!.folderMap[aPathname]
+            })
+          })
+        )
+
+        queueSyncingStorage(storageId, autoSyncDebounceWaitingTime)
+      },
+      [storageMap, setStorageMap, queueSyncingStorage]
+    )
+
+    const changeFolderColor = useCallback(
+      async (storageId: string, pathname: string, color?: string) => {
+        const storage = storageMap[storageId]
+        if (storage == null) {
+          return
+        }
+        const folder = await storage.db.upsertFolder(pathname, { color })
+        const folderPathname = getFolderPathname(folder._id)
+        const notes = await storage.db.findNotesByFolder(folderPathname)
+        const rewrittenNotes = await Promise.all(
+          notes.map((note) =>
+            storage.db.updateNote(note._id, {
+              folderPathname,
+            })
+          )
+        )
+
+        const folderListToRefresh: PopulatedFolderDoc[] = []
+
+        folderListToRefresh.push({
+          ...folder,
+          pathname: folderPathname,
+          noteIdSet: new Set(rewrittenNotes.map((note) => note._id)),
+        })
+
+        setStorageMap(
+          produce((draft: ObjectMap<NoteStorage>) => {
+            folderListToRefresh.forEach((folderDoc) => {
+              draft[storage.id]!.folderMap[folderDoc.pathname] = folderDoc
             })
           })
         )
@@ -1281,6 +1328,7 @@ export function createDbStoreCreator(
       cancelSyncingStorageQueue,
       createFolder,
       renameFolder,
+      changeFolderColor,
       removeFolder,
       createNote,
       updateNote,
