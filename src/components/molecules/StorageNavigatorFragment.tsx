@@ -22,9 +22,16 @@ import NavigatorHeader from '../atoms/NavigatorHeader'
 import NavigatorButton from '../atoms/NavigatorButton'
 import styled from '../../lib/styled'
 import { dispatchNoteDetailFocusTitleInputEvent } from '../../lib/events'
+import { useFolderRearrangement } from '../../lib/folderRearrangement'
+import Spinner from '../atoms/Spinner'
 
 const Spacer = styled.div`
   height: 1em;
+`
+
+const Loader = styled.p`
+  margin: 5px;
+  text-align: center;
 `
 
 interface StorageNavigatorFragmentProps {
@@ -50,6 +57,7 @@ const StorageNavigatorFragment = ({
   const currentPathname = usePathnameWithoutNoteId()
   const user = useFirstUser()
   const { popup } = useContextMenu()
+  const { isRearranging } = useFolderRearrangement()
 
   const showPromptToCreateFolder = (folderPathname: string) => {
     prompt({
@@ -261,11 +269,17 @@ const StorageNavigatorFragment = ({
         onClick={() => push(allNotesPagePathname)}
         onContextMenu={openAllNotesContextMenu}
       />
-      <FolderListFragment
-        storage={storage}
-        showPromptToCreateFolder={showPromptToCreateFolder}
-        showPromptToRenameFolder={showPromptToRenameFolder}
-      />
+      {isRearranging ? (
+        <Loader>
+          <Spinner /> Loading...
+        </Loader>
+      ) : (
+        <FolderListFragment
+          storage={storage}
+          showPromptToCreateFolder={showPromptToCreateFolder}
+          showPromptToRenameFolder={showPromptToRenameFolder}
+        />
+      )}
       <TagListFragment storage={storage} />
       {attachments.length > 0 && (
         <NavigatorItem

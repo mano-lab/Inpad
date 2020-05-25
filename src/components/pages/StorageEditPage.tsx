@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { useDb } from '../../lib/db'
 import { NoteStorage } from '../../lib/db/types'
 import { useRouter } from '../../lib/router'
@@ -17,6 +17,17 @@ import {
 } from '../atoms/form'
 import LinkCloudStorageForm from '../organisms/LinkCloudStorageForm'
 import ManageCloudStorageForm from '../organisms/ManageCloudStorageForm'
+import { values } from '../../lib/db/utils'
+import FolderList from '../organisms/FolderList/FolderList'
+import _ from 'lodash'
+import {
+  getFolderTreeData,
+  isDuplicateFolderPathname,
+  FolderTree,
+  getUpdateFolderTreeInfo,
+} from '../../lib/folderTree'
+import HTML5Backend from 'react-dnd-html5-backend'
+import { useFolderRearrangement } from '../../lib/folderRearrangement'
 
 interface StorageEditProps {
   storage: NoteStorage
@@ -29,6 +40,19 @@ export default ({ storage }: StorageEditProps) => {
   const [name, setName] = useState(storage.name)
   const { messageBox } = useDialog()
   const { pushMessage } = useToast()
+  const {
+    isRearranging,
+    startRearrangement,
+    endRearrangement,
+  } = useFolderRearrangement()
+
+  function usePrevious(value: any) {
+    const ref = useRef()
+    useEffect(() => {
+      ref.current = value
+    })
+    return ref.current
+  }
 
   const removeCallback = useCallback(() => {
     messageBox({
@@ -58,6 +82,66 @@ export default ({ storage }: StorageEditProps) => {
     db.renameStorage(storage.id, name)
   }, [storage.id, db, name])
 
+  const [folderTreeDataState, setFolderTreeDataState] = useState(
+    getFolderTreeData(values(storage.folderMap))
+  )
+  const prevFolderTreeState = usePrevious(folderTreeDataState)
+
+  useEffect(() => {
+    if (folderTreeDataState === prevFolderTreeState) {
+      const newStorage = db.storageMap[storage.id]
+      if (newStorage != undefined) {
+        setFolderTreeDataState(getFolderTreeData(values(newStorage.folderMap)))
+      }
+    }
+  }, [folderTreeDataState, prevFolderTreeState, db.storageMap, storage.id])
+
+  const updateFolderTreeData = (treeData: FolderTree[]) => {
+    if (!isDuplicateFolderPathname(treeData)) {
+      setFolderTreeDataState(treeData)
+    }
+  }
+
+  const rearrangeFolders = useCallback(async () => {
+    startRearrangement()
+    const updateFolderTreeInfo = await getUpdateFolderTreeInfo(
+      folderTreeDataState
+    )
+    for (const aUpdateFolderTreeInfo of updateFolderTreeInfo) {
+      if (_.isEmpty(aUpdateFolderTreeInfo.newPathname)) {
+        await db.reorderFolder(
+          storage.id,
+          aUpdateFolderTreeInfo.oldPathname,
+          aUpdateFolderTreeInfo.order
+        )
+      } else {
+        if (!_.isEmpty(aUpdateFolderTreeInfo.swapTargetPathname)) {
+          await db.renameFolder(
+            storage.id,
+            aUpdateFolderTreeInfo.newPathname,
+            aUpdateFolderTreeInfo.swapTargetPathname,
+            false,
+            aUpdateFolderTreeInfo.order
+          )
+        }
+        await db.renameFolder(
+          storage.id,
+          aUpdateFolderTreeInfo.oldPathname,
+          aUpdateFolderTreeInfo.newPathname,
+          false,
+          aUpdateFolderTreeInfo.order
+        )
+      }
+    }
+    endRearrangement()
+  }, [
+    db,
+    endRearrangement,
+    folderTreeDataState,
+    startRearrangement,
+    storage.id,
+  ])
+
   return (
     <PageContainer>
       <FormHeading depth={1}>Storage Settings</FormHeading>
@@ -74,6 +158,19 @@ export default ({ storage }: StorageEditProps) => {
       <FormGroup>
         <FormPrimaryButton onClick={updateStorageName}>
           Update storage name
+        </FormPrimaryButton>
+      </FormGroup>
+      <hr />
+      <FormHeading depth={2}>Folders</FormHeading>
+      <FolderList
+        backend={HTML5Backend}
+        folderTreeData={folderTreeDataState}
+        handleFolderTreeDataUpdated={updateFolderTreeData}
+        isRearranging={isRearranging}
+      ></FolderList>
+      <FormGroup>
+        <FormPrimaryButton onClick={rearrangeFolders}>
+          Update folders
         </FormPrimaryButton>
       </FormGroup>
       <hr />

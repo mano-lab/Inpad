@@ -105,12 +105,33 @@ export default class NoteDb {
     if (folder != null && props == null) {
       return folder
     }
+    let order = (await this.getAllFolders()).length
+    if (props != null && props.order != null) {
+      order = props.order
+    } else {
+      if (folder != null && folder.order != null) {
+        order = folder.order
+      } else {
+        const parentFolderPathname = getParentFolderPathname(pathname)
+        if (parentFolderPathname !== '/') {
+          const parentFolder = await this.getFolder(parentFolderPathname)
+          if (parentFolder != null && parentFolder.order != null) {
+            const foldersUnderPathname = await this.getAllFolderUnderPathname(
+              parentFolderPathname
+            )
+            order = parentFolder.order + foldersUnderPathname.length
+          }
+        }
+      }
+    }
+
     const now = getNow()
     const folderDocProps = {
       ...(folder || {
         _id: getFolderId(pathname),
         createdAt: now,
         data: {},
+        order: order,
       }),
       ...props,
       updatedAt: now,
@@ -122,6 +143,7 @@ export default class NoteDb {
       createdAt: folderDocProps.createdAt,
       updatedAt: folderDocProps.updatedAt,
       data: folderDocProps.data,
+      order: folderDocProps.order,
       _rev: rev,
     }
   }
@@ -399,17 +421,25 @@ export default class NoteDb {
     }
   }
 
-  async removeFolder(folderPathname: string): Promise<void> {
-    const foldersToDelete = await this.getAllFolderUnderPathname(folderPathname)
+  async removeFolder(folderPathname: string, needDeleteSubFolders = true): Promise<void> {
+    const foldersToDelete = needDeleteSubFolders
+      ? await this.getAllFolderUnderPathname(folderPathname)
+      : [await this.getFolder(folderPathname)]
 
     await Promise.all(
-      foldersToDelete.map((folder) =>
-        this.trashAllNotesInFolder(getFolderPathname(folder._id))
-      )
+      foldersToDelete.map(async (folder) => {
+        if (folder != null) {
+          await this.trashAllNotesInFolder(getFolderPathname(folder._id))
+        }
+      })
     )
 
     await Promise.all(
-      foldersToDelete.map((folder) => this.pouchDb.remove(folder))
+      foldersToDelete.map(async (folder) => {
+        if (folder != null) {
+          await this.pouchDb.remove(folder)
+        }
+      })
     )
   }
 
@@ -440,7 +470,7 @@ export default class NoteDb {
     await Promise.all(
       notes
         .filter((note) => !note.trashed)
-        .map((note) => this.trashNote(note._id))
+        .map(async (note) => await this.trashNote(note._id))
     )
   }
 

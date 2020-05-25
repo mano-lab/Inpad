@@ -42,7 +42,23 @@ const FolderListFragment = ({
   const currentPathnameWithoutNoteId = usePathnameWithoutNoteId()
 
   const folderPathnames = useMemo(() => {
-    return Object.keys(folderMap).sort((a, b) => a.localeCompare(b))
+    return Object.keys(folderMap)
+      .map((key) => {
+        return {
+          pathname: folderMap[key]!.pathname,
+          order: folderMap[key]!.order,
+        }
+      })
+      .sort((a, b) => {
+        const aOrder = a.order === undefined ? 0 : a.order!
+        const bOrder = b.order === undefined ? 0 : b.order!
+        if (aOrder === bOrder) {
+          return a.pathname.localeCompare(b.pathname)
+        } else {
+          return aOrder - bOrder
+        }
+      })
+      .map((folder) => folder.pathname)
   }, [folderMap])
 
   const createOnFolderItemClickHandler = (folderPathname: string) => {

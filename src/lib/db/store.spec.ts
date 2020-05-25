@@ -171,6 +171,49 @@ describe('DbStore', () => {
         _id: getFolderId('/test/child folder'),
       })
     })
+
+    it('creates folders with the correct order', async () => {
+      // Given
+      const { result } = prepareDbStore()
+      let storage: NoteStorage
+      await act(async () => {
+        await result.current.initialize()
+        storage = await result.current.createStorage('test')
+
+        // When
+        await result.current.createFolder(storage.id, '/testA')
+        await result.current.createFolder(storage.id, '/testB')
+        await result.current.createFolder(storage.id, '/testA/testB')
+        await result.current.createFolder(storage.id, '/testA/testC')
+      })
+
+      // Then
+      const folderDocA = await storage!.db.getFolder('/testA')
+      const folderDocB = await storage!.db.getFolder('/testB')
+      const folderDocC = await storage!.db.getFolder('/testA/testB')
+      expect(folderDocA).toMatchObject({
+        _id: getFolderId('/testA'),
+        order: 1,
+      })
+      expect(folderDocB).toMatchObject({
+        _id: getFolderId('/testB'),
+        order: 2,
+      })
+      expect(folderDocC).toMatchObject({
+        _id: getFolderId('/testA/testB'),
+        order: 2,
+      })
+
+      expect(
+        result.current.storageMap[storage!.id]!.folderMap['/testA']
+      ).toBeDefined()
+      expect(
+        result.current.storageMap[storage!.id]!.folderMap['/testA/testB']
+      ).toBeDefined()
+      expect(
+        result.current.storageMap[storage!.id]!.folderMap['/testA/testC']
+      ).toBeDefined()
+    })
   })
 
   describe('#removeFolder', () => {
@@ -834,6 +877,67 @@ describe('DbStore', () => {
       ).toMatchObject({
         folderPathname: '/testok/subfolder',
       })
+    })
+
+    it('renames the folder with the order', async () => {
+      // Given
+      const { result } = prepareDbStore()
+      let storage: NoteStorage
+      await act(async () => {
+        await result.current.initialize()
+        storage = await result.current.createStorage('test')
+        await result.current.createFolder(storage.id, '/test')
+
+        // When
+        await result.current.renameFolder(
+          storage.id,
+          '/test',
+          '/testok',
+          true,
+          5
+        )
+      })
+
+      // Then
+      const folderDoc = await storage!.db.getFolder('/testok')
+      expect(folderDoc).toMatchObject({
+        _id: getFolderId('/testok'),
+        order: 5,
+      })
+
+      expect(
+        result.current.storageMap[storage!.id]!.folderMap['/test']
+      ).toBeUndefined()
+      expect(
+        result.current.storageMap[storage!.id]!.folderMap['/testok']
+      ).toBeDefined()
+    })
+  })
+
+  describe('#reorderFolder', () => {
+    it('changes the folder order', async () => {
+      // Given
+      const { result } = prepareDbStore()
+      let storage: NoteStorage
+      await act(async () => {
+        await result.current.initialize()
+        storage = await result.current.createStorage('test')
+        await result.current.createFolder(storage.id, '/test')
+
+        // When
+        await result.current.reorderFolder(storage.id, '/test', 5)
+      })
+
+      // Then
+      const folderDoc = await storage!.db.getFolder('/test')
+      expect(folderDoc).toMatchObject({
+        _id: getFolderId('/test'),
+        order: 5,
+      })
+
+      expect(
+        result.current.storageMap[storage!.id]!.folderMap['/test']
+      ).toBeDefined()
     })
   })
 })

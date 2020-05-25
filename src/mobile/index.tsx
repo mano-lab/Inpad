@@ -13,6 +13,7 @@ import { ToastProvider } from '../lib/toast'
 import ErrorBoundary from './components/ErrorBoundary'
 import '../lib/i18n'
 import './lib/analytics'
+import { FolderRearrangementProvider } from '../lib/folderRearrangement'
 
 const CombinedProvider = combineProviders(
   PreviewStyleProvider,
@@ -22,7 +23,8 @@ const CombinedProvider = combineProviders(
   DbProvider,
   PreferencesProvider,
   RouterProvider,
-  ToastProvider
+  ToastProvider,
+  FolderRearrangementProvider
 )
 
 function render(Component: typeof App) {

@@ -55,7 +55,14 @@ export interface DbStore {
   renameFolder: (
     storageName: string,
     pathname: string,
-    newName: string
+    newName: string,
+    needUpdateSubFolders?: boolean,
+    order?: number
+  ) => Promise<void>
+  reorderFolder: (
+    storageId: string,
+    pathname: string,
+    newOrder: number
   ) => Promise<void>
   removeFolder: (storageName: string, pathname: string) => Promise<void>
   createNote(
@@ -459,7 +466,13 @@ export function createDbStoreCreator(
     )
 
     const renameFolder = useCallback(
-      async (storageId: string, pathname: string, newPathname: string) => {
+      async (
+        storageId: string,
+        pathname: string,
+        newPathname: string,
+        needUpdateSubFolders = true,
+        order?: number
+      ) => {
         const storage = storageMap[storageId]
         if (storage == null) {
           return
@@ -478,53 +491,56 @@ export function createDbStoreCreator(
         const folderListToRefresh: PopulatedFolderDoc[] = []
         const notesListToRefresh: NoteDoc[] = []
 
-        const subFolders = Object.keys(storage.folderMap).filter((aPathname) =>
-          aPathname.startsWith(`${pathname}/`)
-        )
-        const allFoldersToRename = [pathname, ...subFolders]
-        await Promise.all(
-          allFoldersToRename.map(async (folderPathname) => {
-            const regex = new RegExp(`^${escapeRegExp(pathname)}`, 'g')
-            const newfolderPathname = folderPathname.replace(regex, newPathname)
-            const folder = await storage.db.getFolder(folderPathname)
-            if (folder == null) {
-              throw createUnprocessableEntityError(
-                `this folder does not exist \`${folderPathname}\``
-              )
-            }
-            if ((await storage.db.getFolder(newfolderPathname)) != null) {
-              throw createUnprocessableEntityError(
-                `this folder already exists \`${newfolderPathname}\``
-              )
-            }
-            if (
-              folderPathname.split('/').length !==
-              newfolderPathname.split('/').length
-            ) {
-              throw createUnprocessableEntityError(
-                `New name is invalid. \`${newfolderPathname}\``
-              )
-            }
-            const notes = await storage.db.findNotesByFolder(folderPathname)
-            const newFolder = await storage.db.upsertFolder(newfolderPathname)
-            const rewrittenNotes = await Promise.all(
-              notes.map((note) =>
-                storage.db.updateNote(note._id, {
-                  folderPathname: newfolderPathname,
-                })
-              )
+        const subFolders = needUpdateSubFolders
+          ? Object.keys(storage.folderMap).filter((aPathname) =>
+              aPathname.startsWith(`${pathname}/`)
             )
-
-            folderListToRefresh.push({
-              ...newFolder,
-              pathname: getFolderPathname(newFolder._id),
-              noteIdSet: new Set(rewrittenNotes.map((note) => note._id)),
-            })
-            notesListToRefresh.push(...rewrittenNotes)
+          : []
+        const allFoldersToRename = [pathname, ...subFolders]
+        for (const folderPathname of allFoldersToRename) {
+          const regex = new RegExp(`^${escapeRegExp(pathname)}`, 'g')
+          const newfolderPathname = folderPathname.replace(regex, newPathname)
+          const folder = await storage.db.getFolder(folderPathname)
+          if (folder == null) {
+            throw createUnprocessableEntityError(
+              `this folder does not exist \`${folderPathname}\``
+            )
+          }
+          if ((await storage.db.getFolder(newfolderPathname)) != null) {
+            throw createUnprocessableEntityError(
+              `this folder already exists \`${newfolderPathname}\``
+            )
+          }
+          if (
+            needUpdateSubFolders &&
+            folderPathname.split('/').length !==
+              newfolderPathname.split('/').length
+          ) {
+            throw createUnprocessableEntityError(
+              `New name is invalid. \`${newfolderPathname}\``
+            )
+          }
+          const notes = await storage.db.findNotesByFolder(folderPathname)
+          const newFolder = await storage.db.upsertFolder(newfolderPathname, {
+            order: order,
           })
-        )
+          const rewrittenNotes = await Promise.all(
+            notes.map((note) =>
+              storage.db.updateNote(note._id, {
+                folderPathname: newfolderPathname,
+              })
+            )
+          )
 
-        await storage.db.removeFolder(pathname)
+          folderListToRefresh.push({
+            ...newFolder,
+            pathname: getFolderPathname(newFolder._id),
+            noteIdSet: new Set(rewrittenNotes.map((note) => note._id)),
+          })
+          notesListToRefresh.push(...rewrittenNotes)
+        }
+
+        await storage.db.removeFolder(pathname, needUpdateSubFolders)
 
         setStorageMap(
           produce((draft: ObjectMap<NoteStorage>) => {
@@ -543,6 +559,36 @@ export function createDbStoreCreator(
         queueSyncingStorage(storageId, autoSyncDebounceWaitingTime)
       },
       [storageMap, setStorageMap, queueSyncingStorage]
+    )
+
+    const reorderFolder = useCallback(
+      async (storageId: string, pathname: string, newOrder: number) => {
+        const storage = storageMap[storageId]
+        if (storage == null) {
+          return
+        }
+        const updatedFolderDoc = await storage.db.upsertFolder(pathname, {
+          order: newOrder,
+        })
+        if (updatedFolderDoc == null) {
+          return
+        }
+        const notes = await storage.db.findNotesByFolder(pathname)
+        const folder: PopulatedFolderDoc = {
+          ...updatedFolderDoc,
+          pathname: pathname,
+          noteIdSet: new Set(notes.map((note) => note._id)),
+        }
+
+        setStorageMap(
+          produce((draft: ObjectMap<NoteStorage>) => {
+            draft[storage.id]!.folderMap[folder.pathname] = folder
+          })
+        )
+
+        queueSyncingStorage(storageId, autoSyncDebounceWaitingTime)
+      },
+      [queueSyncingStorage, setStorageMap, storageMap]
     )
 
     const removeFolder = useCallback(
@@ -1266,6 +1312,7 @@ export function createDbStoreCreator(
       cancelSyncingStorageQueue,
       createFolder,
       renameFolder,
+      reorderFolder,
       removeFolder,
       createNote,
       updateNote,

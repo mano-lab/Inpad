@@ -50,6 +50,7 @@ export type FolderDoc = {
 
 export type FolderDocEditibleProps = {
   data: JsonObject
+  order: number
 }
 
 export type TagDoc = {
