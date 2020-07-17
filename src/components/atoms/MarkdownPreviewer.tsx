@@ -89,12 +89,21 @@ function rehypeCodeMirrorAttacher(options: Partial<RehypeCodeMirrorOptions>) {
       }
 
       const rawContent = node.children[0].value as string
-      const cmResult = [] as Node[]
+      let cmResult = [] as Node[]
       if (lang != null) {
         const mime = getMime(lang)
         if (mime != null) {
+          let lineNumber = 1
+          const lines = [
+            h('span.line', {}, [
+              h('span.CodeMirror-linenumber', {}, lineNumber),
+              h('span.CodeMirror-linecontent'),
+            ]),
+          ]
           CodeMirror.runMode(rawContent, mime, (text, style) => {
-            cmResult.push(
+            const lineIndex = lineNumber - 1
+            const lineContainer = lines[lineIndex].children[1]
+            lineContainer.children.push(
               h(
                 'span',
                 {
@@ -105,7 +114,25 @@ function rehypeCodeMirrorAttacher(options: Partial<RehypeCodeMirrorOptions>) {
                 text
               )
             )
+            if (text === '\n') {
+              lineNumber += 1
+              lines.push(
+                h('span.line', {}, [
+                  h('span.CodeMirror-linenumber', {}, lineNumber),
+                  h('span.CodeMirror-linecontent'),
+                ])
+              )
+            }
           })
+          lines.pop() // remove last line due to last \n
+          cmResult = [...cmResult, ...lines]
+          cmResult.push(
+            h(
+              'div.CodeMirror-gutters',
+              {},
+              h('div.CodeMirror-gutter.CodeMirror-linenumbers')
+            )
+          )
         } else if (!ignoreMissing) {
           throw new Error(`Unknown language: \`${lang}\` is not registered`)
         }
@@ -167,6 +194,7 @@ const MarkdownPreviewer = ({
 }: MarkdownPreviewerProps) => {
   const [rendering, setRendering] = useState(false)
   const previousContentRef = useRef('')
+  const previewerRef = useRef(null)
   const previousThemeRef = useRef<string | undefined>('')
   const [renderedContent, setRenderedContent] = useState<React.ReactNode>([])
 
@@ -241,6 +269,24 @@ const MarkdownPreviewer = ({
 
     setRendering(false)
     setRenderedContent(result.contents)
+
+    // reset linenumber width
+    for (const linenumber of [
+      ...previewerRef.current.querySelectorAll('.CodeMirror-linenumber'),
+    ]) {
+      linenumber.style.width = 'auto'
+    }
+    // update codemirror linenumber width
+    for (const code of [...previewerRef.current.querySelectorAll('pre')]) {
+      const linenumbers = [...code.querySelectorAll('.CodeMirror-linenumber')]
+      const linenumberGutter = code.querySelector('.CodeMirror-linenumbers')
+      const lastLinenumber = linenumbers[linenumbers.length - 1]
+      const linenumberWidth = lastLinenumber.offsetWidth
+      for (const linenumber of linenumbers) {
+        linenumber.style.width = `${linenumberWidth}px`
+      }
+      linenumberGutter.style.width = `${linenumberWidth}px`
+    }
   }, [markdownProcessor])
 
   useEffect(() => {
@@ -269,6 +315,25 @@ const MarkdownPreviewer = ({
     return styled.div`
       .CodeMirror {
         height: inherit;
+        padding: 5px 0;
+      }
+      .CodeMirror .line {
+        position: relative;
+        z-index: 10;
+      }
+      .CodeMirror-linenumber {
+        display: inline-block;
+        min-width: 15px;
+      }
+      .CodeMirror-linecontent {
+        padding-left: 7px;
+      }
+      .CodeMirror-gutters {
+        position: absolute;
+        z-index: 0;
+      }
+      .CodeMirror-linenumbers {
+        padding: 0 3px 0 5px;
       }
       ${style}
     `
@@ -276,7 +341,7 @@ const MarkdownPreviewer = ({
 
   return (
     <StyledContainer className='MarkdownPreviewer'>
-      <div className={cc([theme])}>
+      <div ref={previewerRef} className={cc([theme])}>
         {rendering && 'rendering...'}
         {renderedContent}
       </div>
