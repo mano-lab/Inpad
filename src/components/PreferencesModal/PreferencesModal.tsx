@@ -9,6 +9,8 @@ import MarkdownTab from './MarkdownTab'
 import AboutTab from './AboutTab'
 import BillingTab from './BillingTab'
 import ImportTab from './ImportTab'
+import KeyBindingTab from './KeyBindingTab'
+
 import {
   backgroundColor,
   closeIconColor,
@@ -85,6 +87,8 @@ const PreferencesModal = () => {
         return <BillingTab />
       case 'import':
         return <ImportTab />
+      case 'keybindings':
+        return <KeyBindingTab />
       case 'general':
       default:
         return <GeneralTab />
@@ -117,12 +121,12 @@ const PreferencesModal = () => {
           active={tab === 'markdown'}
           setTab={setTab}
         />
-        {/* <TabButton
-          label='Hotkeys'
-          tab='hotkeys'
-          active={tab === 'hotkeys'}
+        <TabButton
+          label='Keybindings'
+          tab='keybindings'
+          active={tab === 'keybindings'}
           setTab={setTab}
-        /> */}
+        />
         <TabButton
           label='About'
           tab='about'

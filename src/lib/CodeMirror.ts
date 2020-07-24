@@ -1,4 +1,4 @@
-import CodeMirror from 'codemirror'
+import CodeMirror, { Editor } from 'codemirror'
 import 'codemirror/addon/runmode/runmode'
 import 'codemirror/addon/mode/overlay'
 import 'codemirror/addon/comment/comment'

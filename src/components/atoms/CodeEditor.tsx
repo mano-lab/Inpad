@@ -1,10 +1,12 @@
 import React from 'react'
 import CodeMirror, { getCodeMirrorTheme } from '../../lib/CodeMirror'
+import { Doc } from 'codemirror'
 import styled from '../../lib/styled'
 import {
   EditorIndentTypeOptions,
   EditorIndentSizeOptions,
   EditorKeyMapOptions,
+  Keybinding,
 } from '../../lib/preferences'
 
 const StyledContainer = styled.div`
@@ -16,6 +18,14 @@ const StyledContainer = styled.div`
 const defaultCodeMirrorOptions: CodeMirror.EditorConfiguration = {
   lineWrapping: true,
   lineNumbers: true,
+}
+
+const translateHotkey = (hotkey: string[]) => {
+  const joinedHotkey = hotkey.join(' + ');
+  return joinedHotkey
+    .replace(/\s*\+\s*/g, '-')
+    .replace(/Command/g, 'Cmd')
+    .replace(/Control/g, 'Ctrl')
 }
 
 interface CodeEditorProps {
@@ -32,6 +42,7 @@ interface CodeEditorProps {
   indentType?: EditorIndentTypeOptions
   indentSize?: EditorIndentSizeOptions
   keyMap?: EditorKeyMapOptions
+  keybindings?: {[key: string]: Keybinding}
   mode?: string
   readonly?: boolean
 }
@@ -46,6 +57,7 @@ class CodeEditor extends React.Component<CodeEditorProps> {
       this.props.keyMap == null || this.props.keyMap === 'default'
         ? 'sublime'
         : this.props.keyMap
+    const keybindings = this.props.keybindings || {}
     this.codeMirror = CodeMirror.fromTextArea(this.textAreaRef.current!, {
       ...defaultCodeMirrorOptions,
       theme: getCodeMirrorTheme(this.props.theme),
@@ -55,6 +67,16 @@ class CodeEditor extends React.Component<CodeEditorProps> {
       keyMap,
       mode: this.props.mode || 'markdown',
       readOnly: this.props.readonly === true,
+      extraKeys: (CodeMirror as any).normalizeKeyMap({
+        [translateHotkey(keybindings['keybinding.insertCurrentDate'])]: (cm: Doc) => {
+          const dateNow = new Date()
+          cm.replaceSelection(dateNow.toLocaleDateString())
+        },
+        [translateHotkey(keybindings['keybinding.insertCurrentDateTime'])]: (cm: Doc) => {
+          const dateNow = new Date()
+          cm.replaceSelection(dateNow.toLocaleString())
+        },
+      }),
     })
     this.codeMirror.on('change', this.handleCodeMirrorChange)
     window.addEventListener('codemirror-mode-load', this.reloadMode)

@@ -131,6 +131,7 @@
     "lodash": "^4.17.19",
     "ltstrg": "^1.0.1",
     "mdast-util-to-string": "^1.0.6",
+    "mousetrap": "^1.6.5",
     "ow": "^0.13.2",
     "path-parse": "^1.0.6",
     "path-to-regexp": "^2.4.0",

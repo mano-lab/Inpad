@@ -1,6 +1,6 @@
 import React from 'react'
 import CodeEditor from './CodeEditor'
-import { usePreferences } from '../../lib/preferences'
+import { usePreferences, Keybinding } from '../../lib/preferences'
 
 interface CustomizedCodeEditorProps {
   value: string
@@ -14,6 +14,8 @@ interface CustomizedCodeEditorProps {
   readonly?: boolean
 }
 
+type KeybindingMap = {[key: string]: Keybinding};
+
 const CustomizedCodeEditor = ({
   onChange,
   value,
@@ -23,6 +25,12 @@ const CustomizedCodeEditor = ({
   readonly,
 }: CustomizedCodeEditorProps) => {
   const { preferences } = usePreferences()
+  const keybindings: KeybindingMap = Object.keys(preferences).reduce((acc, key) => {
+    if (key.startsWith("keybinding")) {
+      acc[key] = preferences[key];
+    }
+    return acc;
+  }, {} as KeybindingMap);
   return (
     <CodeEditor
       onChange={onChange}
@@ -35,6 +43,7 @@ const CustomizedCodeEditor = ({
       indentType={preferences['editor.indentType']}
       indentSize={preferences['editor.indentSize']}
       keyMap={preferences['editor.keyMap']}
+      keybindings={keybindings}
       mode={mode}
       readonly={readonly}
     />
