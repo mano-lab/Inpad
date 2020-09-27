@@ -138,6 +138,8 @@ export default {
     'preferences.editorIndentSize': '编辑器缩进尺寸',
     'preferences.editorKeymap': '编辑器快捷键',
     'preferences.editorPreview': '编辑器预览',
+    'preferences.enableAutoFetchWebPageTitle':
+      '粘贴网页链接的时候，显示为网页标题',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': '预览样式',

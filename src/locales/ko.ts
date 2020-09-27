@@ -141,6 +141,8 @@ export default {
     'preferences.editorIndentSize': '에디터 Indent Size',
     'preferences.editorKeymap': '에디터 키맵',
     'preferences.editorPreview': '에디터 미리보기',
+    'preferences.enableAutoFetchWebPageTitle':
+      'URL이 붙여넣기 되었을 때, 웹페이지 타이틀을 가져옴',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': '미리보기 스타일',

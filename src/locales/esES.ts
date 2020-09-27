@@ -145,6 +145,8 @@ export default {
     'preferences.editorIndentSize': 'Tamaño de espaciado del editor',
     'preferences.editorKeymap': 'Distribución del teclado para el editor',
     'preferences.editorPreview': 'Vista previa del Editor',
+    'preferences.enableAutoFetchWebPageTitle':
+      'Al pegar una URL en el editor, insertar el título de la web',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': 'Vista previa del estilo',

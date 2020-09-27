@@ -141,6 +141,8 @@ export default {
     'preferences.editorIndentSize': 'Розмір відступу редактора',
     'preferences.editorKeymap': 'Розкладка редактора',
     'preferences.editorPreview': 'Попередній перегляд редактора',
+    'preferences.enableAutoFetchWebPageTitle':
+      'Копировать заголовок страницы при вставке URL-ссылки в редакторе',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': 'Стиль попереднього перегляду',

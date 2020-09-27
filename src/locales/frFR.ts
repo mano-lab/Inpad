@@ -146,6 +146,8 @@ export default {
     'preferences.editorIndentSize': "Taille d'indentation de l'éditeur",
     'preferences.editorKeymap': "Distribution des touches de l'éditeur",
     'preferences.editorPreview': "Prévisualisation de l'éditeur",
+    'preferences.enableAutoFetchWebPageTitle':
+      "Mettre le titre de la page lors d'un collé d'une URL dans l'éditeur",
 
     // Preferences MarkdownTab
     'preferences.previewStyle': 'Style de la prévisualisation',

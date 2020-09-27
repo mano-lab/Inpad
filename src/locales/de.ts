@@ -143,6 +143,8 @@ export default {
     'preferences.editorIndentSize': 'Editor Einrückungs-Tiefe',
     'preferences.editorKeymap': 'Editor Keymap',
     'preferences.editorPreview': 'Editor Vorschau',
+    'preferences.enableAutoFetchWebPageTitle':
+      'Titel der Website beim Einfügen in den Editor anzeigen',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': 'Vorschau Style',

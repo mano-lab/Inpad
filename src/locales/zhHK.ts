@@ -139,6 +139,8 @@ export default {
     'preferences.editorIndentSize': '編輯器縮進尺寸',
     'preferences.editorKeymap': '編輯器快速鍵',
     'preferences.editorPreview': '編輯器預覽',
+    'preferences.enableAutoFetchWebPageTitle':
+      '在編輯器貼上網址的時候，自動加上網頁標題',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': '預覽樣式',

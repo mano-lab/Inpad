@@ -24,6 +24,7 @@ import { capitalize } from '../../../lib/string'
 import CustomizedCodeEditor from '../../../components/atoms/CustomizedCodeEditor'
 import { useDebounce } from 'react-use'
 import { useAnalytics, analyticsEvents } from '../../lib/analytics'
+import { codeMirrorPasteHandler } from '../../../lib/eventHandler/pasteHandler'
 
 const defaultPreviewContent = `# hello-world.js
 
@@ -189,6 +190,7 @@ const EditorPreferencesTab = () => {
           <CustomizedCodeEditor
             value={previewContent}
             onChange={(newValue) => setPreviewContent(newValue)}
+            onPaste={codeMirrorPasteHandler}
           />
         </SectionControl>
       </Section>

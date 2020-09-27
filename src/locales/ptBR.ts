@@ -144,6 +144,8 @@
     'preferences.editorIndentSize': 'Tamanho do recup',
     'preferences.editorKeymap': 'Funções das teclas',
     'preferences.editorPreview': 'Pré visualização',
+    'preferences.enableAutoFetchWebPageTitle':
+      'Trazer o título da página da Web ao colar a URL no editor',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': 'Prever estilo',

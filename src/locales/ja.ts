@@ -142,6 +142,8 @@ export default {
     'preferences.editorIndentSize': 'エディターインデントサイズ',
     'preferences.editorKeymap': 'エディターキーマップ',
     'preferences.editorPreview': 'エディタープレヴュー',
+    'preferences.enableAutoFetchWebPageTitle':
+      'URLを貼り付けた時にWebページのタイトルを取得する',
 
     // Preferences MarkdownTab
     'preferences.previewStyle': 'プレビュースタイル',

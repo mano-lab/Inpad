@@ -41,6 +41,9 @@ const CustomizedCodeEditor = ({
       keyMap={preferences['editor.keyMap']}
       mode={mode}
       readonly={readonly}
+      enableAutoFetchWebPageTitle={
+        preferences['editor.enableAutoFetchWebPageTitle']
+      }
       onPaste={onPaste}
       onDrop={onDrop}
     />

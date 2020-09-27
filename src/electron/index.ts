@@ -3,11 +3,13 @@ import {
   BrowserWindow,
   BrowserWindowConstructorOptions,
   Menu,
+  ipcMain,
 } from 'electron'
 import path from 'path'
 import url from 'url'
 import { template } from './menu'
 import { dev } from './consts'
+import { onFetchPageTitle } from './ipcEventHandlers'
 
 // global reference to mainWindow (necessary to prevent window from being garbage collected)
 let mainWindow: BrowserWindow | null = null
@@ -95,3 +97,5 @@ app.on('activate', () => {
 app.on('ready', () => {
   mainWindow = createMainWindow()
 })
+
+ipcMain.on('fetch-page-title-request', onFetchPageTitle)

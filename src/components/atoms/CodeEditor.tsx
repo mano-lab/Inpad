@@ -34,6 +34,7 @@ interface CodeEditorProps {
   keyMap?: EditorKeyMapOptions
   mode?: string
   readonly?: boolean
+  enableAutoFetchWebPageTitle?: boolean
   onPaste?: (codeMirror: CodeMirror.Editor, event: ClipboardEvent) => void
   onDrop?: (codeMirror: CodeMirror.Editor, event: DragEvent) => void
 }
