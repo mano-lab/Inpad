@@ -4,6 +4,7 @@ import {
   BrowserWindowConstructorOptions,
   Menu,
 } from 'electron'
+import windowStateKeeper from 'electron-window-state'
 import path from 'path'
 import url from 'url'
 import { template } from './menu'
@@ -17,14 +18,22 @@ const MAC = process.platform === 'darwin'
 const singleInstance = app.requestSingleInstanceLock()
 
 function createMainWindow() {
+
+  const windowState = windowStateKeeper({
+    defaultWidth: 1200,
+    defaultHeight: 800
+  })
+
   const windowOptions: BrowserWindowConstructorOptions = {
     webPreferences: {
       nodeIntegration: true,
       webSecurity: !dev,
       webviewTag: true,
     },
-    width: 1200,
-    height: 800,
+    'x': windowState.x,
+    'y': windowState.y,
+    'width': windowState.width,
+    'height': windowState.height,
     minWidth: 960,
     minHeight: 630,
   }
@@ -32,6 +41,7 @@ function createMainWindow() {
     windowOptions.titleBarStyle = 'hidden'
   }
   const window = new BrowserWindow(windowOptions)
+  windowState.manage(window);
 
   if (dev) {
     window.loadURL(`http://localhost:3000/app`)
