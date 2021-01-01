@@ -362,6 +362,7 @@ const StorageNavigatorFragment = ({
           label={t('general.attachments')}
           iconPath={mdiPaperclip}
           active={attachmentsPageIsActive}
+          count={attachments.length}
           onClick={() => push(attachmentsPagePathname)}
           onContextMenu={(event) => {
             event.preventDefault()
@@ -374,6 +375,7 @@ const StorageNavigatorFragment = ({
           label={t('general.trash')}
           iconPath={mdiTrashCanOutline}
           active={trashcanPageIsActive}
+          count={trashed.length}
           onClick={() => push(trashcanPagePathname)}
           onContextMenu={(event) => {
             event.preventDefault()

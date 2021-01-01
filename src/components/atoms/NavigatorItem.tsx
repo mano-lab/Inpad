@@ -20,6 +20,9 @@ const Container = styled.div`
     .control {
       opacity: 1;
     }
+    .counter {
+      opacity: 0;
+    }
   }
 
   &.visibleControl {
@@ -109,6 +112,15 @@ const IconContainer = styled.div`
   font-size: 18px;
 `
 
+const ItemCounter = styled.p`
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({ theme }) => theme.navItemColor};
+`
+
 interface NavigatorItemProps {
   label: string
   iconPath?: string
@@ -118,6 +130,7 @@ interface NavigatorItemProps {
   className?: string
   folded?: boolean
   active?: boolean
+  count?: number
   subtle?: boolean
   onFoldButtonClick?: (event: React.MouseEvent) => void
   onClick?: (event: React.MouseEvent) => void
@@ -137,6 +150,7 @@ const NavigatorItem = ({
   className,
   folded,
   active,
+  count,
   subtle,
   onFoldButtonClick,
   onClick,
@@ -181,6 +195,11 @@ const NavigatorItem = ({
           </IconContainer>
         )}
         <Label className={cc([subtle && 'subtle'])}>{label}</Label>
+        {count !== undefined && (
+          <ItemCounter className={control ? 'counter' : ''}>
+            {count}
+          </ItemCounter>
+        )}
       </ClickableContainer>
       {control && <Control className='control'>{control}</Control>}
     </Container>

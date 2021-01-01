@@ -50,6 +50,13 @@ const FolderListFragment = ({
     )
   }, [folderPathnames, storageId, sideNavOpenedItemSet])
 
+  const getFolderNoteCount = (folderPathname: string): number =>
+    Object.values(storage.noteMap).filter(
+      (note) =>
+        (!note!.trashed && note!.folderPathname === folderPathname) ||
+        note!.folderPathname.startsWith(folderPathname + '/')
+    ).length
+
   return (
     <>
       {openedFolderPathnameList.map((item) => {
@@ -65,6 +72,7 @@ const FolderListFragment = ({
             folderName={item.name}
             folderPathname={item.pathname}
             folderSetWithSubFolders={folderSetWithSubFolders}
+            noteCount={getFolderNoteCount(folderPathname)}
             createNoteInFolderAndRedirect={createNoteInFolderAndRedirect}
             showPromptToCreateFolder={showPromptToCreateFolder}
             showPromptToRenameFolder={showPromptToRenameFolder}

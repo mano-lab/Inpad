@@ -29,6 +29,11 @@ const TagListFragment = ({ storage }: TagListFragmentProps) => {
   const tagListNavItemId = getTagListItemId(storage.id)
   const tagListIsFolded = !sideNavOpenedItemSet.has(tagListNavItemId)
 
+  const getTagNoteCount = (tagName: string): number =>
+    Object.values(storage.noteMap).filter(
+      (note) => !note!.trashed && note!.tags.includes(tagName)
+    ).length
+
   const tagList = useMemo(() => {
     return Object.keys(tagMap).map((tagName) => {
       const tagPathname = `/app/storages/${storageId}/tags/${tagName}`
@@ -39,6 +44,7 @@ const TagListFragment = ({ storage }: TagListFragmentProps) => {
           depth={1}
           iconPath={mdiPound}
           label={tagName}
+          count={getTagNoteCount(tagName)}
           onClick={() => {
             push(tagPathname)
           }}
