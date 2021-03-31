@@ -53,6 +53,7 @@ const StorageNavigatorFragment = ({
     bookmarkNote,
     unbookmarkNote,
     trashNote,
+    copyNoteLink,
   } = useDb()
   const { push } = useRouter()
   const { t } = useTranslation()
@@ -274,6 +275,7 @@ const StorageNavigatorFragment = ({
           bookmarkNote={bookmarkNote}
           unbookmarkNote={unbookmarkNote}
           trashNote={trashNote}
+          copyNoteLink={copyNoteLink}
         />
       )}
 

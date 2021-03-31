@@ -15,13 +15,15 @@ import styled from '../lib/styled'
 import { useEffectOnce } from 'react-use'
 import AppNavigator from './organisms/AppNavigator'
 import { useRouter } from '../lib/router'
-import { values, keys } from '../lib/db/utils'
+import { values, keys, prependNoteIdPrefix } from '../lib/db/utils'
+import { useActiveStorageId } from '../lib/routeParams'
 import {
   addIpcListener,
   removeIpcListener,
   setCookie,
 } from '../lib/electronOnly'
 import { useGeneralStatus } from '../lib/generalStatus'
+import { getNoteFullItemId } from '../lib/nav'
 import { useBoostNoteProtocol } from '../lib/protocol'
 import {
   useBoostHub,
@@ -46,6 +48,8 @@ import {
 import { useRouteParams } from '../lib/routeParams'
 import { useCreateWorkspaceModal } from '../lib/createWorkspaceModal'
 import CreateWorkspaceModal from './organisms/CreateWorkspaceModal'
+import { IpcRendererEvent } from 'electron/renderer'
+import { useToast } from '../lib/toast'
 import { useStorageRouter } from '../lib/storageRouter'
 import ExternalStyle from './ExternalStyle'
 import { useDialog, DialogIconTypes } from '../lib/dialog'
@@ -64,8 +68,13 @@ const AppContainer = styled.div`
 `
 
 const App = () => {
-  const { initialize, queueSyncingAllStorage, storageMap } = useDb()
-  const { push, pathname } = useRouter()
+  const {
+    initialize,
+    queueSyncingAllStorage,
+    storageMap,
+    getNotePathname,
+  } = useDb()
+  const { push, pathname, replace } = useRouter()
   const [initialized, setInitialized] = useState(false)
   const { setGeneralStatus, generalStatus } = useGeneralStatus()
   const {
@@ -73,10 +82,12 @@ const App = () => {
     preferences,
     setPreferences,
   } = usePreferences()
+  const { messageBox } = useDialog()
+  const { pushMessage } = useToast()
   const { fetchDesktopGlobalData } = useBoostHub()
   const routeParams = useRouteParams()
   const { navigate: navigateToStorage } = useStorageRouter()
-  const { messageBox } = useDialog()
+  const activeStorageId = useActiveStorageId()
 
   useEffectOnce(() => {
     const fetchDesktopGlobalDataOfCloud = async () => {
@@ -202,6 +213,39 @@ const App = () => {
         console.error(error)
       })
   })
+
+  useEffect(() => {
+    const noteLinkNavigateEventHandler = (
+      _: IpcRendererEvent,
+      noteHref: string
+    ) => {
+      const noteId = Array.isArray(noteHref) ? noteHref[0] : noteHref
+      if (!activeStorageId) {
+        pushMessage({
+          title: 'Invalid navigation!',
+          description: 'Cannot open note link without storage information.',
+        })
+      } else {
+        getNotePathname(activeStorageId, prependNoteIdPrefix(noteId)).then(
+          (pathname) => {
+            if (pathname) {
+              replace(getNoteFullItemId(activeStorageId, pathname, noteId))
+            } else {
+              pushMessage({
+                title: 'Note link invalid!',
+                description:
+                  'The note link you are trying to open is invalid or from another storage.',
+              })
+            }
+          }
+        )
+      }
+    }
+    addIpcListener('note:navigate', noteLinkNavigateEventHandler)
+    return () => {
+      removeIpcListener('note:navigate', noteLinkNavigateEventHandler)
+    }
+  }, [activeStorageId, getNotePathname, pushMessage, replace])
 
   const boostHubTeamsShowPageIsActive =
     routeParams.name === 'boosthub.teams.show'

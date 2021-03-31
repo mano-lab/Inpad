@@ -165,6 +165,7 @@
   function isDefaultProtocolClient(protocol) {
     return electron.remote.app.isDefaultProtocolClient(protocol)
   }
+
   function getWebContentsById(id) {
     return electron.remote.webContents.fromId(id)
   }
@@ -239,7 +240,7 @@
   window.__ELECTRON_ONLY__.setAsDefaultProtocolClient = setAsDefaultProtocolClient
   window.__ELECTRON_ONLY__.removeAsDefaultProtocolClient = removeAsDefaultProtocolClient
   window.__ELECTRON_ONLY__.isDefaultProtocolClient = isDefaultProtocolClient
-  window.__ELECTRON_ONLY__.getWebContentsById
+  window.__ELECTRON_ONLY__.getWebContentsById = getWebContentsById
   window.__ELECTRON_ONLY__.setTrafficLightPosition = setTrafficLightPosition
   window.__ELECTRON_ONLY__.convertHtmlStringToPdfBuffer = convertHtmlStringToPdfBuffer
   window.__ELECTRON_ONLY__.setCookie = setCookie

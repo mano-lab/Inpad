@@ -5,7 +5,7 @@ import remarkParse from 'remark-parse'
 import remarkRehype from 'remark-rehype'
 import remarkSlug from 'remark-slug'
 import remarkMath from 'remark-math'
-import remarkAbmonitions from 'remark-admonitions'
+import remarkAdmonitions from 'remark-admonitions'
 import rehypeRaw from 'rehype-raw'
 import rehypeSanitize from 'rehype-sanitize'
 import rehypeReact from 'rehype-react'
@@ -23,6 +23,16 @@ import { Attachment, ObjectMap } from '../../lib/db/types'
 import MarkdownCheckbox from './markdown/MarkdownCheckbox'
 import AttachmentImage from './markdown/AttachmentImage'
 import CodeFence from './markdown/CodeFence'
+import { useActiveStorageId } from '../../lib/routeParams'
+import { useRouter } from '../../lib/router'
+import { useDb } from '../../lib/db'
+import {
+  isNoteLinkId,
+  prependNoteIdPrefix,
+  removePrefixFromNoteLinks,
+} from '../../lib/db/utils'
+import { getNoteFullItemId } from '../../lib/nav'
+import { useToast } from '../../lib/toast'
 
 const schema = mergeDeepRight(gh, {
   attributes: {
@@ -172,12 +182,15 @@ const MarkdownPreviewer = ({
   attachmentMap = {},
   updateContent,
 }: MarkdownPreviewerProps) => {
+  const { replace } = useRouter()
   const [rendering, setRendering] = useState(false)
   const previousContentRef = useRef('')
   const previousThemeRef = useRef<string | undefined>('')
   const [renderedContent, setRenderedContent] = useState<React.ReactNode>([])
-
   const checkboxIndexRef = useRef<number>(0)
+  const { getNotePathname } = useDb()
+  const activeStorageId = useActiveStorageId()
+  const { pushMessage } = useToast()
 
   const remarkAdmonitionOptions = {
     tag: ':::',
@@ -185,12 +198,38 @@ const MarkdownPreviewer = ({
     infima: false,
   }
 
+  const navigateToNote = useCallback(
+    (noteId) => {
+      if (!activeStorageId) {
+        pushMessage({
+          title: 'Invalid navigation!',
+          description: 'Cannot open note link without storage information.',
+        })
+      } else {
+        getNotePathname(activeStorageId, prependNoteIdPrefix(noteId)).then(
+          (pathname) => {
+            if (pathname) {
+              replace(getNoteFullItemId(activeStorageId, pathname, noteId))
+            } else {
+              pushMessage({
+                title: 'Note link invalid!',
+                description:
+                  'The note link you are trying to open is invalid or from another storage.',
+              })
+            }
+          }
+        )
+      }
+    },
+    [activeStorageId, pushMessage, getNotePathname, replace]
+  )
+
   const markdownProcessor = useMemo(() => {
     return unified()
       .use(remarkParse)
       .use(remarkSlug)
       .use(remarkEmoji, { emoticon: false })
-      .use(remarkAbmonitions, remarkAdmonitionOptions)
+      .use(remarkAdmonitions, remarkAdmonitionOptions)
       .use(remarkMath)
       .use(remarkRehype, { allowDangerousHtml: true })
       .use(rehypeRaw)
@@ -219,7 +258,13 @@ const MarkdownPreviewer = ({
                 href={href}
                 onClick={(event) => {
                   event.preventDefault()
-                  openNew(href)
+                  if (href) {
+                    if (isNoteLinkId(href)) {
+                      navigateToNote(href)
+                    } else {
+                      openNew(href)
+                    }
+                  }
                 }}
               >
                 {children}
@@ -244,7 +289,13 @@ const MarkdownPreviewer = ({
           pre: CodeFence,
         },
       })
-  }, [remarkAdmonitionOptions, codeBlockTheme, attachmentMap, updateContent])
+  }, [
+    remarkAdmonitionOptions,
+    codeBlockTheme,
+    navigateToNote,
+    attachmentMap,
+    updateContent,
+  ])
 
   const renderContent = useCallback(async () => {
     const content = previousContentRef.current
@@ -252,7 +303,9 @@ const MarkdownPreviewer = ({
 
     console.time('render')
     checkboxIndexRef.current = 0
-    const result = await markdownProcessor.process(content)
+
+    const contentWithValidNoteLinks = removePrefixFromNoteLinks(content)
+    const result = await markdownProcessor.process(contentWithValidNoteLinks)
     console.timeEnd('render')
 
     setRendering(false)
@@ -286,7 +339,29 @@ const MarkdownPreviewer = ({
       .CodeMirror {
         height: inherit;
       }
+
       ${style}
+
+      a {
+        text-decoration: none;
+        cursor: pointer;
+        box-sizing: border-box;
+        color: ${({ theme }) => theme.primaryColor};
+        background-color: transparent;
+        opacity: 0.8;
+        &:hover {
+          background: ${({ theme }) => theme.secondaryButtonBackgroundColor};
+          opacity: 1.0;
+          outline: solid 4px ${({ theme }) =>
+            theme.secondaryButtonBackgroundColor};
+          outline-offset: 0;
+        }
+
+        &:visited {
+          color: ${({ theme }) => theme.secondaryButtonBackgroundColor};
+        }
+      }
+    }
     `
   }, [style])
 

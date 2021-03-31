@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*.ts", "src/**/*.tsx", "typings/**/*.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "typings/**/*.d.ts", "src/lib/addons/*.js"],
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,

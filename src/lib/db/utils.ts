@@ -1,4 +1,10 @@
-import { NOTE_ID_PREFIX, FOLDER_ID_PREFIX, TAG_ID_PREFIX } from './consts'
+import {
+  NOTE_ID_PREFIX,
+  FOLDER_ID_PREFIX,
+  TAG_ID_PREFIX,
+  NOTE_LINK_SHORT_ID_REGEXP,
+  NOTE_LINK_PREFIX_AND_SHORT_ID_REGEXP,
+} from './consts'
 import { join } from 'path'
 import {
   ObjectMap,
@@ -39,9 +45,20 @@ export function excludeFileProtocol(src: string) {
 
 export function prependNoteIdPrefix(noteId: string): string {
   if (new RegExp(`^${NOTE_ID_PREFIX}`).test(noteId)) {
-    return `${NOTE_ID_PREFIX}${noteId}`
+    return noteId
   }
-  return noteId
+  return `${NOTE_ID_PREFIX}${noteId}`
+}
+
+export function isNoteLinkId(href: string): boolean {
+  return NOTE_LINK_SHORT_ID_REGEXP.test(href)
+}
+
+export function removePrefixFromNoteLinks(content: string): string {
+  if (NOTE_LINK_PREFIX_AND_SHORT_ID_REGEXP.test(content)) {
+    return content.replace(NOTE_LINK_PREFIX_AND_SHORT_ID_REGEXP, '($2)')
+  }
+  return content
 }
 
 export function getFolderId(pathname: string): string {

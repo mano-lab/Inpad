@@ -33,6 +33,16 @@ const StyledContainer = styled.div`
     color: ${({ theme }) => theme.primaryButtonLabelColor};
     background-color: ${({ theme }) => theme.primaryColor};
   }
+
+  .CodeMirror-hyperlink {
+    cursor: pointer;
+  }
+
+  .CodeMirror-hover {
+    padding: 2px 4px 0 4px;
+    position: absolute;
+    z-index: 99;
+  }
 `
 
 const defaultCodeMirrorOptions: CodeMirror.EditorConfiguration = {

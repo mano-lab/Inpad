@@ -405,6 +405,13 @@ export default class PouchNoteDb implements NoteDb {
     })
   }
 
+  async copyNoteLink(noteId: string, noteProps: Partial<NoteDocEditibleProps>) {
+    const noteLink = `[${escapeRegExp(
+      noteProps.title ? noteProps.title : 'Untitled'
+    )}](:${noteId})`
+    return noteLink
+  }
+
   async trashNote(noteId: string): Promise<NoteDoc> {
     const note = await this.getNote(noteId)
     if (note == null)

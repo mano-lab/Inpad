@@ -259,6 +259,13 @@ class FSNoteDb implements NoteDb {
     await unlinkFile(attachmentPathname)
   }
 
+  async copyNoteLink(noteId: string, noteProps: Partial<NoteDocEditibleProps>) {
+    const noteLink = `[${escapeRegExp(
+      noteProps.title ? noteProps.title : 'Untitled'
+    )}](:${noteId})`
+    return noteLink
+  }
+
   async createNote(
     noteProps: Partial<NoteDocEditibleProps | NoteDocImportableProps>
   ) {

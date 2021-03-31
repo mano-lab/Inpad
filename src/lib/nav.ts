@@ -1,3 +1,16 @@
+export function getNoteFullItemId(
+  storageId: string,
+  pathname: string,
+  noteId: string
+) {
+  const notePathname = pathname.startsWith('/')
+    ? pathname.substring(1)
+    : pathname
+  return `/app/storages/${storageId}/notes/${notePathname}${
+    notePathname === '' ? '' : '/'
+  }note:${noteId}`
+}
+
 export function getStorageItemId(storageId: string) {
   return `storage:${storageId}`
 }

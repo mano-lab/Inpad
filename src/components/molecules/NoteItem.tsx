@@ -22,6 +22,7 @@ import { bookmarkItemId } from '../../lib/nav'
 import { openContextMenu } from '../../lib/electronOnly'
 import { BaseTheme } from '../../lib/styled/BaseTheme'
 import { isColorBright } from '../../lib/colors'
+import { useToast } from '../../lib/toast'
 
 const Container = styled.button`
   margin: 0;
@@ -136,6 +137,7 @@ const NoteItem = ({
   const href = `${basePathname}/${note._id}`
   const {
     createNote,
+    copyNoteLink,
     trashNote,
     purgeNote,
     untrashNote,
@@ -146,6 +148,7 @@ const NoteItem = ({
   const { addSideNavOpenedItem } = useGeneralStatus()
 
   const { messageBox } = useDialog()
+  const { pushMessage } = useToast()
   const { t } = useTranslation()
 
   const openUntrashedNoteContextMenu = useCallback(
@@ -166,6 +169,32 @@ const NoteItem = ({
                 tags: note.tags,
                 data: note.data,
               })
+            },
+          },
+          {
+            type: 'normal',
+            label: 'Copy note link',
+            click: async () => {
+              const noteLink = await copyNoteLink(storageId, note._id, {
+                title: note.title,
+                content: note.content,
+                folderPathname: note.folderPathname,
+                tags: note.tags,
+                data: note.data,
+              })
+              if (noteLink) {
+                pushMessage({
+                  title: 'Note Link Copied',
+                  description:
+                    'Paste note link in any note to add a link to it',
+                })
+              } else {
+                pushMessage({
+                  title: 'Note Link Error',
+                  description:
+                    'An error occurred while attempting to create a note link',
+                })
+              }
             },
           },
           { type: 'separator' },
@@ -211,21 +240,23 @@ const NoteItem = ({
       })
     },
     [
-      createNote,
-      storageId,
+      note.data,
       note.title,
       note.content,
       note.folderPathname,
       note.tags,
-      note.data,
-      note.trashed,
       note._id,
-      trashNote,
+      note.trashed,
       applyDefaultNoteListing,
       applyCompactListing,
+      createNote,
+      storageId,
+      copyNoteLink,
+      pushMessage,
+      trashNote,
       bookmarkNote,
-      unbookmarkNote,
       addSideNavOpenedItem,
+      unbookmarkNote,
     ]
   )
 
