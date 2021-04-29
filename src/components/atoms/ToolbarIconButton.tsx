@@ -2,6 +2,7 @@ import React from 'react'
 import styled from '../../lib/styled'
 import Icon from './Icon'
 import { flexCenter } from '../../lib/styled/styleFunctions'
+import Tooltip from './Tooltip'
 
 const Container = styled.button`
   height: 32px;
@@ -12,7 +13,7 @@ const Container = styled.button`
   padding: 0 5px;
 
   background-color: transparent;
-  ${flexCenter}
+  ${flexCenter};
 
   border: none;
   border-radius: 3px;
@@ -49,15 +50,16 @@ const ToolbarIconButton = React.forwardRef(
     }: ToolbarButtonProps,
     ref
   ) => (
-    <Container
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      className={active ? 'active' : ''}
-      ref={ref}
-      title={title}
-    >
-      <Icon size={18} path={iconPath} />
-    </Container>
+    <Tooltip space={10} text={title}>
+      <Container
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        className={active ? 'active' : ''}
+        ref={ref}
+      >
+        <Icon size={18} path={iconPath} />
+      </Container>
+    </Tooltip>
   )
 )
 

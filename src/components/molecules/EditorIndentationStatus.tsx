@@ -4,11 +4,13 @@ import { openContextMenu } from '../../lib/electronOnly'
 import { MenuItemConstructorOptions } from 'electron'
 import { capitalize } from '../../lib/string'
 import BottomBarButton from '../atoms/BottomBarButton'
+import { useTranslation } from 'react-i18next'
 
 const EditorIndentationStatus = () => {
   const { preferences, setPreferences } = usePreferences()
   const currentIndentType = preferences['editor.indentType']
   const currentIndentSize = preferences['editor.indentSize']
+  const { t } = useTranslation()
 
   const openEditorIndentationContextMenu = useCallback(() => {
     openContextMenu({
@@ -60,7 +62,10 @@ const EditorIndentationStatus = () => {
   }, [currentIndentType, currentIndentSize, setPreferences])
 
   return (
-    <BottomBarButton onClick={openEditorIndentationContextMenu}>
+    <BottomBarButton
+      tooltipText={t('editor.editorIndentStatus')}
+      onClick={openEditorIndentationContextMenu}
+    >
       {capitalize(currentIndentType)}: {currentIndentSize}
     </BottomBarButton>
   )

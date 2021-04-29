@@ -238,16 +238,17 @@ const FolderNavigatorItem = ({
       control={
         <>
           <NavigatorButton
-            title='New Note'
+            title={t('navigator.newNote')}
             onClick={createNoteInFolder}
             iconPath={mdiTextBoxPlusOutline}
           />
           <NavigatorButton
-            title='New Subfolder'
+            title={t('navigator.newSubFolder')}
             onClick={createSubFolder}
             iconPath={mdiFolderMultiplePlusOutline}
           />
           <NavigatorButton
+            title={t('navigator.moreItems')}
             onClick={openMoreContextMenu}
             iconPath={mdiDotsVertical}
           />

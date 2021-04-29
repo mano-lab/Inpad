@@ -5,10 +5,12 @@ import { MenuItemConstructorOptions } from 'electron'
 import BottomBarButton from '../atoms/BottomBarButton'
 import Icon from '../atoms/Icon'
 import { mdiKeyboard } from '@mdi/js'
+import { useTranslation } from 'react-i18next'
 
 const EditorKeyMapSelect = () => {
   const { preferences, setPreferences } = usePreferences()
   const editorKeyMap = preferences['editor.keyMap']
+  const { t } = useTranslation()
 
   const openThemeContextMenu = useCallback(() => {
     openContextMenu({
@@ -32,7 +34,10 @@ const EditorKeyMapSelect = () => {
   }, [setPreferences, editorKeyMap])
 
   return (
-    <BottomBarButton onClick={openThemeContextMenu}>
+    <BottomBarButton
+      tooltipText={t('editor.keymapSelect')}
+      onClick={openThemeContextMenu}
+    >
       <Icon path={mdiKeyboard} />
     </BottomBarButton>
   )

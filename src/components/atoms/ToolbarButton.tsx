@@ -3,6 +3,7 @@ import styled from '../../lib/styled'
 import Icon from './Icon'
 import { flexCenter, textOverflow } from '../../lib/styled/styleFunctions'
 import cc from 'classcat'
+import Tooltip from './Tooltip'
 
 interface ToolbarButtonProps {
   iconPath?: string
@@ -22,16 +23,17 @@ const ToolbarButton = ({
   limitWidth,
 }: ToolbarButtonProps) => {
   return (
-    <Container
-      className={cc([active && 'active', limitWidth && 'limitWidth'])}
-      title={title == null ? label : title}
-      onClick={onClick}
-    >
-      {iconPath != null && <Icon className='icon' path={iconPath} />}
-      {label != null && label.length > 0 && (
-        <div className='label'>{label}</div>
-      )}
-    </Container>
+    <Tooltip text={title == null ? label : title}>
+      <Container
+        className={cc([active && 'active', limitWidth && 'limitWidth'])}
+        onClick={onClick}
+      >
+        {iconPath != null && <Icon className='icon' path={iconPath} />}
+        {label != null && label.length > 0 && (
+          <div className='label'>{label}</div>
+        )}
+      </Container>
+    </Tooltip>
   )
 }
 

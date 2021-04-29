@@ -32,6 +32,8 @@ import Icon from '../atoms/Icon'
 import cc from 'classcat'
 import FolderTreeListItem from '../atoms/FolderTreeListItem'
 import { addIpcListener, removeIpcListener } from '../../lib/electronOnly'
+import Tooltip from '../atoms/Tooltip'
+import { useTranslation } from 'react-i18next'
 
 interface NotePageToolbarNoteHeaderProps {
   storageId: string
@@ -54,6 +56,7 @@ const NotePageToolbarNoteHeader = ({
 }: NotePageToolbarNoteHeaderProps) => {
   const { push } = useRouter()
   const { updateNote } = useDb()
+  const { t } = useTranslation()
 
   const folderDataList = useMemo<FolderData[]>(() => {
     if (noteFolderPathname === '/') {
@@ -180,7 +183,7 @@ const NotePageToolbarNoteHeader = ({
         <>
           <ToolbarSlashSeparator />
           <ToolbarButton
-            title='All Parent Folders'
+            title={t('toolbar.parentFolders')}
             iconPath={mdiDotsHorizontal}
             active={showingParentFolderListPopup}
             onClick={showParentFolderListPopup}
@@ -215,9 +218,9 @@ const NotePageToolbarNoteHeader = ({
           <ToolbarSlashSeparator />
           <ToolbarButton
             iconPath={mdiFolderOutline}
-            title={`Navigate to ${
-              folderDataList[folderDataList.length - 1].pathname
-            }`}
+            title={t('toolbar.navigateToFolder', {
+              folder: folderDataList[folderDataList.length - 1].pathname,
+            })}
             label={folderDataList[folderDataList.length - 1].name}
             limitWidth={true}
             onClick={() => {
@@ -266,13 +269,15 @@ const NoteTitleButton = ({ title, onClick }: NoteTitleButtonProps) => {
   const titleIsEmpty = title == null || title.trim().length === 0
 
   return (
-    <NoteTitleButtonContainer title='Edit Title' onClick={onClick}>
-      <Icon className='icon' path={mdiCardTextOutline} />
-      <div className={cc(['label', titleIsEmpty && 'empty'])}>
-        {titleIsEmpty ? 'Untitled' : title}
-      </div>
-      <Icon className='hoverIcon' path={mdiPencilOutline} />
-    </NoteTitleButtonContainer>
+    <Tooltip text={'Edit Title'}>
+      <NoteTitleButtonContainer onClick={onClick}>
+        <Icon className='icon' path={mdiCardTextOutline} />
+        <div className={cc(['label', titleIsEmpty && 'empty'])}>
+          {titleIsEmpty ? 'Untitled' : title}
+        </div>
+        <Icon className='hoverIcon' path={mdiPencilOutline} />
+      </NoteTitleButtonContainer>
+    </Tooltip>
   )
 }
 

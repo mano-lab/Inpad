@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from '../../lib/styled'
 import Icon from './Icon'
+import Tooltip from './Tooltip'
 
 const ButtonContainer = styled.button`
   width: 24px;
@@ -45,14 +46,15 @@ const NavigatorButton = ({
   spin,
 }: NavigatorButtonProps) => {
   return (
-    <ButtonContainer
-      onClick={onClick}
-      onContextMenu={onContextMenu}
-      title={title}
-      className={active ? 'active' : ''}
-    >
-      <Icon path={iconPath} spin={spin} />
-    </ButtonContainer>
+    <Tooltip space={10} text={title}>
+      <ButtonContainer
+        onClick={onClick}
+        onContextMenu={onContextMenu}
+        className={active ? 'active' : ''}
+      >
+        <Icon path={iconPath} spin={spin} />
+      </ButtonContainer>
+    </Tooltip>
   )
 }
 

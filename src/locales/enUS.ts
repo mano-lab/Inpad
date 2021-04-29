@@ -15,7 +15,10 @@ export default {
 
     // Navigator
     'navigator.noStorage': 'There are no spaces',
+    'navigator.newNote': 'New Note',
+    'navigator.newSubFolder': 'New Subfolder',
     'navigator.createStorage': 'Click here to create one.',
+    'navigator.moreItems': 'More options',
 
     // Newsletter
     'newsletter.subscribe': 'Subscribe',
@@ -130,6 +133,14 @@ export default {
     'billing.addStorage': 'Add Extra Storage',
 
     'editor.editor': 'Editor',
+    'editor.keymapSelect': 'Keymap selection',
+    'editor.editorIndentStatus': 'Indent options',
+    'editor.editorThemeSelect': 'Select editor theme',
+    'editor.showMarkdownPreview': 'Show markdown preview',
+    'editor.showEditor': 'Show editor',
+
+    'toolbar.parentFolders': 'All Parent Folders',
+    'toolbar.navigateToFolder': 'Navigate to #{{folder}}',
 
     // Preferences
     'preferences.general': 'Preferences',

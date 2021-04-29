@@ -6,11 +6,13 @@ import BottomBarButton from '../atoms/BottomBarButton'
 import Icon from '../atoms/Icon'
 import { mdiPaletteOutline } from '@mdi/js'
 import { themes } from '../../lib/CodeMirror'
+import { useTranslation } from 'react-i18next'
 
 const EditorThemeSelect = () => {
   const { preferences, setPreferences } = usePreferences()
   const editorTheme = preferences['editor.theme']
   const codeBlockTheme = preferences['markdown.codeBlockTheme']
+  const { t } = useTranslation()
 
   const openThemeContextMenu = useCallback(() => {
     openContextMenu({
@@ -48,7 +50,10 @@ const EditorThemeSelect = () => {
   }, [editorTheme, codeBlockTheme, setPreferences])
 
   return (
-    <BottomBarButton onClick={openThemeContextMenu}>
+    <BottomBarButton
+      tooltipText={t('editor.editorThemeSelect')}
+      onClick={openThemeContextMenu}
+    >
       <Icon path={mdiPaletteOutline} />
     </BottomBarButton>
   )

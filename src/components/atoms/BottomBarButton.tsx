@@ -1,21 +1,26 @@
 import React, { MouseEventHandler, FC } from 'react'
 import styled from '../../lib/styled'
 import { flexCenter, borderLeft } from '../../lib/styled/styleFunctions'
+import Tooltip from './Tooltip'
 
 interface BottomBarButtonProps {
   className?: string
   onClick?: MouseEventHandler<HTMLButtonElement>
+  tooltipText?: string
 }
 
 const BottomBarButton: FC<BottomBarButtonProps> = ({
   className,
   onClick,
   children,
+  tooltipText,
 }) => {
   return (
-    <Container className={className} onClick={onClick}>
-      {children}
-    </Container>
+    <Tooltip space={10} text={tooltipText}>
+      <Container className={className} onClick={onClick}>
+        {children}
+      </Container>
+    </Tooltip>
   )
 }
 

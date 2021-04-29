@@ -370,11 +370,13 @@ const NotePageToolbar = ({ storage, note }: NotePageToolbarProps) => {
               )}
               {noteViewMode !== 'preview' ? (
                 <ToolbarIconButton
+                  title={t('editor.showMarkdownPreview')}
                   iconPath={mdiEye}
                   onClick={selectPreviewMode}
                 />
               ) : (
                 <ToolbarIconButton
+                  title={t('editor.showEditor')}
                   iconPath={mdiPencil}
                   onClick={selectEditMode}
                 />
