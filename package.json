@@ -12,6 +12,7 @@
     "dev:cloud": "env-cmd cross-env NODE_ENV=development TARGET=electron TS_NODE_PROJECT=\"tsconfig-webpack.json\" webpack-dev-server --mode development --config webpack.cloud.config.ts",
     "dev:webpack": "env-cmd cross-env NODE_ENV=development TS_NODE_PROJECT=\"tsconfig-webpack.json\" webpack-dev-server --mode development",
     "dev:electron": "env-cmd cross-env NODE_ENV=development ts-node -P tsconfig-webpack.json scripts/dev-electron.ts",
+    "dev:mobile": "env-cmd cross-env NODE_ENV=development TS_NODE_PROJECT=\"tsconfig-webpack.json\" webpack-dev-server --mode development --config webpack.mobile.config.ts",
     "start": "electron electron/index.js",
     "lint": "eslint src/* --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*\"",
