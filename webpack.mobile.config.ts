@@ -120,7 +120,7 @@ module.exports = (env, argv) => {
         app.use((req, res, next) => {
           res.setHeader(
             'Access-Control-Allow-Origin',
-            process.env.BOOST_HUB_BASE_URL
+            process.env.MOBILE_BOOST_HUB_BASE_URL
           )
           res.setHeader(
             'Access-Control-Allow-Methods',

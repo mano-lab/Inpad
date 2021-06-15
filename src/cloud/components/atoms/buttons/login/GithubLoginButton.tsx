@@ -4,6 +4,7 @@ import styled from '../../../../lib/styled'
 import { stringify } from 'querystring'
 import IconMdi from '../../IconMdi'
 import { mdiGithub } from '@mdi/js'
+import { boostHubBaseUrl } from '../../../../lib/consts'
 
 interface GithubLoginButtonProps {
   query?: any
@@ -21,7 +22,7 @@ const GithubLoginButton = ({
   setDisabled,
 }: GithubLoginButtonProps) => {
   const [sending, setSending] = useState<boolean>(false)
-  const loginHref = `/api/oauth/github${
+  const loginHref = `${boostHubBaseUrl}/api/oauth/github${
     query != null ? `?${stringify(query)}` : ''
   }`
 
