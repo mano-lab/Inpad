@@ -1,4 +1,9 @@
-import React, { useMemo, ChangeEventHandler, useCallback } from 'react'
+import React, {
+  useMemo,
+  ChangeEventHandler,
+  useCallback,
+  useEffect,
+} from 'react'
 import { NoteStorage, NoteDoc } from '../../lib/db/types'
 import {
   values,
@@ -18,6 +23,7 @@ import {
   selectStyle,
 } from '../../shared/lib/styled/styleFunctions'
 import styled from '../../shared/lib/styled'
+import { useSidebarSearch } from '../../lib/search/stores/store'
 
 interface FolderDetailProps {
   storage: NoteStorage
@@ -28,6 +34,7 @@ const FolderDetail = ({ storage, folderPathname }: FolderDetailProps) => {
   const { preferences, setPreferences } = usePreferences()
   const noteSorting = preferences['general.noteSorting']
   const { push } = useRouter()
+  const { addVisitedToHistory } = useSidebarSearch()
 
   const subFolders = useMemo(() => {
     const folders = values(storage.folderMap)
@@ -107,6 +114,13 @@ const FolderDetail = ({ storage, folderPathname }: FolderDetailProps) => {
   }, [folderPathname, storage.id, push])
 
   const folderIsRoot = folderPathname === '/'
+
+  useEffect(() => {
+    const folderDoc = storage.folderMap[folderPathname]
+    if (folderDoc != null) {
+      addVisitedToHistory(folderDoc)
+    }
+  }, [addVisitedToHistory, folderPathname, storage.folderMap])
 
   return (
     <PageContainer>

@@ -49,6 +49,8 @@ export interface SearchReplaceOptions {
   preservingCaseReplace: boolean
 }
 
+export type HistoryItem = { type: 'folder' | 'doc'; item: string }
+
 const SEARCH_MEGABYTES_PER_NOTE = 30
 export const MAX_SEARCH_PREVIEW_LINE_LENGTH = 10000
 export const MAX_SEARCH_CONTENT_LENGTH_PER_NOTE =

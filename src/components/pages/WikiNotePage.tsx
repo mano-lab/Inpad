@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { NoteStorage } from '../../lib/db/types'
 import NoteDetail from '../organisms/NoteDetail'
 import {
@@ -46,6 +46,7 @@ import {
 import NoteContextView from '../organisms/NoteContextView'
 import Application from '../Application'
 import { useToast } from '../../shared/lib/stores/toast'
+import { useSidebarSearch } from '../../lib/search/stores/store'
 
 interface WikiNotePageProps {
   storage: NoteStorage
@@ -70,8 +71,8 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
   const { pushMessage } = useToast()
   const storageId = storage.id
   const { updateNote, addAttachments } = useDb()
-
   const { push, goBack, goForward } = useRouter()
+  const { addVisitedToHistory } = useSidebarSearch()
 
   const note = useMemo(() => {
     switch (routeParams.name) {
@@ -115,6 +116,10 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
     return undefined
   }, [routeParams, storage.noteMap])
   const noteId = note?._id
+
+  const [previousNoteId, setPreviousNoteId] = useState<string | undefined>(
+    noteId
+  )
 
   const topbarTree = useMemo(() => {
     return mapTopBarTree(storage.noteMap, storage.folderMap, storage, push)
@@ -463,6 +468,13 @@ const WikiNotePage = ({ storage }: WikiNotePageProps) => {
       }
     }
   }, [generalStatus.focusOnEditorCursor, hash, setGeneralStatus])
+
+  useEffect(() => {
+    if (noteId != null && note != null && noteId != previousNoteId) {
+      addVisitedToHistory(note)
+      setPreviousNoteId(noteId)
+    }
+  }, [addVisitedToHistory, note, noteId, previousNoteId, setPreviousNoteId])
 
   return (
     <Application

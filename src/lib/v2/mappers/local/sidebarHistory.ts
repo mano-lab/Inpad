@@ -1,31 +1,34 @@
 import { SidebarSearchHistory } from '../../../../shared/components/organisms/Sidebar/molecules/SidebarSearch'
-import { mdiFileDocumentOutline } from '@mdi/js'
+import { mdiFileDocumentOutline, mdiFolderOutline } from '@mdi/js'
 import { FolderDoc, NoteDoc, NoteStorage, ObjectMap } from '../../../db/types'
 import {
   getFolderHref,
   getFolderName,
   getDocHref,
   getNoteTitle,
+  getFolderPathname,
 } from '../../../db/utils'
-
-type HistoryItem = { type: 'folder' | 'note'; item: string }
+import { HistoryItem } from '../../../search/search'
 
 export function mapHistory(
   history: HistoryItem[],
   push: (href: string) => void,
   noteMap: ObjectMap<NoteDoc>,
   foldersMap: ObjectMap<FolderDoc>,
-  storage: NoteStorage
+  workspace: NoteStorage
 ) {
+  if (!history) {
+    return []
+  }
   const items = [] as SidebarSearchHistory[]
-
   history.forEach((historyItem) => {
     if (historyItem.type === 'folder') {
-      const folderDoc = foldersMap[historyItem.item]
+      const folderDoc = foldersMap[getFolderPathname(historyItem.item)]
       if (folderDoc != null) {
-        const href = getFolderHref(folderDoc, storage.id)
+        const href = getFolderHref(folderDoc, workspace.id)
         items.push({
-          // emoji: item.emoji,
+          // emoji: folderDoc.emoji,
+          defaultIcon: mdiFolderOutline,
           label: getFolderName(folderDoc),
           href,
           onClick: () => push(href),
@@ -34,7 +37,7 @@ export function mapHistory(
     } else {
       const noteDoc = noteMap[historyItem.item]
       if (noteDoc != null) {
-        const href = getDocHref(noteDoc, storage.id)
+        const href = getDocHref(noteDoc, workspace.id)
         items.push({
           // emoji: noteDoc.emoji,
           defaultIcon: mdiFileDocumentOutline,
