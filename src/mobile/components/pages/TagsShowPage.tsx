@@ -8,7 +8,7 @@ import { usePage } from '../../../cloud/lib/stores/pageStore'
 import ColoredBlock from '../../../cloud/components/atoms/ColoredBlock'
 import { SerializedWorkspace } from '../../../cloud/interfaces/db/workspace'
 import { GetInitialPropsParameters } from '../../../cloud/interfaces/pages'
-import DocOnlyContentManager from '../../../cloud/components/molecules/ContentManager/DocOnlyContentManager'
+import DocOnlyContentManager from '../organisms/DocOnlyContentManager'
 import AppLayout from '../layouts/AppLayout'
 
 const TagsShowPage = ({ pageTag: pagePropsTag }: TagsShowPageResponseBody) => {

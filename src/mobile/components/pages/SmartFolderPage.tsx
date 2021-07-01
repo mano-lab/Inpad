@@ -15,7 +15,7 @@ import {
   UpdateDateCondition,
 } from '../../../cloud/interfaces/db/smartFolder'
 import { addDays, subDays } from 'date-fns'
-import DocOnlyContentManager from '../../../cloud/components/molecules/ContentManager/DocOnlyContentManager'
+import DocOnlyContentManager from '../organisms/DocOnlyContentManager'
 import { getTeamIndexPageData } from '../../../cloud/api/pages/teams'
 import { localizeDate } from '../../../cloud/components/organisms/Modal/contents/SmartFolder/DocDateSelect'
 import AppLayout from '../layouts/AppLayout'

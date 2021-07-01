@@ -4,7 +4,7 @@ import { usePage } from '../../../cloud/lib/stores/pageStore'
 import { useNav } from '../../../cloud/lib/stores/nav'
 import { useTitle } from 'react-use'
 import { GetInitialPropsParameters } from '../../../cloud/interfaces/pages'
-import DocOnlyContentManager from '../../../cloud/components/molecules/ContentManager/DocOnlyContentManager'
+import DocOnlyContentManager from '../organisms/DocOnlyContentManager'
 import AppLayout from '../layouts/AppLayout'
 
 const SharedDocsListPage = () => {

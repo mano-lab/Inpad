@@ -1,6 +1,4 @@
 import React, { useMemo } from 'react'
-import Page from '../../../cloud/components/Page'
-import DefaultLayout from '../../../cloud/components/layouts/DefaultLayout'
 import {
   getResourceShowPageData,
   ResourceShowPageResponseBody,
@@ -11,11 +9,9 @@ import { GetInitialPropsParameters } from '../../../cloud/interfaces/pages'
 
 const ResourceIndex = (props: ResourceShowPageResponseBody) => {
   const content = useMemo(() => {
-    let innerPage
-
     switch (props.type) {
       case 'doc':
-        innerPage = (
+        return (
           <DocPage
             doc={props.pageDoc}
             contributors={props.contributors || []}
@@ -23,18 +19,10 @@ const ResourceIndex = (props: ResourceShowPageResponseBody) => {
             revisionHistory={props.revisionHistory || []}
           />
         )
-        break
 
       case 'folder':
-        innerPage = <FolderPage />
-        break
+        return <FolderPage />
     }
-
-    return (
-      <Page>
-        <DefaultLayout>{innerPage}</DefaultLayout>
-      </Page>
-    )
   }, [props])
 
   return content

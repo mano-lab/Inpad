@@ -1,35 +1,29 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SerializedDocWithBookmark } from '../../../cloud/interfaces/db/doc'
 import DocLimitReachedBanner from '../../../cloud/components/molecules/Banner/SubLimitReachedBanner'
-import { getDocURL, getTeamURL } from '../../../cloud/lib/utils/patterns'
 import styled from '../../../cloud/lib/styled'
-import { useNav } from '../../../cloud/lib/stores/nav'
-import { SerializedTeam } from '../../../cloud/interfaces/db/team'
-import { usePreferences } from '../../../cloud/lib/stores/preferences'
+import { usePreferences } from '../../lib/preferences'
 import { rightSideTopBarHeight } from '../../../cloud/components/organisms/RightSideTopBar/styled'
 import { rightSidePageLayout } from '../../../cloud/lib/styled/styleFunctions'
 import { SerializedUser } from '../../../cloud/interfaces/db/user'
 import MarkdownView from '../../../cloud/components/atoms/MarkdownView'
-import { EmbedDoc } from '../../../cloud/lib/docEmbedPlugin'
 import useRealtime from '../../../cloud/lib/editor/hooks/useRealtime'
 import { buildIconUrl } from '../../../cloud/api/files'
 import { getColorFromString } from '../../../cloud/lib/utils/string'
 import { createAbsolutePositionFromRelativePosition } from 'yjs'
-import useCommentManagerState from '../../../shared/lib/hooks/useCommentManagerState'
+import useCommentManagerState from '../../../cloud/lib/hooks/useCommentManagerState'
 import { HighlightRange } from '../../../cloud/lib/rehypeHighlight'
 import Spinner from '../../../shared/components/atoms/Spinner'
 import AppLayout from '../layouts/AppLayout'
 
 interface ViewPageProps {
-  team: SerializedTeam
   doc: SerializedDocWithBookmark
   editable: boolean
   user: SerializedUser
 }
 
-const ViewPage = ({ doc, editable, team, user }: ViewPageProps) => {
+const ViewPage = ({ doc, editable, user }: ViewPageProps) => {
   const { setPreferences } = usePreferences()
-  const { docsMap } = useNav()
   const initialRenderDone = useRef(false)
   const previewRef = useRef<HTMLDivElement>(null)
   const [realtimeContent, setRealtimeContent] = useState('')
@@ -60,26 +54,6 @@ const ViewPage = ({ doc, editable, team, user }: ViewPageProps) => {
       initialRenderDone.current = true
     }
   })
-
-  const embeddableDocs = useMemo(() => {
-    const embedMap = new Map<string, EmbedDoc>()
-    if (team == null) {
-      return embedMap
-    }
-
-    for (const doc of docsMap.values()) {
-      if (doc.head != null) {
-        const current = `${location.protocol}//${location.host}`
-        const link = `${current}${getTeamURL(team)}${getDocURL(doc)}`
-        embedMap.set(doc.id, {
-          title: doc.title,
-          content: doc.head.content,
-          link,
-        })
-      }
-    }
-    return embedMap
-  }, [docsMap, team])
 
   const [commentState, commentActions] = useCommentManagerState(doc.id)
 
@@ -199,7 +173,6 @@ const ViewPage = ({ doc, editable, team, user }: ViewPageProps) => {
                 headerLinks={true}
                 onRender={onRender.current}
                 className='scroller'
-                embeddableDocs={embeddableDocs}
                 scrollerRef={previewRef}
                 comments={viewComments}
                 commentClick={commentClick}

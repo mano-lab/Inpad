@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { getColorFromString } from '../../../cloud/lib/utils/string'
-import styled from '../../../cloud/lib/styled'
+import styled from '../../../shared/lib/styled'
 import { SerializedDocWithBookmark } from '../../../cloud/interfaces/db/doc'
 import {
   useSettings,
@@ -17,13 +17,9 @@ import {
   createAbsolutePositionFromRelativePosition,
 } from 'yjs'
 import { SerializedTeam } from '../../../cloud/interfaces/db/team'
-import {
-  getDocTitle,
-  getTeamURL,
-  getDocURL,
-} from '../../../cloud/lib/utils/patterns'
+import { getDocTitle } from '../../../cloud/lib/utils/patterns'
 import { SerializedUser } from '../../../cloud/interfaces/db/user'
-import { usePreferences } from '../../../cloud/lib/stores/preferences'
+import { usePreferences } from '../../lib/preferences'
 import { rightSidePageLayout } from '../../../cloud/lib/styled/styleFunctions'
 import { useRouter } from '../../../cloud/lib/router'
 import {
@@ -33,22 +29,16 @@ import {
 } from '../../../cloud/lib/editor/plugins/pasteFormatPlugin'
 import { buildIconUrl } from '../../../cloud/api/files'
 import {
-  mdiRepeat,
-  mdiRepeatOff,
-  mdiFileDocumentOutline,
   mdiCommentTextOutline,
+  mdiPencilOutline,
+  mdiEyeOutline,
+  mdiDotsHorizontal,
 } from '@mdi/js'
-import { not } from 'ramda'
 import { useNav } from '../../../cloud/lib/stores/nav'
 import { Hint } from 'codemirror'
-import { EmbedDoc } from '../../../cloud/lib/docEmbedPlugin'
-import { SerializedTemplate } from '../../../cloud/interfaces/db/template'
-import TemplatesModal from '../../../cloud/components/organisms/Modal/contents/TemplatesModal'
 import {
   focusTitleEventEmitter,
   focusEditorEventEmitter,
-  toggleSplitEditModeEventEmitter,
-  togglePreviewModeEventEmitter,
 } from '../../../cloud/lib/utils/events'
 import { ScrollSync, scrollSyncer } from '../../../cloud/lib/editor/scrollSync'
 import CodeMirrorEditor from '../../../cloud/lib/editor/components/CodeMirrorEditor'
@@ -56,23 +46,15 @@ import MarkdownView, {
   SelectionContext,
 } from '../../../cloud/components/atoms/MarkdownView'
 import { useToast } from '../../../shared/lib/stores/toast'
-import { trackEvent } from '../../../cloud/api/track'
-import { MixpanelActionTrackTypes } from '../../../cloud/interfaces/analytics/mixpanel'
-import { useModal } from '../../../shared/lib/stores/modal'
 import Icon from '../../../cloud/components/atoms/Icon'
-import useCommentManagerState from '../../../shared/lib/hooks/useCommentManagerState'
+import useCommentManagerState from '../../../cloud/lib/hooks/useCommentManagerState'
 import { HighlightRange } from '../../../cloud/lib/rehypeHighlight'
 import EditorSelectionStatus from '../../../cloud/components/molecules/Editor/EditorSelectionStatus'
 import EditorThemeSelect from '../../../cloud/components/molecules/Editor/EditorThemeSelect'
-import EditorKeyMapSelect from '../../../cloud/components/molecules/Editor/EditorKeyMapSelect'
-import EditorTemplateButton from '../../../cloud/components/molecules/Editor/EditorTemplateButton'
 import AppLayout from '../layouts/AppLayout'
 import EditorIndentationStatus from '../../../cloud/components/molecules/Editor/EditorIndentationStatus'
-import EditorToolButton from '../../../cloud/components/molecules/Editor/EditorToolButton'
-import EditorToolbar from '../../../cloud/components/molecules/Editor/EditorToolbar'
-import EditorToolbarUpload from '../../../cloud/components/molecules/Editor/EditorToolbarUpload'
-
-type LayoutMode = 'split' | 'preview' | 'editor'
+import { getDocLinkHref } from '../../lib/href'
+import NavigationBarButton from '../atoms/NavigationBarButton'
 
 interface EditorProps {
   doc: SerializedDocWithBookmark
@@ -100,11 +82,6 @@ const Editor = ({ doc, team, user }: EditorProps) => {
   const editorRef = useRef<CodeMirror.Editor | null>(null)
   const [initialLoadDone, setInitialLoadDone] = useState(false)
   const fileUploadHandlerRef = useRef<OnFileCallback>()
-  const [editorLayout, setEditorLayout] = useState<LayoutMode>(
-    preferences.lastEditorMode != 'preview'
-      ? preferences.lastEditorEditLayout
-      : 'preview'
-  )
   const [editorContent, setEditorContent] = useState('')
   const docRef = useRef<string>('')
   const { state } = useRouter()
@@ -132,8 +109,10 @@ const Editor = ({ doc, team, user }: EditorProps) => {
       },
     ],
   })
-  const { docsMap, workspacesMap } = useNav()
+  const { docsMap, workspacesMap, loadDoc } = useNav()
   const suggestionsRef = useRef<Hint[]>([])
+
+  const { editorMode } = preferences
 
   const userInfo = useMemo(() => {
     return {
@@ -240,58 +219,35 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     [commentState, commentActions, setPreferences]
   )
 
-  const changeEditorLayout = useCallback(
-    (target: LayoutMode) => {
-      setEditorLayout(target)
-      if (target === 'preview') {
-        setPreferences({
-          lastEditorMode: 'preview',
-        })
-        return
-      }
-
-      setPreferences({
-        lastEditorMode: 'edit',
-        lastEditorEditLayout: target,
-      })
-    },
-    [setPreferences]
-  )
-
   const docIsNew = !!state?.new
   useEffect(() => {
     if (docRef.current !== doc.id) {
       if (docIsNew) {
-        changeEditorLayout(preferences.lastEditorEditLayout)
         if (titleRef.current != null) {
           titleRef.current.focus()
         }
+
+        setPreferences({
+          editorMode: 'edit',
+        })
       } else {
-        setEditorLayout(
-          preferences.lastEditorMode === 'preview'
-            ? 'preview'
-            : preferences.lastEditorEditLayout
-        )
+        setPreferences({
+          editorMode: 'preview',
+        })
       }
       docRef.current = doc.id
     }
-  }, [
-    doc.id,
-    docIsNew,
-    preferences.lastEditorEditLayout,
-    preferences.lastEditorMode,
-    changeEditorLayout,
-  ])
+  }, [doc.id, docIsNew, preferences.editorMode, setPreferences])
 
   useEffect(() => {
-    if (editorLayout === 'preview') {
+    if (editorMode === 'preview') {
       return
     }
 
     if (editorRef.current != null) {
       editorRef.current.focus()
     }
-  }, [editorLayout])
+  }, [editorMode])
 
   useEffect(() => {
     if (!initialLoadDone) {
@@ -352,13 +308,6 @@ const Editor = ({ doc, team, user }: EditorProps) => {
 
   const previewRef = useRef<HTMLDivElement>(null)
   const syncScroll = useRef<ScrollSync>()
-  const [scrollSync, setScrollSync] = useState(true)
-
-  useEffect(() => {
-    if (syncScroll.current != null) {
-      scrollSync ? syncScroll.current.unpause() : syncScroll.current.pause()
-    }
-  }, [scrollSync])
 
   const onRender = useRef(() => {
     if (!initialRenderDone.current && window.location.hash) {
@@ -463,17 +412,7 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     if (editorRef.current != null) {
       editorRef.current.refresh()
     }
-  }, [editorLayout])
-
-  const onTemplatePickCallback = useCallback(
-    (template: SerializedTemplate) => {
-      if (editorRef.current == null || realtime == null) {
-        return
-      }
-      editorRef.current.setValue(template.content)
-    },
-    [realtime]
-  )
+  }, [editorMode])
 
   const { settings } = useSettings()
   const editorConfig: CodeMirror.EditorConfiguration = useMemo(() => {
@@ -520,36 +459,25 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     [editorRef, editorContent]
   )
 
-  const { openModal } = useModal()
-  const onEditorTemplateToolClick = useCallback(() => {
-    openModal(<TemplatesModal callback={onTemplatePickCallback} />, {
-      width: 'large',
-    })
-  }, [openModal, onTemplatePickCallback])
-
-  const toggleScrollSync = useCallback(() => {
-    setScrollSync(not)
-  }, [])
-
-  const embeddableDocs = useMemo(() => {
-    const embedMap = new Map<string, EmbedDoc>()
-    if (team == null) {
-      return embedMap
-    }
-
-    for (const doc of docsMap.values()) {
-      if (doc.head != null) {
-        const current = `${location.protocol}//${location.host}`
-        const link = `${current}${getTeamURL(team)}${getDocURL(doc)}`
-        embedMap.set(doc.id, {
-          title: doc.title,
-          content: doc.head.content,
-          link,
-        })
+  const getEmbed = useCallback(
+    async (id: string) => {
+      if (team == null) {
+        return undefined
       }
-    }
-    return embedMap
-  }, [docsMap, team])
+      const doc = await loadDoc(id, team.id)
+      if (doc == null) {
+        return undefined
+      }
+      const current = `${location.protocol}//${location.host}`
+      const link = `${current}${getDocLinkHref(doc, team, 'index')}`
+      return {
+        title: doc.title,
+        content: doc.head != null ? doc.head.content : '',
+        link,
+      }
+    },
+    [loadDoc, team]
+  )
 
   const shortcodeConvertMenuStyle: React.CSSProperties = useMemo(() => {
     if (shortcodeConvertMenu == null || editorRef.current == null) {
@@ -577,7 +505,7 @@ const Editor = ({ doc, team, user }: EditorProps) => {
   }, [shortcodeConvertMenu])
 
   const focusEditor = useCallback(() => {
-    if (editorLayout === 'preview') {
+    if (editorMode === 'preview') {
       return
     }
 
@@ -586,7 +514,7 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     }
 
     editorRef.current.focus()
-  }, [editorLayout])
+  }, [editorMode])
 
   const focusTitleInputRef = useRef<() => void>()
   useEffect(() => {
@@ -610,56 +538,11 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     }
   }, [focusEditor])
 
-  const updateLayout = useCallback(
-    (mode: LayoutMode) => {
-      if (editorLayout === 'preview' && mode !== 'preview') {
-        trackEvent(MixpanelActionTrackTypes.DocLayoutEdit, {
-          team: doc.teamId,
-          doc: doc.id,
-        })
-      }
-
-      changeEditorLayout(mode)
-    },
-    [changeEditorLayout, doc.id, doc.teamId, editorLayout]
-  )
-
-  const toggleViewMode = useCallback(() => {
-    if (editorLayout === 'preview') {
-      changeEditorLayout(preferences.lastEditorEditLayout)
-      return
-    }
-
-    trackEvent(MixpanelActionTrackTypes.DocLayoutEdit, {
-      team: doc.teamId,
-      doc: doc.id,
+  const toggleEditorMode = useCallback(() => {
+    setPreferences({
+      editorMode: editorMode === 'edit' ? 'preview' : 'edit',
     })
-    changeEditorLayout('preview')
-  }, [
-    changeEditorLayout,
-    preferences.lastEditorEditLayout,
-    editorLayout,
-    doc.teamId,
-    doc.id,
-  ])
-
-  useEffect(() => {
-    togglePreviewModeEventEmitter.listen(toggleViewMode)
-    return () => {
-      togglePreviewModeEventEmitter.unlisten(toggleViewMode)
-    }
-  }, [toggleViewMode])
-
-  const toggleSplitEditMode = useCallback(() => {
-    updateLayout(editorLayout === 'split' ? 'editor' : 'split')
-  }, [updateLayout, editorLayout])
-
-  useEffect(() => {
-    toggleSplitEditModeEventEmitter.listen(toggleSplitEditMode)
-    return () => {
-      toggleSplitEditModeEventEmitter.unlisten(toggleSplitEditMode)
-    }
-  }, [toggleSplitEditMode])
+  }, [setPreferences, editorMode])
 
   if (!initialLoadDone) {
     return (
@@ -674,47 +557,30 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     )
   }
   return (
-    <AppLayout>
+    <AppLayout
+      title={doc.title}
+      navigatorBarRight={
+        <>
+          <NavigationBarButton onClick={toggleEditorMode}>
+            <Icon
+              path={editorMode === 'preview' ? mdiPencilOutline : mdiEyeOutline}
+            />
+          </NavigationBarButton>
+          <NavigationBarButton onClick={() => {}}>
+            <Icon path={mdiDotsHorizontal} />
+          </NavigationBarButton>
+        </>
+      }
+    >
       <Container>
-        {editorLayout !== 'preview' && (
-          <StyledLayoutDimensions className={editorLayout}>
-            <ToolbarRow>
-              <EditorToolButton
-                tooltip={`${scrollSync ? 'Disable' : 'Enable'} scroll sync`}
-                path={scrollSync ? mdiRepeatOff : mdiRepeat}
-                onClick={toggleScrollSync}
-                className='scroll-sync'
-              />
-              <EditorToolbar
-                editorRef={editorRef}
-                team={team}
-                currentDoc={doc}
-              />
-              <EditorToolbarUpload
-                editorRef={editorRef}
-                fileUploadHandlerRef={fileUploadHandlerRef}
-              />
-              <EditorToolButton
-                tooltip='Use a template'
-                path={mdiFileDocumentOutline}
-                onClick={onEditorTemplateToolClick}
-              />
-            </ToolbarRow>
-          </StyledLayoutDimensions>
-        )}
-        <StyledEditor className={editorLayout}>
-          <StyledEditorWrapper className={`layout-${editorLayout}`}>
+        <StyledEditor className={editorMode}>
+          <StyledEditorWrapper className={`layout-${editorMode}`}>
             <>
               <CodeMirrorEditor
                 bind={bindCallback}
                 config={editorConfig}
                 realtime={realtime}
               />
-              {editorContent === '' && (
-                <EditorTemplateButton
-                  onTemplatePickCallback={onTemplatePickCallback}
-                />
-              )}
               {shortcodeConvertMenu !== null && (
                 <StyledShortcodeConvertMenu style={shortcodeConvertMenuStyle}>
                   <button onClick={() => shortcodeConvertMenu.cb(false)}>
@@ -727,14 +593,14 @@ const Editor = ({ doc, team, user }: EditorProps) => {
               )}
             </>
           </StyledEditorWrapper>
-          <StyledPreview className={`layout-${editorLayout}`}>
+          <StyledPreview className={`layout-${editorMode}`}>
             <MarkdownView
               content={editorContent}
               updateContent={setEditorRefContent}
-              headerLinks={editorLayout === 'preview'}
+              headerLinks={editorMode === 'preview'}
               onRender={onRender.current}
               className='scroller'
-              embeddableDocs={embeddableDocs}
+              getEmbed={getEmbed}
               scrollerRef={previewRef}
               comments={viewComments}
               commentClick={commentClick}
@@ -749,13 +615,12 @@ const Editor = ({ doc, team, user }: EditorProps) => {
           </StyledPreview>
         </StyledEditor>
 
-        {editorLayout !== 'preview' && (
+        {editorMode !== 'preview' && (
           <StyledBottomBar>
             <EditorSelectionStatus
               cursor={selection.currentCursor}
               selections={selection.currentSelections}
             />
-            <EditorKeyMapSelect />
             <EditorThemeSelect />
             <EditorIndentationStatus />
           </StyledBottomBar>
@@ -777,9 +642,9 @@ const StyledBottomBar = styled.div`
   display: flex;
   position: relative;
   flex: 0 0 auto;
-  border-top: solid 1px ${({ theme }) => theme.baseBorderColor};
+  border-top: solid 1px ${({ theme }) => theme.colors.border.main};
   height: 24px;
-  background-color: ${({ theme }) => theme.baseBackgroundColor};
+  background-color: ${({ theme }) => theme.colors.background.primary};
   box-sizing: content-box;
   & > :first-child {
     flex: 1;
@@ -787,19 +652,18 @@ const StyledBottomBar = styled.div`
 `
 
 const StyledShortcodeConvertMenu = styled.div`
-  margin-top: ${({ theme }) => theme.space.xsmall}px;
+  margin-top: ${({ theme }) => theme.sizes.spaces.xsm}px;
   border-radius: 5px;
-  box-shadow: ${({ theme }) => theme.baseShadowColor};
 
   button {
     display: block;
     width: 200px;
     line-height: 25px;
-    padding: ${({ theme }) => theme.space.xsmall}px
-      ${({ theme }) => theme.space.small}px;
-    background-color: ${({ theme }) => theme.contextMenuColor};
-    color: ${({ theme }) => theme.baseTextColor};
-    font-size: ${({ theme }) => theme.fontSizes.small}px;
+    padding: ${({ theme }) => theme.sizes.spaces.xsm}px
+      ${({ theme }) => theme.sizes.spaces.sm}px;
+    background-color: ${({ theme }) => theme.colors.variants.primary.base};
+    color: ${({ theme }) => theme.colors.variants.primary.text};
+    font-size: ${({ theme }) => theme.sizes.fonts.sm}px;
     text-align: left;
 
     &:first-child {
@@ -812,20 +676,10 @@ const StyledShortcodeConvertMenu = styled.div`
 
     &:hover,
     &:focus {
-      background-color: ${({ theme }) => theme.subtleBackgroundColor};
-      color: ${({ theme }) => theme.emphasizedTextColor};
+      background-color: ${({ theme }) => theme.colors.background.quaternary};
+      color: ${({ theme }) => theme.colors.text.primary};
       cursor: pointer;
     }
-  }
-`
-
-const StyledLayoutDimensions = styled.div`
-  width: 100%;
-  &.preview,
-  .preview {
-    ${rightSidePageLayout}
-    margin: ${({ theme }) => theme.space.default}px auto 0;
-    height: auto;
   }
 `
 
@@ -842,19 +696,10 @@ const StyledLoadingView = styled.div`
   }
 `
 
-const ToolbarRow = styled.div`
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: end;
-  margin-bottom: ${({ theme }) => theme.space.xxsmall}px;
-  border-bottom: solid 1px ${({ theme }) => theme.divideBorderColor};
-`
-
 const StyledEditorWrapper = styled.div`
   position: relative;
   height: auto;
-  width: 50%;
-  &.layout-editor {
+  &.layout-edit {
     width: 100%;
   }
   &.layout-preview {
@@ -865,20 +710,12 @@ const StyledEditorWrapper = styled.div`
 const StyledPreview = styled.div`
   height: 100%;
   width: 50%;
-  &.layout-split {
-    width: 50%;
-    .scroller {
-      height: 100%;
-      overflow: auto;
-      border-left: 1px solid ${({ theme }) => theme.baseBorderColor};
-    }
-  }
   &.layout-preview {
-    padding-top: ${({ theme }) => theme.space.small}px;
+    padding-top: ${({ theme }) => theme.sizes.spaces.sm}px;
     margin: 0 auto;
     width: 100%;
   }
-  &.layout-editor {
+  &.layout-edit {
     display: none;
   }
 
@@ -910,7 +747,10 @@ const StyledEditor = styled.div`
   .preview {
     ${rightSidePageLayout}
     margin: auto;
-    padding: 0 ${({ theme }) => theme.space.xlarge}px;
+    .scroller {
+      padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px
+        ${({ theme }) => theme.sizes.spaces.xl}px;
+    }
   }
   & .CodeMirrorWrapper {
     height: 100%;
@@ -930,9 +770,9 @@ const StyledEditor = styled.div`
       margin: 0;
       padding: 0;
       border-radius: 3px;
-      border: 1px solid ${({ theme }) => theme.baseBorderColor};
-      background: ${({ theme }) => theme.baseBackgroundColor};
-      color: ${({ theme }) => theme.baseTextColor};
+      border: 1px solid ${({ theme }) => theme.colors.border.main};
+      background: ${({ theme }) => theme.colors.background.primary};
+      color: ${({ theme }) => theme.colors.text.primary};
       font-size: 90%;
       font-family: monospace;
       list-style: none;
@@ -940,24 +780,24 @@ const StyledEditor = styled.div`
     .CodeMirror-hint {
       position: relative;
       margin: 0;
-      padding: ${({ theme }) => theme.space.xxsmall}px
-        ${({ theme }) => theme.space.small}px;
+      padding: ${({ theme }) => theme.sizes.spaces.xsm}px
+        ${({ theme }) => theme.sizes.spaces.sm}px;
       white-space: pre;
-      color: ${({ theme }) => theme.baseTextColor};
+      color: ${({ theme }) => theme.colors.text.primary};
       cursor: pointer;
-      font-size: ${({ theme }) => theme.fontSizes.xsmall}px;
+      font-size: ${({ theme }) => theme.sizes.spaces.xsm}px;
     }
     li.CodeMirror-hint-active {
-      color: ${({ theme }) => theme.primaryTextColor};
+      color: ${({ theme }) => theme.colors.text.primary};
       &:before {
         content: '';
         display: block;
         position: absolute;
         top: 3px;
-        left: ${({ theme }) => theme.space.xsmall}px;
+        left: ${({ theme }) => theme.sizes.spaces.xsm}px;
         width: 3px;
         height: 22px;
-        background-color: ${({ theme }) => theme.primaryBackgroundColor};
+        background-color: ${({ theme }) => theme.colors.background.primary};
       }
     }
     & .remote-caret {
@@ -975,9 +815,9 @@ const StyledEditor = styled.div`
         height: 100%;
         top: 0;
         transform: translate3d(0, -100%, 0);
-        font-size: ${({ theme }) => theme.fontSizes.xxsmall}px;
-        height: ${({ theme }) => theme.fontSizes.xxsmall + 4}px;
-        line-height: ${({ theme }) => theme.fontSizes.xxsmall + 4}px;
+        font-size: ${({ theme }) => theme.sizes.fonts.xsm}px;
+        height: ${({ theme }) => theme.sizes.fonts.xsm + 4}px;
+        line-height: ${({ theme }) => theme.sizes.fonts.xsm + 4}px;
         vertical-align: middle;
         background-color: rgb(250, 129, 0);
         user-select: none;
@@ -996,7 +836,7 @@ const StyledEditor = styled.div`
   }
   .CodeMirror-code,
   .CodeMirror-gutters {
-    padding-bottom: ${({ theme }) => theme.space.xxxlarge}px;
+    padding-bottom: ${({ theme }) => theme.sizes.fonts.xl}px;
   }
   & .file-loading-widget {
     transform: translate3d(0, -100%, 0);
