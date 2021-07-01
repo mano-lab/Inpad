@@ -443,7 +443,7 @@ const StyledMarkdownPreview = styled.div`
     height: 20px;
     display: flex;
     align-items: flex-start;
-    color: ${({ theme }) => theme.colors.icon.default}
+    color: ${({ theme }) => theme.colors.icon.default};
     font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 
     &:hover {
