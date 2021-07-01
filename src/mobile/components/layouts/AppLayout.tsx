@@ -1,75 +1,62 @@
 import React from 'react'
 import styled from '../../../shared/lib/styled'
 import Icon from '../../../shared/components/atoms/Icon'
-import {
-  mdiMenu,
-  mdiClockOutline,
-  mdiMagnify,
-  mdiSquareEditOutline,
-} from '@mdi/js'
+import { mdiMenu, mdiMagnify, mdiSquareEditOutline } from '@mdi/js'
 import cc from 'classcat'
-import { useToggle } from 'react-use'
 import Navigator from '../organisms/Navigator'
-import { useGlobalData } from '../../../cloud/lib/stores/globalData'
 import { usePage } from '../../../cloud/lib/stores/pageStore'
-import { useCloudSidebarTree } from '../../../cloud/lib/hooks/sidebar/useCloudSidebarTree'
-import { useRouter } from '../../../cloud/lib/router'
+import { useNavigatorTree } from '../../lib/sidebar/useNavigatorTree'
+import { useAppStatus } from '../../lib/appStatus'
+import NavigationBarContainer from '../atoms/NavigationBarContainer'
+import NavigationBarButton from '../atoms/NavigationBarButton'
 
 interface AppLayoutProps {
   title?: React.ReactNode
+  navigatorBarRight?: React.ReactNode
 }
 
-const AppLayout: React.FC<AppLayoutProps> = ({ children, title }) => {
-  const [showingNav, toggleShowingNav] = useToggle(
-    true
-    // false
-  )
-  const { treeWithOrderedCategories } = useCloudSidebarTree()
-  const { push } = useRouter()
+const AppLayout: React.FC<AppLayoutProps> = ({
+  children,
+  title,
+  navigatorBarRight,
+}) => {
+  const { showingNavigator, toggleShowingNavigator } = useAppStatus()
+  const { treeWithOrderedCategories } = useNavigatorTree()
 
-  const {
-    team,
-    permissions = [],
-    currentUserPermissions,
-    subscription,
-    currentUserIsCoreMember,
-  } = usePage()
-  const {
-    globalData: { teams, invites, currentUser },
-    initialized,
-  } = useGlobalData()
+  const { team } = usePage()
 
   return (
-    <Container className={cc([showingNav && 'show-nav'])}>
+    <Container className={cc([showingNavigator && 'show-nav'])}>
       <div className='nav'>
-        <Navigator
-          currentTeam={team}
-          teams={teams}
-          invites={invites}
-          tree={treeWithOrderedCategories}
-        />
+        <Navigator currentTeam={team} tree={treeWithOrderedCategories} />
       </div>
       <div className='main'>
+        <div
+          className={cc([
+            'main__navigator-curtain',
+            showingNavigator && 'main__navigator-curtain--show',
+          ])}
+          onClick={toggleShowingNavigator}
+        />
         <div className='main__header'>
-          <button onClick={toggleShowingNav}>
-            <Icon path={mdiMenu} />
-          </button>
-          {title}
+          <NavigationBarContainer
+            label={title}
+            left={
+              <NavigationBarButton onClick={toggleShowingNavigator}>
+                <Icon path={mdiMenu} />
+              </NavigationBarButton>
+            }
+            right={navigatorBarRight}
+          />
         </div>
 
         <div className='main__body'>{children}</div>
         <div className='main__footer'>
-          <button
-            onClick={() => {
-              push(`/${team!.domain}/timeline`)
-            }}
-          >
-            <Icon path={mdiClockOutline} />
-          </button>
-          <button>
+          <button className='main__footer__button'>
             <Icon path={mdiMagnify} />
           </button>
-          <button>
+          <div className='main__footer__spacer' />
+          <button className='main__footer__button'>
             <Icon path={mdiSquareEditOutline} />
           </button>
         </div>
@@ -104,29 +91,60 @@ const Container = styled.div`
     width: 100%;
     transition: left 200ms ease-in-out;
   }
+  .main__navigator-curtain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+    opacity: 0;
+    display: none;
+    transition: opacity 200ms ease-in-out;
+
+    &.main__navigator-curtain--show {
+      opacity: 1;
+      display: block;
+    }
+  }
   .main__header {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 40px;
+    height: 30px;
   }
 
   .main__body {
     position: absolute;
-    top: 40px;
+    top: 30px;
     left: 0;
     right: 0;
-    bottom: 40px;
+    bottom: 30px;
     overflow: auto;
   }
 
   .main__footer {
     position: absolute;
-    height: 40px;
+    height: 30px;
     left: 0;
     right: 0;
     bottom: 0;
+    display: flex;
+    border-top: 1px solid ${({ theme }) => theme.colors.border.main};
+  }
+  .main__footer__spacer {
+    flex: 1;
+    height: 29px;
+  }
+  .main__footer__button {
+    height: 29px;
+    background-color: transparent;
+    border: none;
+    color: ${({ theme }) => theme.colors.text.primary};
+    padding: 0 ${({ theme }) => theme.sizes.spaces.xsm}px;
+    flex: 1;
   }
 
   &.show-nav {

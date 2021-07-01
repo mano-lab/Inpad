@@ -7,6 +7,7 @@ import {
   TeamIdProps,
   TeamLinkIntent,
 } from '../../cloud/components/atoms/Link/TeamLink'
+import { SerializedSmartFolder } from '../../cloud/interfaces/db/smartFolder'
 
 export function getTeamLinkHref(
   team: TeamIdProps,
@@ -32,5 +33,39 @@ export function getDocLinkHref(
   if (intent === 'index') {
     return `${basePathname}${queryPathName}`
   }
+  return `${basePathname}/${intent}${queryPathName}`
+}
+
+export type SmartFolderRouteIntent = 'index'
+
+export function getSmartFolderHref(
+  smartFolder: SerializedSmartFolder,
+  team: SerializedTeam,
+  intent: SmartFolderRouteIntent,
+  query?: any
+) {
+  const basePathname = `${getTeamURL(team)}/smart-folders/${encodeURIComponent(
+    smartFolder.id
+  )}`
+  const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
+  if (intent === 'index') {
+    return `${basePathname}${queryPathName}`
+  }
+  return `${basePathname}/${intent}${queryPathName}`
+}
+
+export type DocStatusRouteIntent =
+  | 'in-progress'
+  | 'paused'
+  | 'completed'
+  | 'archived'
+
+export function getDocStatusHref(
+  team: SerializedTeam,
+  intent: DocStatusRouteIntent,
+  query?: any
+) {
+  const basePathname = `${getTeamURL(team)}/status`
+  const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
   return `${basePathname}/${intent}${queryPathName}`
 }

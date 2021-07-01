@@ -10,7 +10,7 @@ import nProgress from 'nprogress'
 import { combineProviders } from '../../cloud/lib/utils/context'
 import { SettingsProvider, useSettings } from '../../cloud/lib/stores/settings'
 
-import { PreferencesProvider } from '../../cloud/lib/stores/preferences'
+import { PreferencesProvider } from '../lib/preferences'
 import { SearchProvider } from '../../cloud/lib/stores/search'
 import { ExternalEntitiesProvider } from '../../cloud/lib/stores/externalEntities'
 import { PageDataProvider } from '../../cloud/lib/stores/pageStore'
@@ -36,7 +36,7 @@ import { V2DialogProvider } from '../../shared/lib/stores/dialog'
 import Toast from '../../shared/components/organisms/Toast'
 import Dialog from '../../shared/components/organisms/Dialog/Dialog'
 import ContextMenu from '../../shared/components/molecules/ContextMenu'
-import { CommentsProvider } from '../../shared/lib/stores/comments'
+import { CommentsProvider } from '../../cloud/lib/stores/comments'
 import EmojiPicker from '../../shared/components/molecules/EmojiPicker'
 import CooperatePage from './pages/CooperatePage'
 import RootPage from './pages/RootPage'
@@ -47,12 +47,14 @@ import { SidebarCollapseProvider } from '../../cloud/lib/stores/sidebarCollapse'
 import DocStatusShowPage from './pages/DocStatusShowPage'
 import TagsShowPage from './pages/TagsShowPage'
 import UploadListPage from './pages/UploadsPage'
-import TimelinePage from './pages/TimeLinePage'
 import SmartFolderPage from './pages/SmartFolderPage'
 import OpenInvitePage from './pages/OpenInvitePage'
 import BookmarksListPage from './pages/BookmarksListPage'
 import SharedDocsListPage from './pages/SharedDocsListPage'
 import DeleteTeamPage from './pages/TeamDeletePage'
+import Modal from './organisms/modals/Modal'
+import { AppStatusProvider } from '../lib/appStatus'
+import WorkspacePage from './pages/WorkspacePage'
 
 const CombinedProvider = combineProviders(
   SidebarCollapseProvider,
@@ -70,7 +72,8 @@ const V2CombinedProvider = combineProviders(
   V2ContextMenuProvider,
   V2ModalProvider,
   V2DialogProvider,
-  CommentsProvider
+  CommentsProvider,
+  AppStatusProvider
 )
 
 interface PageInfo {
@@ -242,6 +245,8 @@ const Router = () => {
                 <ContextMenu />
                 <EmojiPicker />
                 <Dialog />
+
+                <Modal />
               </V2ThemeProvider>
             </CustomThemeProvider>
           </NavProvider>
@@ -326,15 +331,15 @@ function getPageComponent(pathname: string): PageSpec | null {
           Component: SharedDocsListPage,
           getInitialProps: SharedDocsListPage.getInitialProps,
         }
+      case 'shared':
+        return {
+          Component: SharedDocsListPage,
+          getInitialProps: SharedDocsListPage.getInitialProps,
+        }
       case 'delete':
         return {
           Component: DeleteTeamPage,
           getInitialProps: DeleteTeamPage.getInitialProps,
-        }
-      case 'timeline':
-        return {
-          Component: TimelinePage,
-          getInitialProps: TimelinePage.getInitialProps,
         }
       case 'uploads':
         return {
@@ -365,6 +370,11 @@ function getPageComponent(pathname: string): PageSpec | null {
         return {
           Component: DocStatusShowPage,
           getInitialProps: DocStatusShowPage.getInitialProps,
+        }
+      case 'workspaces':
+        return {
+          Component: WorkspacePage,
+          getInitialProps: WorkspacePage.getInitialProps,
         }
       default:
         return {
