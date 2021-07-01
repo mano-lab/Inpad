@@ -95,6 +95,10 @@ export const ModalLine = styled.div`
     justify-content: flex-end;
   }
 
+  &.justify-center {
+    justify-content: center;
+  }
+
   &.scrollable {
     margin: 0;
     overflow: hidden auto;
