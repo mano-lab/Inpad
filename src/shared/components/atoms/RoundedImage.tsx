@@ -71,6 +71,7 @@ const StyledFillerIcon = styled.div<{ size: number }>`
     font-size: ${({ theme }) => theme.sizes.fonts.sm}px;
     width: 100%;
     height: 100%;
+    justify-content: center;
   }
 
   &.rounded__image--rounded {
