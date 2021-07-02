@@ -21,6 +21,7 @@
     "build:electron-renderer": "rimraf electron/compiled && env-cmd cross-env TS_NODE_PROJECT=\"tsconfig-webpack.json\" TARGET=electron webpack --mode production",
     "build:electron-main": "rimraf electron/index.js && env-cmd ts-node -P tsconfig-webpack.json scripts/build-electron-main",
     "build:cloud": "rimraf compiled-cloud && env-cmd cross-env NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-webpack.json\" webpack --mode production --config webpack.cloud.config.ts",
+    "build:mobile": "rimraf compiled-mobile && env-cmd cross-env NODE_ENV=production TS_NODE_PROJECT=\"tsconfig-webpack.json\" webpack --mode production --config webpack.mobile.config.ts",
     "meta": "node scripts/meta.js",
     "prepack": "rimraf dist && env-cmd npm run meta && electron-builder --dir",
     "pack": "rimraf dist && env-cmd npm run meta && env-cmd electron-builder",
