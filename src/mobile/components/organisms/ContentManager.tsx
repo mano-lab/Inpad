@@ -29,8 +29,8 @@ import { CustomSelectOption } from '../../../cloud/components/atoms/Select/Custo
 import SortingOption, {
   sortingOrders,
 } from '../../../cloud/components/molecules/ContentManager/SortingOption'
-import ContentManagerDocRow from '../../../cloud/components/molecules/ContentManager/Rows/ContentManagerDocRow'
-import ContentmanagerFolderRow from '../../../cloud/components/molecules/ContentManager/Rows/ContentManagerFolderRow'
+import ContentManagerDocRow from '../molecules/ContentManagerDocRow'
+import ContentManagerFolderRow from '../molecules/ContentManagerFolderRow'
 import { difference } from 'ramda'
 import ContentManagerBulkActions from '../../../cloud/components/molecules/ContentManager/Actions/ContentManagerBulkActions'
 import {
@@ -353,7 +353,7 @@ const ContentManager = ({
           )}
         </StyledContentManagerListHeader>
         {orderedFolders.map((folder) => (
-          <ContentmanagerFolderRow
+          <ContentManagerFolderRow
             folder={folder}
             key={folder.id}
             team={team}
@@ -513,7 +513,7 @@ export const StyledContentManagerHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 8px;
+  padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
   .header__left {
     display: flex;
     align-items: center;
@@ -544,26 +544,16 @@ export const StyledContentManagerListHeader = styled.div`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.background.secondary};
   position: relative;
-  padding: 0 8px;
+  padding: 0 ${({ theme }) => theme.sizes.spaces.xsm}px;
   .header__label {
     flex: 1;
     line-height: 24px;
   }
 
   .header__checkbox {
-    opacity: 0;
-    margin-right: ${({ theme }) => theme.sizes.spaces.sm}px;
-
-    &.header__checkbox--checked {
-      opacity: 1;
-    }
+    margin-right: ${({ theme }) => theme.sizes.spaces.xsm}px;
   }
 
-  &:hover {
-    .header__checkbox {
-      opacity: 1;
-    }
-  }
   .header__control {
   }
 

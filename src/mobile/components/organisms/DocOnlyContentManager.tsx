@@ -18,7 +18,7 @@ import SortingOption, {
   sortingOrders,
 } from '../../../cloud/components/molecules/ContentManager/SortingOption'
 import Spinner from '../../../shared/components/atoms/Spinner'
-import ContentManagerDocRow from '../../../cloud/components/molecules/ContentManager/Rows/ContentManagerDocRow'
+import ContentManagerDocRow from '../molecules/ContentManagerDocRow'
 import { difference } from 'ramda'
 import DocOnlyContentManagerBulkActions from '../../../cloud/components/molecules/ContentManager/Actions/DocOnlyContentManagerBulkActions'
 import { usePreferences } from '../../lib/preferences'
