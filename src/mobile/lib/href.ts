@@ -2,12 +2,17 @@ import { SerializedDoc } from '../../cloud/interfaces/db/doc'
 import { SerializedTeam } from '../../cloud/interfaces/db/team'
 import { DocLinkIntent } from '../../cloud/components/atoms/Link/DocLink'
 import querystring from 'querystring'
-import { getDocURL, getTeamURL } from '../../cloud/lib/utils/patterns'
+import {
+  getDocURL,
+  getTeamURL,
+  getFolderURL,
+} from '../../cloud/lib/utils/patterns'
 import {
   TeamIdProps,
   TeamLinkIntent,
 } from '../../cloud/components/atoms/Link/TeamLink'
 import { SerializedSmartFolder } from '../../cloud/interfaces/db/smartFolder'
+import { SerializedFolder } from '../../cloud/interfaces/db/folder'
 
 export function getTeamLinkHref(
   team: TeamIdProps,
@@ -29,6 +34,22 @@ export function getDocLinkHref(
   query?: any
 ) {
   const basePathname = `${getTeamURL(team)}${getDocURL(doc)}`
+  const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
+  if (intent === 'index') {
+    return `${basePathname}${queryPathName}`
+  }
+  return `${basePathname}/${intent}${queryPathName}`
+}
+
+export type FolderLinkIntent = 'index'
+
+export function getFolderHref(
+  folder: SerializedFolder,
+  team: SerializedTeam,
+  intent: FolderLinkIntent,
+  query?: any
+) {
+  const basePathname = `${getTeamURL(team)}${getFolderURL(folder)}`
   const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
   if (intent === 'index') {
     return `${basePathname}${queryPathName}`

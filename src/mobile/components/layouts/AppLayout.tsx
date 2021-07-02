@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import styled from '../../../shared/lib/styled'
 import Icon from '../../../shared/components/atoms/Icon'
 import { mdiMenu, mdiMagnify, mdiSquareEditOutline } from '@mdi/js'
@@ -9,6 +9,8 @@ import { useNavigatorTree } from '../../lib/sidebar/useNavigatorTree'
 import { useAppStatus } from '../../lib/appStatus'
 import NavigationBarContainer from '../atoms/NavigationBarContainer'
 import NavigationBarButton from '../atoms/NavigationBarButton'
+import { useModal } from '../../../shared/lib/stores/modal'
+import SearchModal from '../organisms/modals/SearchModal'
 
 interface AppLayoutProps {
   title?: React.ReactNode
@@ -24,6 +26,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const { treeWithOrderedCategories } = useNavigatorTree()
 
   const { team } = usePage()
+
+  const { openModal } = useModal()
+  const openSearchModal = useCallback(() => {
+    openModal(<SearchModal />)
+  }, [openModal])
 
   return (
     <Container className={cc([showingNavigator && 'show-nav'])}>
@@ -52,7 +59,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
         <div className='main__body'>{children}</div>
         <div className='main__footer'>
-          <button className='main__footer__button'>
+          <button className='main__footer__button' onClick={openSearchModal}>
             <Icon path={mdiMagnify} />
           </button>
           <div className='main__footer__spacer' />
