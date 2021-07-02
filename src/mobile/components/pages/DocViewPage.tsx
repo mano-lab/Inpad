@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SerializedDocWithBookmark } from '../../../cloud/interfaces/db/doc'
+import {
+  SerializedDocWithBookmark,
+  SerializedDoc,
+} from '../../../cloud/interfaces/db/doc'
 import DocLimitReachedBanner from '../../../cloud/components/molecules/Banner/SubLimitReachedBanner'
 import styled from '../../../cloud/lib/styled'
 import { usePreferences } from '../../lib/preferences'
@@ -15,15 +18,32 @@ import useCommentManagerState from '../../../cloud/lib/hooks/useCommentManagerSt
 import { HighlightRange } from '../../../cloud/lib/rehypeHighlight'
 import Spinner from '../../../shared/components/atoms/Spinner'
 import AppLayout from '../layouts/AppLayout'
+import NavigationBarButton from '../atoms/NavigationBarButton'
+import Icon from '../../../shared/components/atoms/Icon'
+import { mdiDotsHorizontal } from '@mdi/js'
+import DocInfoModal from '../organisms/modals/DocInfoModal'
+import { useModal } from '../../../shared/lib/stores/modal'
+import { SerializedTeam } from '../../../cloud/interfaces/db/team'
 
 interface ViewPageProps {
+  team: SerializedTeam
+  contributors: SerializedUser[]
+  backLinks: SerializedDoc[]
   doc: SerializedDocWithBookmark
   editable: boolean
   user: SerializedUser
 }
 
-const ViewPage = ({ doc, editable, user }: ViewPageProps) => {
+const ViewPage = ({
+  doc,
+  editable,
+  user,
+  team,
+  contributors,
+  backLinks,
+}: ViewPageProps) => {
   const { setPreferences } = usePreferences()
+  const { openModal } = useModal()
   const initialRenderDone = useRef(false)
   const previewRef = useRef<HTMLDivElement>(null)
   const [realtimeContent, setRealtimeContent] = useState('')
@@ -148,6 +168,17 @@ const ViewPage = ({ doc, editable, user }: ViewPageProps) => {
     }
   }, [connState])
 
+  const openDocInfoModal = useCallback(() => {
+    openModal(
+      <DocInfoModal
+        team={team}
+        currentDoc={doc}
+        contributors={contributors}
+        backLinks={backLinks}
+      />
+    )
+  }, [openModal, team, doc, contributors, backLinks])
+
   if (!initialLoadDone) {
     return (
       <AppLayout>
@@ -162,7 +193,16 @@ const ViewPage = ({ doc, editable, user }: ViewPageProps) => {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      title={doc.title}
+      navigatorBarRight={
+        <>
+          <NavigationBarButton onClick={openDocInfoModal}>
+            <Icon path={mdiDotsHorizontal} />
+          </NavigationBarButton>
+        </>
+      }
+    >
       <Container>
         <div className='view__wrapper'>
           <div className='view__content'>

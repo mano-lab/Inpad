@@ -4,7 +4,7 @@ import { getDocTitle } from '../../../cloud/lib/utils/patterns'
 import { useNav } from '../../../cloud/lib/stores/nav'
 import ColoredBlock from '../../../cloud/components/atoms/ColoredBlock'
 import DocEditPage from './DocEditPage'
-import ViewPage from '../../../cloud/components/organisms/DocPage/View'
+import DocViewPage from './DocViewPage'
 import { useTitle } from 'react-use'
 import { useGlobalData } from '../../../cloud/lib/stores/globalData'
 import {
@@ -22,12 +22,7 @@ interface DocPageProps {
   revisionHistory: SerializedRevision[]
 }
 
-const DocPage = ({
-  doc,
-  contributors,
-  backLinks,
-  revisionHistory,
-}: DocPageProps) => {
+const DocPage = ({ doc, contributors, backLinks }: DocPageProps) => {
   const {
     team,
     subscription,
@@ -115,16 +110,21 @@ const DocPage = ({
   }
 
   return docIsEditable ? (
-    <DocEditPage team={team} doc={currentDoc} user={currentUser} />
+    <DocEditPage
+      team={team}
+      doc={currentDoc}
+      user={currentUser}
+      contributors={contributors}
+      backLinks={backLinks}
+    />
   ) : (
-    <ViewPage
+    <DocViewPage
       team={team}
       doc={currentDoc}
       editable={docIsEditable}
       contributors={contributors}
       backLinks={currentBacklinks}
       user={currentUser}
-      revisionHistory={revisionHistory}
     />
   )
 }

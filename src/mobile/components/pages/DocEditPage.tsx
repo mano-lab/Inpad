@@ -1,11 +1,11 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { getColorFromString } from '../../../cloud/lib/utils/string'
 import styled from '../../../shared/lib/styled'
-import { SerializedDocWithBookmark } from '../../../cloud/interfaces/db/doc'
 import {
-  useSettings,
-  CodeMirrorKeyMap,
-} from '../../../cloud/lib/stores/settings'
+  SerializedDocWithBookmark,
+  SerializedDoc,
+} from '../../../cloud/interfaces/db/doc'
+import { useSettings } from '../../../cloud/lib/stores/settings'
 import useRealtime from '../../../cloud/lib/editor/hooks/useRealtime'
 import Spinner from '../../../cloud/components/atoms/CustomSpinner'
 import attachFileHandlerToCodeMirrorEditor, {
@@ -55,11 +55,16 @@ import AppLayout from '../layouts/AppLayout'
 import EditorIndentationStatus from '../../../cloud/components/molecules/Editor/EditorIndentationStatus'
 import { getDocLinkHref } from '../../lib/href'
 import NavigationBarButton from '../atoms/NavigationBarButton'
+import { useModal } from '../../../shared/lib/stores/modal'
+import DocInfoModal from '../organisms/modals/DocInfoModal'
+import { SerializedRevision } from '../../../cloud/interfaces/db/revision'
 
 interface EditorProps {
   doc: SerializedDocWithBookmark
   team: SerializedTeam
   user: SerializedUser
+  contributors: SerializedUser[]
+  backLinks: SerializedDoc[]
 }
 
 interface EditorPosition {
@@ -75,16 +80,17 @@ interface SelectionState {
   }[]
 }
 
-const Editor = ({ doc, team, user }: EditorProps) => {
+const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
   const { pushMessage, pushApiErrorMessage } = useToast()
-  const [color] = useState(() => getColorFromString(user.id))
   const { preferences, setPreferences } = usePreferences()
-  const editorRef = useRef<CodeMirror.Editor | null>(null)
-  const [initialLoadDone, setInitialLoadDone] = useState(false)
-  const fileUploadHandlerRef = useRef<OnFileCallback>()
-  const [editorContent, setEditorContent] = useState('')
-  const docRef = useRef<string>('')
   const { state } = useRouter()
+  const { openModal } = useModal()
+  const [color] = useState(() => getColorFromString(user.id))
+  const [initialLoadDone, setInitialLoadDone] = useState(false)
+  const [editorContent, setEditorContent] = useState('')
+  const editorRef = useRef<CodeMirror.Editor | null>(null)
+  const fileUploadHandlerRef = useRef<OnFileCallback>()
+  const docRef = useRef<string>('')
   const [shortcodeConvertMenu, setShortcodeConvertMenu] = useState<{
     pos: PositionRange
     cb: Callback
@@ -237,7 +243,7 @@ const Editor = ({ doc, team, user }: EditorProps) => {
       }
       docRef.current = doc.id
     }
-  }, [doc.id, docIsNew, preferences.editorMode, setPreferences])
+  }, [doc.id, docIsNew, editorMode, setPreferences])
 
   useEffect(() => {
     if (editorMode === 'preview') {
@@ -425,7 +431,6 @@ const Editor = ({ doc, team, user }: EditorProps) => {
         : editorTheme === 'solarized-dark'
         ? 'solarized dark'
         : editorTheme
-    const keyMap = resolveKeyMap(settings['general.editorKeyMap'])
     const editorIndentType = settings['general.editorIndentType']
     const editorIndentSize = settings['general.editorIndentSize']
 
@@ -437,7 +442,6 @@ const Editor = ({ doc, team, user }: EditorProps) => {
       indentWithTabs: editorIndentType === 'tab',
       indentUnit: editorIndentSize,
       tabSize: editorIndentSize,
-      keyMap,
       extraKeys: {
         Enter: 'newlineAndIndentContinueMarkdownList',
         Tab: 'indentMore',
@@ -544,6 +548,30 @@ const Editor = ({ doc, team, user }: EditorProps) => {
     })
   }, [setPreferences, editorMode])
 
+  const onRestoreRevisionCallback = useCallback(
+    (rev: SerializedRevision) => {
+      if (realtime == null) {
+        return
+      }
+      const realtimeTitle = realtime.doc.getText('title')
+      realtimeTitle.delete(0, realtimeTitle.toString().length)
+      setEditorRefContent(rev.content)
+    },
+    [realtime, setEditorRefContent]
+  )
+
+  const openDocInfoModal = useCallback(() => {
+    openModal(
+      <DocInfoModal
+        team={team}
+        currentDoc={doc}
+        contributors={contributors}
+        backLinks={backLinks}
+        restoreRevision={onRestoreRevisionCallback}
+      />
+    )
+  }, [openModal, team, doc, contributors, backLinks, onRestoreRevisionCallback])
+
   if (!initialLoadDone) {
     return (
       <AppLayout>
@@ -566,7 +594,7 @@ const Editor = ({ doc, team, user }: EditorProps) => {
               path={editorMode === 'preview' ? mdiPencilOutline : mdiEyeOutline}
             />
           </NavigationBarButton>
-          <NavigationBarButton onClick={() => {}}>
+          <NavigationBarButton onClick={openDocInfoModal}>
             <Icon path={mdiDotsHorizontal} />
           </NavigationBarButton>
         </>
@@ -844,13 +872,3 @@ const StyledEditor = styled.div`
 `
 
 export default Editor
-
-function resolveKeyMap(keyMap: CodeMirrorKeyMap) {
-  switch (keyMap) {
-    case 'vim':
-      return 'vim'
-    case 'default':
-    default:
-      return 'sublime'
-  }
-}
