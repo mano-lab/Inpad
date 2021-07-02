@@ -11,6 +11,7 @@ import NavigationBarContainer from '../atoms/NavigationBarContainer'
 import NavigationBarButton from '../atoms/NavigationBarButton'
 import { useModal } from '../../../shared/lib/stores/modal'
 import SearchModal from '../organisms/modals/SearchModal'
+import DocCreateModal from '../organisms/modals/DocCreateModal'
 
 interface AppLayoutProps {
   title?: React.ReactNode
@@ -30,6 +31,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({
   const { openModal } = useModal()
   const openSearchModal = useCallback(() => {
     openModal(<SearchModal />)
+  }, [openModal])
+
+  const openDocCreateModal = useCallback(() => {
+    openModal(<DocCreateModal />)
   }, [openModal])
 
   return (
@@ -63,7 +68,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             <Icon path={mdiMagnify} />
           </button>
           <div className='main__footer__spacer' />
-          <button className='main__footer__button'>
+          <button className='main__footer__button' onClick={openDocCreateModal}>
             <Icon path={mdiSquareEditOutline} />
           </button>
         </div>
