@@ -58,11 +58,11 @@ import {
 import { useCloudApi } from '../../../cloud/lib/hooks/useCloudApi'
 import { useCloudResourceModals } from '../../../cloud/lib/hooks/useCloudResourceModals'
 import { getDocStatusHref, getSmartFolderHref } from '../href'
-import CreateSmartFolderModal from '../../../cloud/components/organisms/Modal/contents/SmartFolder/CreateSmartFolderModal'
-import UpdateSmartFolderModal from '../../../cloud/components/organisms/Modal/contents/SmartFolder/UpdateSmartFolderModal'
 import { useDialog } from '../../../shared/lib/stores/dialog'
 import WorkspaceCreateModal from '../../components/organisms/modals/WorkspaceCreateModal'
 import { useAppStatus } from '../appStatus'
+import SmartFolderCreateModal from '../../components/organisms/modals/SmartFolderCreateModal'
+import SmartFolderUpdateModal from '../../components/organisms/modals/SmartFolderUpdateModal'
 
 export function useNavigatorTree() {
   const { team, currentUserIsCoreMember } = usePage()
@@ -562,7 +562,7 @@ export function useNavigatorTree() {
                   label: 'Edit',
                   onClick: () => {
                     openModal(
-                      <UpdateSmartFolderModal smartFolder={smartFolder} />
+                      <SmartFolderUpdateModal smartFolder={smartFolder} />
                     )
                   },
                 },
@@ -600,7 +600,7 @@ export function useNavigatorTree() {
             {
               icon: mdiPlus,
               onClick: () => {
-                openModal(<CreateSmartFolderModal />)
+                openModal(<SmartFolderCreateModal />)
               },
             },
           ]

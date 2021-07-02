@@ -19,6 +19,8 @@ import DocOnlyContentManager from '../organisms/DocOnlyContentManager'
 import { getTeamIndexPageData } from '../../../cloud/api/pages/teams'
 import { localizeDate } from '../../../cloud/components/organisms/Modal/contents/SmartFolder/DocDateSelect'
 import AppLayout from '../layouts/AppLayout'
+import { mdiFolderCogOutline } from '@mdi/js'
+import Icon from '../../../shared/components/atoms/Icon'
 
 function validateAssignees(
   doc: SerializedDocWithBookmark,
@@ -256,7 +258,14 @@ const SmartFolderPage = (params: any) => {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      title={
+        <>
+          <Icon path={mdiFolderCogOutline} />
+          {smartFolder.name}
+        </>
+      }
+    >
       <DocOnlyContentManager
         team={team}
         documents={documents}
