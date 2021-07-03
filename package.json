@@ -243,12 +243,21 @@
       "entitlementsInherit": "macOs/entitlements.mac.plist",
       "entitlements": "macOs/entitlements.mac.plist"
     },
+    "snap": {
+      "confinement": "strict",
+      "plugs": [
+        "default",
+        "removable-media"
+      ]
+    },
     "linux": {
+      "executableName": "boostnote-next",
       "icon": "static/icon.icns",
       "target": [
         "deb",
         "rpm",
-        "AppImage"
+        "AppImage",
+        "snap"
       ]
     },
     "win": {
