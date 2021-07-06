@@ -53,7 +53,7 @@ const Container = styled.a`
   display: inline;
   transition: 200ms color;
   text-decoration: none;
-  color: ${({ theme }) => theme.colors.text.link}
+  color: ${({ theme }) => theme.colors.text.link};
   padding: 0 2px;
   cursor: pointer;
 
