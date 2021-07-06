@@ -25,6 +25,6 @@ const Container = styled.button`
   width: 47px;
   background-color: transparent;
   border: none;
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.text.subtle};
   font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 `

@@ -18,7 +18,7 @@ const Container = styled.button`
   height: 47px;
   background-color: transparent;
   border: none;
-  color: ${({ theme }) => theme.colors.text.primary};
+  color: ${({ theme }) => theme.colors.text.subtle};
   padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
   display: flex;
   align-items: center;
