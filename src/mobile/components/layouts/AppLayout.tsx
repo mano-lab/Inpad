@@ -55,7 +55,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
             label={title}
             left={
               <NavigationBarButton onClick={toggleShowingNavigator}>
-                <Icon path={mdiMenu} />
+                <Icon size={20} path={mdiMenu} />
               </NavigationBarButton>
             }
             right={navigatorBarRight}
@@ -65,11 +65,11 @@ const AppLayout: React.FC<AppLayoutProps> = ({
         <div className='main__body'>{children}</div>
         <div className='main__footer'>
           <button className='main__footer__button' onClick={openSearchModal}>
-            <Icon path={mdiMagnify} />
+            <Icon size={20} path={mdiMagnify} />
           </button>
           <div className='main__footer__spacer' />
           <button className='main__footer__button' onClick={openDocCreateModal}>
-            <Icon path={mdiSquareEditOutline} />
+            <Icon size={20} path={mdiSquareEditOutline} />
           </button>
         </div>
       </div>
@@ -89,15 +89,15 @@ const Container = styled.div`
   height: 100%;
   overflow: hidden;
   .nav {
-    position: absolute;
-    left: -240px;
-    width: 240px;
+    position: fixed;
+    left: -360px;
+    width: 360px;
     bottom: 0;
     top: 0;
     transition: left 200ms ease-in-out;
   }
   .main {
-    position: absolute;
+    position: fixed;
     left: 0;
     height: 100%;
     width: 100%;
@@ -125,21 +125,21 @@ const Container = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 30px;
+    height: 48px;
   }
 
   .main__body {
     position: absolute;
-    top: 30px;
+    top: 48px;
     left: 0;
     right: 0;
-    bottom: 30px;
+    bottom: 48px;
     overflow: auto;
   }
 
   .main__footer {
     position: absolute;
-    height: 30px;
+    height: 48px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -148,14 +148,14 @@ const Container = styled.div`
   }
   .main__footer__spacer {
     flex: 1;
-    height: 29px;
+    height: 47px;
   }
   .main__footer__button {
-    height: 29px;
+    height: 47px;
     background-color: transparent;
     border: none;
     color: ${({ theme }) => theme.colors.text.primary};
-    padding: 0 ${({ theme }) => theme.sizes.spaces.xsm}px;
+    padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
     flex: 1;
   }
 
@@ -164,7 +164,7 @@ const Container = styled.div`
       left: 0;
     }
     .main {
-      left: 240px;
+      left: 360px;
     }
   }
 `

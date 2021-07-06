@@ -21,7 +21,7 @@ const TableHeaderItem = ({ label, iconPath }: TableHeaderItemProps) => {
 export default TableHeaderItem
 
 const Container = styled.button`
-  height: 30px;
+  height: 48px;
   display: flex;
   align-items: center;
   padding: 0 ${({ theme }) => theme.sizes.spaces.df}px;

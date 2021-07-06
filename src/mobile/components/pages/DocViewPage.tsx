@@ -198,7 +198,7 @@ const ViewPage = ({
       navigatorBarRight={
         <>
           <NavigationBarButton onClick={openDocInfoModal}>
-            <Icon path={mdiDotsHorizontal} />
+            <Icon size={20} path={mdiDotsHorizontal} />
           </NavigationBarButton>
         </>
       }

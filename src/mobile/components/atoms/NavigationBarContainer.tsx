@@ -23,7 +23,7 @@ const NavigationBarContainer = ({
 }
 const Container = styled.div`
   &.navigation_bar_container {
-    height: 30px;
+    height: 48px;
     width: 100%;
     background-color: ${({ theme }) => theme.colors.background.primary};
     border-bottom: solid 1px ${({ theme }) => theme.colors.border.main};
@@ -31,7 +31,7 @@ const Container = styled.div`
   }
 
   .navigation_bar_container__left {
-    width: 80px;
+    width: 96px;
     display: flex;
   }
   .navigation_bar_container__label {
@@ -40,9 +40,10 @@ const Container = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
   }
   .navigation_bar_container__right {
-    width: 80px;
+    width: 96px;
     justify-content: flex-end;
     display: flex;
   }

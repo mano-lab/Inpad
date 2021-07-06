@@ -261,7 +261,7 @@ const SmartFolderPage = (params: any) => {
     <AppLayout
       title={
         <>
-          <Icon path={mdiFolderCogOutline} />
+          <Icon size={20} path={mdiFolderCogOutline} />
           {smartFolder.name}
         </>
       }

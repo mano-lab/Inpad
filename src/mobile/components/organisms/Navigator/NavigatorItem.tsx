@@ -77,7 +77,7 @@ const NavigatorItem: React.FC<NavigatorItemProps> = ({
         {folded != null && (
           <Button
             variant='icon'
-            iconSize={16}
+            iconSize={20}
             iconPath={folded ? mdiChevronRight : mdiChevronDown}
             className='sidebar__tree__item__icon'
             size='sm'
@@ -93,9 +93,9 @@ const NavigatorItem: React.FC<NavigatorItemProps> = ({
           draggable={false}
         >
           {emoji != null ? (
-            <Emoji emoji={emoji} set='apple' size={16} />
+            <Emoji emoji={emoji} set='apple' size={20} />
           ) : defaultIcon != null ? (
-            <Icon path={defaultIcon} size={16} />
+            <Icon path={defaultIcon} size={20} />
           ) : null}
           <span className='sidebar__tree__item__label__ellipsis'>{label}</span>
         </LabelTag>
@@ -105,7 +105,7 @@ const NavigatorItem: React.FC<NavigatorItemProps> = ({
               <Button
                 key={i}
                 variant='icon'
-                iconSize={16}
+                iconSize={20}
                 iconPath={control.icon}
                 tabIndex={-1}
                 className='sidebar__tree__item__control'
@@ -116,7 +116,7 @@ const NavigatorItem: React.FC<NavigatorItemProps> = ({
             {contextControls != null && (
               <Button
                 variant='icon'
-                iconSize={16}
+                iconSize={20}
                 iconPath={mdiDotsHorizontal}
                 tabIndex={-1}
                 className='sidebar__tree__item__control'
@@ -137,9 +137,9 @@ const Container = styled.div<{ depth: number }>`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  height: 30px;
+  height: 48px;
   white-space: nowrap;
-  font-size: ${({ theme }) => theme.sizes.fonts.df}px;
+  font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 
   border-bottom: solid 1px ${({ theme }) => theme.colors.border.main};
   background-color: ${({ theme }) => theme.colors.background.secondary};
@@ -176,7 +176,7 @@ const Container = styled.div<{ depth: number }>`
   }
 
   .sidebar__tree__item__label {
-    font-size: ${({ theme }) => theme.sizes.fonts.df}px;
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
     display: flex;
     align-items: center;
     flex: 1 1 auto;
@@ -193,7 +193,7 @@ const Container = styled.div<{ depth: number }>`
       color: ${({ theme }) => theme.colors.text.link};
     }
     .sidebar__tree__item__label__ellipsis {
-      padding-left: ${({ theme }) => theme.sizes.spaces.xsm}px;
+      padding-left: ${({ theme }) => theme.sizes.spaces.sm}px;
       padding-right: ${({ theme }) => theme.sizes.spaces.df}px;
       ${overflowEllipsis};
     }

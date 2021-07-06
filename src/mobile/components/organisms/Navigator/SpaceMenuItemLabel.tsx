@@ -29,10 +29,12 @@ export default SpaceMenuItemLabel
 const Container = styled.div`
   display: flex;
   align-items: center;
+  height: 48px;
+  font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 
   .space-menu-item-label__icon {
     text-align: center;
-    margin-right: ${({ theme }) => theme.sizes.spaces.xsm}px;
+    margin-right: ${({ theme }) => theme.sizes.spaces.sm}px;
   }
 
   .space-menu-item-label__name {

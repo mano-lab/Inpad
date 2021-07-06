@@ -11,7 +11,9 @@ interface TableItemProps {
 const TableItem = ({ label, iconPath, onClick }: TableItemProps) => {
   return (
     <Container className='tableItem' onClick={onClick}>
-      {iconPath != null && <Icon className='tableItem__icon' path={iconPath} />}
+      {iconPath != null && (
+        <Icon size={20} className='tableItem__icon' path={iconPath} />
+      )}
       <div className='tableItem__label'>{label}</div>
     </Container>
   )
@@ -20,7 +22,7 @@ const TableItem = ({ label, iconPath, onClick }: TableItemProps) => {
 export default TableItem
 
 const Container = styled.button`
-  height: 30px;
+  height: 48px;
   display: flex;
   align-items: center;
   padding: 0 ${({ theme }) => theme.sizes.spaces.df}px;

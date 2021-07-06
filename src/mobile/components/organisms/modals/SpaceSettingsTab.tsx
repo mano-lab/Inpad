@@ -66,7 +66,7 @@ const SpaceSettingsTab = ({ setActiveTab }: SpaceSettingsTabProps) => {
     <ModalContainer
       left={
         <NavigationBarButton onClick={() => setActiveTab(null)}>
-          <Icon path={mdiArrowLeft} /> Back
+          <Icon size={20} path={mdiArrowLeft} /> Back
         </NavigationBarButton>
       }
       title='Members'

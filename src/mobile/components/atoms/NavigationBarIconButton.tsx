@@ -13,7 +13,7 @@ const NavigationBarIconButton = ({
 }: NavigationBarIconButtonProps) => {
   return (
     <Container onClick={onClick}>
-      <Icon path={iconPath} />
+      <Icon size={20} path={iconPath} />
     </Container>
   )
 }
@@ -21,9 +21,10 @@ const NavigationBarIconButton = ({
 export default NavigationBarIconButton
 
 const Container = styled.button`
-  height: 29px;
+  height: 47px;
+  width: 47px;
   background-color: transparent;
   border: none;
   color: ${({ theme }) => theme.colors.text.primary};
-  padding: 0 ${({ theme }) => theme.sizes.spaces.xsm}px;
+  font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 `

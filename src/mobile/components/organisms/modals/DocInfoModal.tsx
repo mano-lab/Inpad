@@ -251,7 +251,7 @@ const DocInfoModal = ({
                     <label className='context__label'>
                       <Icon
                         path={mdiAccountCircleOutline}
-                        size={16}
+                        size={20}
                         className='context__icon'
                       />{' '}
                       {translate(lngKeys.Assignees)}
@@ -282,7 +282,7 @@ const DocInfoModal = ({
                   <label className='context__label'>
                     <Icon
                       path={mdiListStatus}
-                      size={16}
+                      size={20}
                       className='context__icon'
                     />{' '}
                     {translate(lngKeys.GeneralStatus)}
@@ -302,7 +302,7 @@ const DocInfoModal = ({
                   <label className='context__label'>
                     <Icon
                       path={mdiClockOutline}
-                      size={16}
+                      size={20}
                       className='context__icon'
                     />{' '}
                     {translate(lngKeys.DueDate)}
@@ -323,7 +323,7 @@ const DocInfoModal = ({
                   <label className='context__label' style={{ height: 32 }}>
                     <Icon
                       path={mdiLabelMultipleOutline}
-                      size={16}
+                      size={20}
                       className='context__icon'
                     />{' '}
                     {translate(lngKeys.GeneralLabels)}
@@ -343,7 +343,7 @@ const DocInfoModal = ({
                   <label className='context__label'>
                     <Icon
                       path={mdiClockOutline}
-                      size={16}
+                      size={20}
                       className='context__icon'
                     />{' '}
                     {translate(lngKeys.CreationDate)}
@@ -363,7 +363,7 @@ const DocInfoModal = ({
                     <label className='context__label'>
                       <Icon
                         path={mdiAccountCircleOutline}
-                        size={16}
+                        size={20}
                         className='context__icon'
                       />{' '}
                       {translate(lngKeys.CreatedBy)}
@@ -383,7 +383,7 @@ const DocInfoModal = ({
                   <label className='context__label'>
                     <Icon
                       path={mdiContentSaveOutline}
-                      size={16}
+                      size={20}
                       className='context__icon'
                     />{' '}
                     {translate(lngKeys.UpdateDate)}
@@ -409,7 +409,7 @@ const DocInfoModal = ({
                     <label className='context__label'>
                       <Icon
                         path={mdiAccountCircleOutline}
-                        size={16}
+                        size={20}
                         className='context__icon'
                       />{' '}
                       {translate(lngKeys.UpdatedBy)}
@@ -442,7 +442,7 @@ const DocInfoModal = ({
                     <label className='context__label'>
                       <Icon
                         path={mdiAccountMultiple}
-                        size={16}
+                        size={20}
                         className='context__icon'
                       />{' '}
                       {translate(lngKeys.Contributors)}
@@ -480,7 +480,7 @@ const DocInfoModal = ({
                   <label className='context__label'>
                     <Icon
                       path={mdiHistory}
-                      size={16}
+                      size={20}
                       className='context__icon'
                     />{' '}
                     {translate(lngKeys.History)}
@@ -541,7 +541,7 @@ const DocInfoModal = ({
                                 >
                                   <Icon
                                     path={mdiArrowBottomLeft}
-                                    size={16}
+                                    size={20}
                                     className='context__icon'
                                   />
                                   {getDocTitle(doc)}

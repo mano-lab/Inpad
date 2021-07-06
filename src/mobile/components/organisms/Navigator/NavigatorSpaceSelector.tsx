@@ -87,6 +87,7 @@ const NavigatorSpaceSelector = ({
       )}
 
       <Icon
+        size={20}
         className='space-selector__select-icon'
         path={mdiUnfoldMoreHorizontal}
       />
@@ -106,6 +107,7 @@ const Container = styled.button`
     height: 100%;
     align-items: center;
     padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 
     &:active,
     &:hover {

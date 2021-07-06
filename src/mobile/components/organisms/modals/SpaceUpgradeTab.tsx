@@ -41,7 +41,7 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
     <ModalContainer
       left={
         <NavigationBarButton onClick={() => setActiveTab(null)}>
-          <Icon path={mdiArrowLeft} /> Back
+          <Icon size={20} path={mdiArrowLeft} /> Back
         </NavigationBarButton>
       }
       title='Settings'
@@ -55,6 +55,7 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
               onClick={() => toggleTab('free')}
             >
               <Icon
+                size={20}
                 className='planItem__header__titleButton__foldIcon'
                 path={isTabOpen('free') ? mdiChevronDown : mdiChevronRight}
               />
@@ -75,15 +76,15 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
               </div>
               <ul className='planItem__body__featureList'>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   10 docs per team
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Unlimited members
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   100MB storage per member
                 </li>
               </ul>
@@ -135,23 +136,23 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
               </div>
               <ul className='planItem__body__featureList'>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Collaborative workspace
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Unlimited documents
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Unlimited members
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   1GB storage per member
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />7 days revision history
+                  <Icon size={20} path={mdiCheck} />7 days revision history
                 </li>
               </ul>
               <a
@@ -172,6 +173,7 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
               onClick={() => toggleTab('pro')}
             >
               <Icon
+                size={20}
                 className='planItem__header__titleButton__foldIcon'
                 path={isTabOpen('pro') ? mdiChevronDown : mdiChevronRight}
               />
@@ -198,23 +200,23 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
               </div>
               <ul className='planItem__body__featureList'>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Everything in Standard
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Guest invite
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Password/Expiration date for sharing
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   10GB storage per member
                 </li>
                 <li className='planItem__body__featureList__item'>
-                  <Icon path={mdiCheck} />
+                  <Icon size={20} path={mdiCheck} />
                   Priority support
                 </li>
               </ul>
@@ -301,7 +303,7 @@ const Container = styled.div`
   .planItem__body__featureList__item {
     display: flex;
     align-items: center;
-    padding: ${({ theme }) => theme.sizes.spaces.xsm}px
+    padding: ${({ theme }) => theme.sizes.spaces.sm}px
       ${({ theme }) => theme.sizes.spaces.sm}px;
   }
   .planItem__body__learnMoreButton {

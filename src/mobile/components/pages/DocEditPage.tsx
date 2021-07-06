@@ -591,11 +591,12 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
         <>
           <NavigationBarButton onClick={toggleEditorMode}>
             <Icon
+              size={20}
               path={editorMode === 'preview' ? mdiPencilOutline : mdiEyeOutline}
             />
           </NavigationBarButton>
           <NavigationBarButton onClick={openDocInfoModal}>
-            <Icon path={mdiDotsHorizontal} />
+            <Icon size={20} path={mdiDotsHorizontal} />
           </NavigationBarButton>
         </>
       }
@@ -632,13 +633,6 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
               scrollerRef={previewRef}
               comments={viewComments}
               commentClick={commentClick}
-              SelectionMenu={({ selection }) => (
-                <StyledSelectionMenu>
-                  <div onClick={() => newRangeThread(selection)}>
-                    <Icon size={21} path={mdiCommentTextOutline} />
-                  </div>
-                </StyledSelectionMenu>
-              )}
             />
           </StyledPreview>
         </StyledEditor>

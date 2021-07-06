@@ -53,12 +53,12 @@ const Container = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 30px;
+    height: 48px;
   }
 
   .modal-container__body {
     position: absolute;
-    top: 30px;
+    top: 48px;
     left: 0;
     right: 0;
     bottom: 0;

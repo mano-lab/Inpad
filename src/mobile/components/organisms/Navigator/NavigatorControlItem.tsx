@@ -19,7 +19,7 @@ const NavigatorControlItem: React.FC<NavigatorControlItemProps> = ({
       <Icon
         className='navigator-control-item__icon'
         path={iconPath}
-        size={16}
+        size={20}
       />
       <div className='navigator-control-item__label'>{label}</div>
     </Container>
@@ -30,10 +30,11 @@ const Container = styled.button`
   &.navigator-control-item {
     display: flex;
     width: 100%;
-    height: 40px;
+    padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
+    height: 48px;
     flex-shrink: 0;
     align-items: center;
-    font-size: ${({ theme }) => theme.sizes.fonts.df}px;
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
     background-color: transparent;
     border: none;
     color: ${({ theme }) => theme.colors.text.subtle};

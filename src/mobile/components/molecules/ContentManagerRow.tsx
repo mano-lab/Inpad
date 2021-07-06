@@ -48,7 +48,7 @@ const StyledContentManagerRow = styled.div`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  height: 40px;
+  height: 48px;
   flex: 1 1 auto;
   flex-shrink: 0;
   width: 100%;
@@ -57,11 +57,7 @@ const StyledContentManagerRow = styled.div`
   }
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.second};
   font-size: 13px;
-  padding: 0 ${({ theme }) => theme.sizes.spaces.xsm}px;
-
-  &.expanded {
-    height: 60px;
-  }
+  padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
 
   .actions {
     display: none;
@@ -111,7 +107,7 @@ const StyledContentManagerRow = styled.div`
   }
 
   .row__checkbox {
-    margin-right: 4px;
+    margin-right: ${({ theme }) => theme.sizes.spaces.sm}px;
     &.row__checkbox--checked {
     }
   }
@@ -130,8 +126,8 @@ const StyledContentManagerRow = styled.div`
 
   .label {
     flex: 1 1 auto;
-    font-size: ${({ theme }) => theme.sizes.fonts.df}px;
-    margin: 0 ${({ theme }) => theme.sizes.spaces.xsm}px 0 0;
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
+    margin: 0 ${({ theme }) => theme.sizes.spaces.sm}px 0 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

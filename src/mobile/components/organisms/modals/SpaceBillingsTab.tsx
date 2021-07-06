@@ -54,7 +54,7 @@ const SpaceBillingsTab = ({ setActiveTab }: SpaceBillingsTabProps) => {
       <ModalContainer
         left={
           <NavigationBarButton onClick={() => setActiveTab(null)}>
-            <Icon path={mdiArrowLeft} /> Back
+            <Icon size={20} path={mdiArrowLeft} /> Back
           </NavigationBarButton>
         }
         title='Settings'
@@ -78,7 +78,7 @@ const SpaceBillingsTab = ({ setActiveTab }: SpaceBillingsTabProps) => {
       <ModalContainer
         left={
           <NavigationBarButton onClick={() => setActiveTab(null)}>
-            <Icon path={mdiArrowLeft} /> Back
+            <Icon size={20} path={mdiArrowLeft} /> Back
           </NavigationBarButton>
         }
         title='Settings'
@@ -102,7 +102,7 @@ const SpaceBillingsTab = ({ setActiveTab }: SpaceBillingsTabProps) => {
       <ModalContainer
         left={
           <NavigationBarButton onClick={() => setActiveTab(null)}>
-            <Icon path={mdiArrowLeft} /> Back
+            <Icon size={20} path={mdiArrowLeft} /> Back
           </NavigationBarButton>
         }
         title='Settings'
@@ -125,7 +125,7 @@ const SpaceBillingsTab = ({ setActiveTab }: SpaceBillingsTabProps) => {
     <ModalContainer
       left={
         <NavigationBarButton onClick={() => setActiveTab(null)}>
-          <Icon path={mdiArrowLeft} /> Back
+          <Icon size={20} path={mdiArrowLeft} /> Back
         </NavigationBarButton>
       }
       title='Billings'

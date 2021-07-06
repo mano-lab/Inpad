@@ -15,11 +15,12 @@ const NavigationBarButton: React.FC<NavigationBarButtonProps> = ({
 export default NavigationBarButton
 
 const Container = styled.button`
-  height: 29px;
+  height: 47px;
   background-color: transparent;
   border: none;
   color: ${({ theme }) => theme.colors.text.primary};
-  padding: 0 ${({ theme }) => theme.sizes.spaces.xsm}px;
+  padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
   display: flex;
   align-items: center;
+  font-size: ${({ theme }) => theme.sizes.fonts.md}px;
 `

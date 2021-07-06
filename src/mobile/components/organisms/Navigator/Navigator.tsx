@@ -47,7 +47,7 @@ const Navigator = ({
           type: MenuTypes.Normal,
           label: (
             <>
-              <Icon path={mdiSortAlphabeticalAscending} /> Title A-Z
+              <Icon size={20} path={mdiSortAlphabeticalAscending} /> Title A-Z
             </>
           ),
           active: preferences.navigatorTreeSortingOrder === 'a-z',
@@ -61,7 +61,7 @@ const Navigator = ({
           type: MenuTypes.Normal,
           label: (
             <>
-              <Icon path={mdiSortAlphabeticalDescending} /> Title Z-A
+              <Icon size={20} path={mdiSortAlphabeticalDescending} /> Title Z-A
             </>
           ),
           active: preferences.navigatorTreeSortingOrder === 'z-a',
@@ -75,7 +75,8 @@ const Navigator = ({
           type: MenuTypes.Normal,
           label: (
             <>
-              <Icon path={mdiSortAlphabeticalAscending} /> Last Updated
+              <Icon size={20} path={mdiSortAlphabeticalAscending} /> Last
+              Updated
             </>
           ),
           active: preferences.navigatorTreeSortingOrder === 'last-updated',
@@ -103,6 +104,7 @@ const Navigator = ({
           onClick={popupTreeSortingOrder}
         >
           <Icon
+            size={20}
             path={
               preferences.navigatorTreeSortingOrder === 'a-z'
                 ? mdiSortAlphabeticalAscending
@@ -136,13 +138,14 @@ const Container = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 30px;
+    height: 48px;
     display: flex;
     border-bottom: solid 1px ${({ theme }) => theme.colors.border.main};
     background-color: ${({ theme }) => theme.colors.background.secondary};
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
   }
   .sidebar__header__button {
-    width: 30px;
+    width: 48px;
     height: 100%;
     background-color: ${({ theme }) => theme.colors.background.secondary};
     color: ${({ theme }) => theme.colors.variants.secondary.text};
@@ -150,7 +153,7 @@ const Container = styled.div`
   }
   .sidebar__body {
     position: absolute;
-    top: 30px;
+    top: 48px;
     left: 0;
     right: 0;
     bottom: 0;
