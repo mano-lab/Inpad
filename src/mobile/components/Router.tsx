@@ -35,7 +35,7 @@ import { V2ModalProvider } from '../../shared/lib/stores/modal'
 import { V2DialogProvider } from '../../shared/lib/stores/dialog'
 import Toast from '../../shared/components/organisms/Toast'
 import Dialog from '../../shared/components/organisms/Dialog/Dialog'
-import ContextMenu from '../../shared/components/molecules/ContextMenu'
+import MobileContextMenu from './molecules/MobileContextMenu'
 import { CommentsProvider } from '../../cloud/lib/stores/comments'
 import EmojiPicker from '../../shared/components/molecules/EmojiPicker'
 import CooperatePage from './pages/CooperatePage'
@@ -242,7 +242,7 @@ const Router = () => {
                 <GlobalStyle />
                 <CodeMirrorStyle />
                 <Toast />
-                <ContextMenu />
+                <MobileContextMenu />
                 <EmojiPicker />
                 <Dialog />
 
