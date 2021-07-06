@@ -47,7 +47,7 @@ export default GithubLoginButton
 const StyledGithubButton = styled.a`
   display: inline-block;
   text-decoration: none;
-  width: 400px;
+  width: 100%;
   height: 40px;
   line-height: 10px;
   text-align: center;

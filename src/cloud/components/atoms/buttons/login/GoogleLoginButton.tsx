@@ -56,6 +56,7 @@ const GoogleLoginButton = ({
   )
 
   const errorHandler = (response: any) => {
+    console.log(response.error)
     if (response.error === 'popup_closed_by_user') {
       return
     }
@@ -109,7 +110,7 @@ export default GoogleLoginButton
 
 const StyledGoogleButton = styled.button`
   text-decoration: none;
-  width: 400px;
+  width: 100%;
   height: 40px;
   line-height: 10px;
   cursor: pointer;

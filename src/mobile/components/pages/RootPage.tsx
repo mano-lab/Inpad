@@ -5,6 +5,7 @@ import { mobileBaseUrl } from '../../../cloud/lib/consts'
 import SignInForm from '../../../cloud/components/molecules/SignInForm'
 import Button from '../../../shared/components/atoms/Button'
 import { useRouter } from '../../../cloud/lib/router'
+import styled from '../../../shared/lib/styled'
 
 const RootPage = () => {
   const { globalData } = useGlobalData()
@@ -12,10 +13,22 @@ const RootPage = () => {
 
   if (globalData.currentUser == null) {
     return (
-      <div>
-        BoostNote
-        <SignInForm redirectTo='http://localhost:3005' />
-      </div>
+      <Container>
+        <div className='intro'>
+          <img
+            className='intro__logo'
+            src='/static/images/logo.png'
+            width='80'
+            height='80'
+          />
+          <h1 className='intro__heading'>Welcome to Boost Note!</h1>
+          <p className='intro__description'>
+            Boost Note is a powerful, lightspeed collaborative workspace for
+            developer teams.
+          </p>
+        </div>
+        <SignInForm redirectTo='http://localhost:3005' width='100%' />
+      </Container>
     )
   }
   return (
@@ -56,3 +69,18 @@ const RootPage = () => {
 }
 
 export default RootPage
+
+const Container = styled.div`
+  padding: ${({ theme }) => theme.sizes.spaces.md}px;
+  .intro {
+    margin-top: ${({ theme }) => theme.sizes.spaces.xl}px;
+  }
+  .intro__logo {
+  }
+  .intro__heading {
+    font-size: ${({ theme }) => theme.sizes.fonts.l}px;
+  }
+  .intro__description {
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
+  }
+`
