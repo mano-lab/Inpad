@@ -52,6 +52,7 @@ import OpenInvitePage from './pages/OpenInvitePage'
 import BookmarksListPage from './pages/BookmarksListPage'
 import SharedDocsListPage from './pages/SharedDocsListPage'
 import DeleteTeamPage from './pages/TeamDeletePage'
+import DeleteAccountPage from './pages/DeleteAccountPage'
 import Modal from './organisms/modals/Modal'
 import { AppStatusProvider } from '../lib/appStatus'
 import WorkspacePage from './pages/WorkspacePage'
@@ -321,6 +322,16 @@ function getPageComponent(pathname: string): PageSpec | null {
         return {
           Component: CooperatePage,
         }
+    }
+  }
+
+  if (
+    splittedPathnames.length >= 1 &&
+    splittedPathnames[0] === 'account' &&
+    splittedPathnames[1] === 'delete'
+  ) {
+    return {
+      Component: DeleteAccountPage,
     }
   }
 
