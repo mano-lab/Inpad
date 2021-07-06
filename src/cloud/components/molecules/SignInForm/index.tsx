@@ -13,6 +13,7 @@ interface SignInFormProps {
   openInviteSlug?: string
   disabled?: boolean
   width?: string
+  mobile?: boolean
 }
 
 const SignInForm = ({
@@ -22,6 +23,7 @@ const SignInForm = ({
   disabled: preventAction = false,
   openInviteSlug,
   width = '400px',
+  mobile,
 }: SignInFormProps) => {
   const [error, setError] = useState<unknown>()
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -44,8 +46,11 @@ const SignInForm = ({
     if (openInviteSlug != null) {
       query.openInviteSlug = openInviteSlug
     }
+    if (mobile) {
+      query.mobile = 'true'
+    }
     return query
-  }, [redirectTo, isSignup, inviteId, openInviteSlug])
+  }, [redirectTo, isSignup, inviteId, openInviteSlug, mobile])
 
   return (
     <>

@@ -65,7 +65,11 @@ const RootPage = () => {
             developer teams.
           </p>
         </div>
-        <SignInForm redirectTo='http://localhost:3005' width='100%' />
+        <SignInForm
+          redirectTo='http://localhost:3005'
+          width='100%'
+          mobile={true}
+        />
       </Container>
     )
   }
