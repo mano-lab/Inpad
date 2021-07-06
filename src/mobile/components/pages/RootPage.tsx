@@ -1,16 +1,56 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useGlobalData } from '../../../cloud/lib/stores/globalData'
-import SignOutButton from '../../../cloud/components/atoms/buttons/SignOutButton'
-import { mobileBaseUrl } from '../../../cloud/lib/consts'
+import { mobileBaseUrl, boostHubBaseUrl } from '../../../cloud/lib/consts'
 import SignInForm from '../../../cloud/components/molecules/SignInForm'
-import Button from '../../../shared/components/atoms/Button'
 import { useRouter } from '../../../cloud/lib/router'
 import styled from '../../../shared/lib/styled'
+import {
+  useContextMenu,
+  MenuTypes,
+  NormalMenuItem,
+} from '../../../shared/lib/stores/contextMenu'
+import SpaceMenuItemLabel from '../organisms/Navigator/SpaceMenuItemLabel'
+import Icon from '../../../shared/components/atoms/Icon'
+import { mdiUnfoldMoreHorizontal } from '@mdi/js'
+import UserIcon from '../../../cloud/components/atoms/UserIcon'
+import Button from '../../../shared/components/atoms/Button'
 
 const RootPage = () => {
   const { globalData } = useGlobalData()
   const { push } = useRouter()
 
+  const { popup } = useContextMenu()
+
+  const signOut = useCallback(() => {
+    window.location.href = `${boostHubBaseUrl}/api/oauth/signout?redirectTo=${mobileBaseUrl}`
+  }, [])
+
+  const popupSpaceSelect = useCallback(
+    (event: React.MouseEvent) => {
+      popup(event, [
+        ...globalData.teams.map((team) => {
+          return {
+            type: MenuTypes.Normal,
+            label: <SpaceMenuItemLabel team={team} />,
+            onClick: () => {
+              push(`/${team.domain}`)
+            },
+          }
+        }),
+        {
+          type: MenuTypes.Separator,
+        },
+        {
+          type: MenuTypes.Normal,
+          label: 'Create a space',
+          onClick: () => {
+            push('/cooperate')
+          },
+        },
+      ] as NormalMenuItem[])
+    },
+    [globalData.teams, popup, push]
+  )
   if (globalData.currentUser == null) {
     return (
       <Container>
@@ -32,39 +72,39 @@ const RootPage = () => {
     )
   }
   return (
-    <div>
-      BoostNote
-      <div>
-        Signed in as
-        {globalData.currentUser.displayName}
+    <Container>
+      <div className='intro'>
+        <img
+          className='intro__logo'
+          src='/static/images/logo.png'
+          width='80'
+          height='80'
+        />
+        <h1 className='intro__heading'>Welcome to Boost Note!</h1>
+        <div className='intro__user'>
+          <span className='intro__user__prefix'>Signed in as </span>
+          <UserIcon
+            className='intro__user__icon'
+            user={globalData.currentUser}
+          />{' '}
+          <span className='intro__user__displayName'>
+            {globalData.currentUser.displayName}
+          </span>
+          <Button variant='link' onClick={signOut}>
+            (Sign Out)
+          </Button>
+        </div>
       </div>
-      {globalData.teams.map((team) => {
-        return (
-          <div key={team.id}>
-            <Button
-              onClick={() => {
-                push(`/${team.domain}`)
-              }}
-            >
-              {team.name}
-            </Button>
-          </div>
-        )
-      })}
-      {globalData.teams.length === 0 && <div>There is no team</div>}
-      <div>
-        <Button
-          onClick={() => {
-            push('/cooperate')
-          }}
-        >
-          Create a new team
-        </Button>
-      </div>
-      <div>
-        <SignOutButton redirectTo={mobileBaseUrl}></SignOutButton>
-      </div>
-    </div>
+
+      <button className='speceSelector' onClick={popupSpaceSelect}>
+        Select Space
+        <Icon
+          size={20}
+          className='space-selector__select-icon'
+          path={mdiUnfoldMoreHorizontal}
+        />
+      </button>
+    </Container>
   )
 }
 
@@ -82,5 +122,34 @@ const Container = styled.div`
   }
   .intro__description {
     font-size: ${({ theme }) => theme.sizes.fonts.md}px;
+  }
+
+  .speceSelector {
+    display: flex;
+    padding: ${({ theme }) => theme.sizes.spaces.sm}px;
+    width: 100%;
+    height: 48px;
+    align-items: center;
+    border: none;
+    background-color: ${({ theme }) => theme.colors.background.secondary};
+    color: ${({ theme }) => theme.colors.variants.secondary.text};
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
+  }
+
+  .intro__user {
+    display: flex;
+    margin-bottom: ${({ theme }) => theme.sizes.spaces.md}px;
+    font-size: ${({ theme }) => theme.sizes.fonts.md}px;
+    align-items: center;
+  }
+  .intro__user__prefix {
+    margin-right: ${({ theme }) => theme.sizes.spaces.sm}px;
+  }
+
+  .intro__user__icon {
+    margin-right: ${({ theme }) => theme.sizes.spaces.xsm}px;
+  }
+  .intro__user__displayName {
+    margin-right: ${({ theme }) => theme.sizes.spaces.sm}px;
   }
 `
