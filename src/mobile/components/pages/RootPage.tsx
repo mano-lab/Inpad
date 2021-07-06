@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { useGlobalData } from '../../../cloud/lib/stores/globalData'
-import { mobileBaseUrl, boostHubBaseUrl } from '../../../cloud/lib/consts'
 import SignInForm from '../../../cloud/components/molecules/SignInForm'
 import { useRouter } from '../../../cloud/lib/router'
 import styled from '../../../shared/lib/styled'
@@ -14,6 +13,7 @@ import Icon from '../../../shared/components/atoms/Icon'
 import { mdiUnfoldMoreHorizontal } from '@mdi/js'
 import UserIcon from '../../../cloud/components/atoms/UserIcon'
 import Button from '../../../shared/components/atoms/Button'
+import useSignOut from '../../lib/signOut'
 
 const RootPage = () => {
   const { globalData } = useGlobalData()
@@ -21,9 +21,7 @@ const RootPage = () => {
 
   const { popup } = useContextMenu()
 
-  const signOut = useCallback(() => {
-    window.location.href = `${boostHubBaseUrl}/api/oauth/signout?redirectTo=${mobileBaseUrl}`
-  }, [])
+  const signOut = useSignOut()
 
   const popupSpaceSelect = useCallback(
     (event: React.MouseEvent) => {
