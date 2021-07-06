@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import Button from '../../../shared/components/atoms/Button'
 import { useRouter } from '../../../cloud/lib/router'
 import { createTeam } from '../../../cloud/api/teams'
-import { getTeamLinkHref } from '../../lib/href'
-import { getDocLinkHref } from '../../../cloud/components/atoms/Link/DocLink'
+import { getTeamLinkHref, getDocLinkHref } from '../../lib/href'
 import styled from '../../../shared/lib/styled'
 import NavigationBarContainer from '../atoms/NavigationBarContainer'
 import NavigationBarButton from '../atoms/NavigationBarButton'
@@ -111,8 +110,6 @@ export default CooperatePage
 const Container = styled.div`
   .form {
     padding: ${({ theme }) => theme.sizes.spaces.md}px;
-  }
-  .form__description {
     font-size: ${({ theme }) => theme.sizes.fonts.md}px;
   }
 
