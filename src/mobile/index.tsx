@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './components/App'
-import '../lib/i18n'
+import '../cloud/lib/i18n'
 
 function render(Component: typeof App) {
   let rootDiv = document.getElementById('root')
