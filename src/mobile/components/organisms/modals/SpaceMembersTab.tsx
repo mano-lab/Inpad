@@ -22,7 +22,6 @@ import { getUserEmailsFromPermissions } from '../../../../cloud/api/teams/permis
 import { useRouter } from '../../../../cloud/lib/router'
 import { mdiArrowLeft } from '@mdi/js'
 import { useSet } from 'react-use'
-import SettingsTeamForm from '../../../../cloud/components/molecules/SettingsTeamForm'
 import { useToast } from '../../../../shared/lib/stores/toast'
 import SettingTabContent from '../../../../shared/components/organisms/Settings/atoms/SettingTabContent'
 import Button from '../../../../shared/components/atoms/Button'
@@ -33,6 +32,7 @@ import NavigationBarButton from '../../atoms/NavigationBarButton'
 import Icon from '../../../../shared/components/atoms/Icon'
 import ModalContainer from './atoms/ModalContainer'
 import { SettingsTabTypes } from './types'
+import SettingsTeamForm from './organisms/SettingsTeamForm'
 
 interface SpaceMembersTabProps {
   setActiveTab: (tabType: SettingsTabTypes | null) => void
