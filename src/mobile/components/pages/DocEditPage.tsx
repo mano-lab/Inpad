@@ -12,10 +12,7 @@ import attachFileHandlerToCodeMirrorEditor, {
   OnFileCallback,
 } from '../../../cloud/lib/editor/plugins/fileHandler'
 import { uploadFile, buildTeamFileUrl } from '../../../cloud/api/teams/files'
-import {
-  createRelativePositionFromTypeIndex,
-  createAbsolutePositionFromRelativePosition,
-} from 'yjs'
+import { createAbsolutePositionFromRelativePosition } from 'yjs'
 import { SerializedTeam } from '../../../cloud/interfaces/db/team'
 import { getDocTitle } from '../../../cloud/lib/utils/patterns'
 import { SerializedUser } from '../../../cloud/interfaces/db/user'
@@ -28,12 +25,7 @@ import {
   Callback,
 } from '../../../cloud/lib/editor/plugins/pasteFormatPlugin'
 import { buildIconUrl } from '../../../cloud/api/files'
-import {
-  mdiCommentTextOutline,
-  mdiPencilOutline,
-  mdiEyeOutline,
-  mdiDotsHorizontal,
-} from '@mdi/js'
+import { mdiPencilOutline, mdiEyeOutline, mdiDotsHorizontal } from '@mdi/js'
 import { useNav } from '../../../cloud/lib/stores/nav'
 import { Hint } from 'codemirror'
 import {
@@ -42,9 +34,7 @@ import {
 } from '../../../cloud/lib/utils/events'
 import { ScrollSync, scrollSyncer } from '../../../cloud/lib/editor/scrollSync'
 import CodeMirrorEditor from '../../../cloud/lib/editor/components/CodeMirrorEditor'
-import MarkdownView, {
-  SelectionContext,
-} from '../../../cloud/components/atoms/MarkdownView'
+import MarkdownView from '../../../cloud/components/atoms/MarkdownView'
 import { useToast } from '../../../shared/lib/stores/toast'
 import Icon from '../../../cloud/components/atoms/Icon'
 import useCommentManagerState from '../../../cloud/lib/hooks/useCommentManagerState'
@@ -136,27 +126,6 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
   })
 
   const [commentState, commentActions] = useCommentManagerState(doc.id)
-
-  const newRangeThread = useCallback(
-    (selection: SelectionContext) => {
-      if (realtime == null) {
-        return
-      }
-      const text = realtime.doc.getText('content')
-      const anchor = createRelativePositionFromTypeIndex(text, selection.start)
-      const head = createRelativePositionFromTypeIndex(text, selection.end)
-      setPreferences({ docContextMode: 'comment' })
-      commentActions.setMode({
-        mode: 'new_thread',
-        context: selection.text,
-        selection: {
-          anchor,
-          head,
-        },
-      })
-    },
-    [realtime, commentActions, setPreferences]
-  )
 
   const [viewComments, setViewComments] = useState<HighlightRange[]>([])
   const calculatePositions = useCallback(() => {
@@ -745,13 +714,6 @@ const StyledPreview = styled.div`
   .inline-comment.hv-active {
     background-color: rgba(112, 84, 0, 0.8);
   }
-`
-
-const StyledSelectionMenu = styled.div`
-  display: flex;
-  padding: 8px;
-  max-height: 37px;
-  cursor: pointer;
 `
 
 const StyledEditor = styled.div`
