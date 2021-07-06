@@ -83,10 +83,10 @@ module.exports = (env, argv) => {
             from: path.join(__dirname, 'node_modules/codemirror/theme'),
             to: 'app/codemirror/theme',
           },
-          // {
-          //   from: path.join(__dirname, 'mobile-static'),
-          //   to: 'app/static',
-          // },
+          {
+            from: path.join(__dirname, 'mobile-static'),
+            to: 'static',
+          },
           {
             from: path.join(__dirname, 'node_modules/katex/dist/katex.min.css'),
             to: 'app/katex/katex.min.css',
@@ -103,7 +103,7 @@ module.exports = (env, argv) => {
     ],
 
     devServer: {
-      host: 'localhost',
+      host: '0.0.0.0',
       port: 3005,
 
       disableHostCheck: true,
@@ -120,7 +120,7 @@ module.exports = (env, argv) => {
         app.use((req, res, next) => {
           res.setHeader(
             'Access-Control-Allow-Origin',
-            process.env.MOBILE_BOOST_HUB_BASE_URL
+            process.env.MOBILE_BASE_URL
           )
           res.setHeader(
             'Access-Control-Allow-Methods',
@@ -161,10 +161,10 @@ module.exports = (env, argv) => {
             )
           )
         )
-        // app.use(
-        //   '/static',
-        //   express.static(path.join(__dirname, 'mobile-static'))
-        // )
+        app.use(
+          '/static',
+          express.static(path.join(__dirname, 'mobile-static'))
+        )
       },
     },
 
