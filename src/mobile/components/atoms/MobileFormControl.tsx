@@ -1,4 +1,3 @@
-import React from 'react'
 import styled from '../../../shared/lib/styled'
 
 const MobileFormControl = styled.div`
