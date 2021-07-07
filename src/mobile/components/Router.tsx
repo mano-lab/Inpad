@@ -46,7 +46,6 @@ import TeamIndex from './pages/TeamIndex'
 import { SidebarCollapseProvider } from '../../cloud/lib/stores/sidebarCollapse'
 import DocStatusShowPage from './pages/DocStatusShowPage'
 import TagsShowPage from './pages/TagsShowPage'
-import UploadListPage from './pages/UploadsPage'
 import SmartFolderPage from './pages/SmartFolderPage'
 import OpenInvitePage from './pages/OpenInvitePage'
 import BookmarksListPage from './pages/BookmarksListPage'
@@ -363,11 +362,6 @@ function getPageComponent(pathname: string): PageSpec | null {
         return {
           Component: DeleteTeamPage,
           getInitialProps: DeleteTeamPage.getInitialProps,
-        }
-      case 'uploads':
-        return {
-          Component: UploadListPage,
-          getInitialProps: UploadListPage.getInitialProps,
         }
       case 'bookmarks':
         return {
