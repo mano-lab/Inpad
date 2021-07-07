@@ -312,6 +312,11 @@ const V2ThemeProvider: React.FC = ({ children }) => {
 }
 
 function getPageComponent(pathname: string): PageSpec | null {
+  if (pathname === '' || pathname === '/') {
+    return {
+      Component: RootPage,
+    }
+  }
   const [, ...splittedPathnames] = pathname.split('/')
   if (splittedPathnames.length >= 1 && splittedPathnames[0] === 'cooperate') {
     switch (splittedPathnames[1]) {
@@ -406,12 +411,6 @@ function getPageComponent(pathname: string): PageSpec | null {
     return {
       Component: TeamIndex,
       getInitialProps: TeamIndex.getInitialProps,
-    }
-  }
-
-  if (splittedPathnames.length === 0) {
-    return {
-      Component: RootPage,
     }
   }
 
