@@ -10,7 +10,7 @@ import { useAppStatus } from '../../lib/appStatus'
 import NavigationBarContainer from '../atoms/NavigationBarContainer'
 import NavigationBarButton from '../atoms/NavigationBarButton'
 import { useModal } from '../../../shared/lib/stores/modal'
-import SearchModal from '../organisms/modals/SearchModal'
+import MobileSearchModal from '../organisms/modals/MobileSearchModal'
 import DocCreateModal from '../organisms/modals/DocCreateModal'
 
 interface AppLayoutProps {
@@ -30,7 +30,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({
 
   const { openModal } = useModal()
   const openSearchModal = useCallback(() => {
-    openModal(<SearchModal />)
+    openModal(<MobileSearchModal />)
   }, [openModal])
 
   const openDocCreateModal = useCallback(() => {

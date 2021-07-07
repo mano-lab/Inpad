@@ -5,10 +5,6 @@ import { useSearch } from '../../../../cloud/lib/stores/search'
 import { useRouter } from '../../../../cloud/lib/router'
 import { useNav } from '../../../../cloud/lib/stores/nav'
 import { getFolderHref, getDocLinkHref } from '../../../lib/href'
-import {
-  SidebarSearchHistory,
-  SidebarSearchResult,
-} from '../../../../shared/components/organisms/Sidebar/molecules/SidebarSearch'
 import useApi from '../../../../shared/lib/hooks/useApi'
 import {
   GetSearchResultsRequestQuery,
@@ -21,16 +17,19 @@ import { SerializedTeam } from '../../../../cloud/interfaces/db/team'
 import { getDocTitle } from '../../../../cloud/lib/utils/patterns'
 import { mdiFileDocumentOutline } from '@mdi/js'
 import { SerializedFolder } from '../../../../cloud/interfaces/db/folder'
-import SidebarSearch from '../../../../shared/components/organisms/Sidebar/molecules/SidebarSearch'
 import ModalContainer from './atoms/ModalContainer'
+import MobileSearchView, {
+  MobileSearchHistory,
+  MobileSearchResult,
+} from './organisms/MobileSearchView'
 
-const SearchModal = () => {
+const MobileSearchModal = () => {
   const { docsMap, foldersMap } = useNav()
   const { team } = usePage()
   const { push } = useRouter()
   const { history, searchHistory, addToSearchHistory } = useSearch()
   const [sidebarSearchQuery, setSidebarSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<SidebarSearchResult[]>([])
+  const [searchResults, setSearchResults] = useState<MobileSearchResult[]>([])
 
   const historyItems = useMemo(() => {
     return mapHistory(history || [], push, docsMap, foldersMap, team)
@@ -91,7 +90,7 @@ const SearchModal = () => {
 
   return (
     <ModalContainer title='Search' closeLabel='Done'>
-      <SidebarSearch
+      <MobileSearchView
         recentlySearched={searchHistory}
         recentlyVisited={historyItems}
         searchQuery={sidebarSearchQuery}
@@ -103,7 +102,7 @@ const SearchModal = () => {
   )
 }
 
-export default SearchModal
+export default MobileSearchModal
 
 function mapSearchResults(
   results: SearchResult[],
@@ -144,7 +143,7 @@ function mapSearchResults(
       onClick: () => push(href),
     })
     return acc
-  }, [] as SidebarSearchResult[])
+  }, [] as MobileSearchResult[])
 }
 
 function mapHistory(
@@ -158,7 +157,7 @@ function mapHistory(
     return []
   }
 
-  const items = [] as SidebarSearchHistory[]
+  const items = [] as MobileSearchHistory[]
 
   history.forEach((historyItem) => {
     if (historyItem.type === 'folder') {
