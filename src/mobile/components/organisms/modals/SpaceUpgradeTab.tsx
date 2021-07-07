@@ -4,16 +4,11 @@ import { useSet } from 'react-use'
 import { usePage } from '../../../../cloud/lib/stores/pageStore'
 import { PageStoreWithTeam } from '../../../../cloud/interfaces/pageStore'
 import Icon from '../../../../shared/components/atoms/Icon'
-import {
-  mdiChevronRight,
-  mdiCheck,
-  mdiChevronDown,
-  mdiArrowLeft,
-} from '@mdi/js'
+import { mdiChevronRight, mdiCheck, mdiChevronDown } from '@mdi/js'
 import Banner from '../../../../shared/components/atoms/Banner'
 import { SettingsTabTypes } from './types'
-import NavigationBarButton from '../../atoms/NavigationBarButton'
 import ModalContainer from './atoms/ModalContainer'
+import NavigationBarBackButton from '../../atoms/NavigationBarBackButton'
 
 type TabType = 'free' | 'standard' | 'pro'
 
@@ -39,11 +34,7 @@ const SpaceUpgradeTab = ({ setActiveTab }: SpaceUpgradeTabProps) => {
 
   return (
     <ModalContainer
-      left={
-        <NavigationBarButton onClick={() => setActiveTab(null)}>
-          <Icon size={20} path={mdiArrowLeft} /> Back
-        </NavigationBarButton>
-      }
+      left={<NavigationBarBackButton onClick={() => setActiveTab(null)} />}
       title='Settings'
       closeLabel='Done'
     >

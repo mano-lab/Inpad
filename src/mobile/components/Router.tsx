@@ -56,6 +56,7 @@ import DeleteAccountPage from './pages/DeleteAccountPage'
 import Modal from './organisms/modals/Modal'
 import { AppStatusProvider } from '../lib/appStatus'
 import WorkspacePage from './pages/WorkspacePage'
+import SettingsPage from './pages/SettingsPage'
 
 const CombinedProvider = combineProviders(
   SidebarCollapseProvider,
@@ -324,6 +325,12 @@ function getPageComponent(pathname: string): PageSpec | null {
         }
     }
   }
+  if (splittedPathnames[0] === 'settings') {
+    return {
+      Component: SettingsPage,
+      getInitialProps: SettingsPage.getInitialProps,
+    }
+  }
 
   if (
     splittedPathnames.length >= 1 &&
@@ -405,9 +412,6 @@ function getPageComponent(pathname: string): PageSpec | null {
   if (splittedPathnames.length === 0) {
     return {
       Component: RootPage,
-      getInitialProps: async () => {
-        return {}
-      },
     }
   }
 

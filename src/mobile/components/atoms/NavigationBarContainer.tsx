@@ -5,7 +5,7 @@ import { textOverflow } from '../../../shared/lib/styled/styleFunctions'
 interface NavigationBarContainerProps {
   left?: React.ReactNode
   right?: React.ReactNode
-  label: React.ReactNode
+  label?: React.ReactNode
 }
 
 const NavigationBarContainer = ({
