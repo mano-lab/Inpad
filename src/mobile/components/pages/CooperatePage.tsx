@@ -49,8 +49,8 @@ const CooperatePage = () => {
             <input
               type='radio'
               checked={personalSpace}
-              onClick={() => {
-                setPersonalSpace(true)
+              onChange={(event) => {
+                setPersonalSpace(event.target.checked)
               }}
             />{' '}
             Personal
@@ -61,8 +61,8 @@ const CooperatePage = () => {
             <input
               type='radio'
               checked={!personalSpace}
-              onClick={() => {
-                setPersonalSpace(false)
+              onChange={(event) => {
+                setPersonalSpace(!event.target.checked)
               }}
             />{' '}
             Team
