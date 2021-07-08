@@ -32,10 +32,12 @@ import {
   sortByAttributeAsc,
   sortByAttributeDesc,
 } from '../../../shared/lib/utils/array'
-import { getDocLinkHref } from '../../../cloud/components/atoms/Link/DocLink'
-import { getFolderHref } from '../../../cloud/components/atoms/Link/FolderLink'
-import { getTagHref } from '../../../cloud/components/atoms/Link/TagLink'
-import { getTeamLinkHref } from '../../../cloud/components/atoms/Link/TeamLink'
+import {
+  getDocLinkHref,
+  getFolderHref,
+  getTagHref,
+  getTeamLinkHref,
+} from '../../lib/href'
 import { getWorkspaceHref } from '../../../cloud/components/atoms/Link/WorkspaceLink'
 import { SerializedWorkspace } from '../../../cloud/interfaces/db/workspace'
 import { useRouter } from '../../../cloud/lib/router'
@@ -56,13 +58,13 @@ import {
   getFolderId,
 } from '../../../cloud/lib/utils/patterns'
 import { useCloudApi } from '../../../cloud/lib/hooks/useCloudApi'
-import { useCloudResourceModals } from '../../../cloud/lib/hooks/useCloudResourceModals'
 import { getDocStatusHref, getSmartFolderHref } from '../href'
 import { useDialog } from '../../../shared/lib/stores/dialog'
-import WorkspaceCreateModal from '../../components/organisms/modals/WorkspaceCreateModal'
 import { useAppStatus } from '../appStatus'
 import SmartFolderCreateModal from '../../components/organisms/modals/SmartFolderCreateModal'
 import SmartFolderUpdateModal from '../../components/organisms/modals/SmartFolderUpdateModal'
+import WorkspaceCreateModal from '../../components/organisms/modals/WorkspaceCreateModal'
+import { useMobileResourceModals } from '../useMobileResourceModals'
 
 export function useNavigatorTree() {
   const { team, currentUserIsCoreMember } = usePage()
@@ -105,7 +107,7 @@ export function useNavigatorTree() {
     deleteDoc,
     openRenameDocForm,
     openWorkspaceEditForm,
-  } = useCloudResourceModals()
+  } = useMobileResourceModals()
 
   const getFoldEvents = useCallback(
     (type: CollapsableType, key: string, reversed?: boolean) => {

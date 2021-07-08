@@ -32,7 +32,6 @@ import SortingOption, {
 import ContentManagerDocRow from '../molecules/ContentManagerDocRow'
 import ContentManagerFolderRow from '../molecules/ContentManagerFolderRow'
 import { difference } from 'ramda'
-import ContentManagerBulkActions from '../../../cloud/components/molecules/ContentManager/Actions/ContentManagerBulkActions'
 import {
   mdiFilePlusOutline,
   mdiFolderPlusOutline,
@@ -46,6 +45,7 @@ import { usePreferences } from '../../lib/preferences'
 import EmptyRow from '../../../cloud/components/molecules/ContentManager/Rows/EmptyRow'
 import cc from 'classcat'
 import { useCloudResourceModals } from '../../../cloud/lib/hooks/useCloudResourceModals'
+import MobileContentManagerBulkActions from '../molecules/MobileContentManagerBulkActions'
 
 export type ContentManagerParent =
   | { type: 'folder'; item: SerializedFolderWithBookmark }
@@ -308,7 +308,7 @@ const ContentManager = ({
           )}
 
           {currentUserIsCoreMember && (
-            <ContentManagerBulkActions
+            <MobileContentManagerBulkActions
               selectedDocs={selectedDocSet}
               selectedFolders={selectedFolderSet}
               documentsMap={currentDocumentsRef.current}

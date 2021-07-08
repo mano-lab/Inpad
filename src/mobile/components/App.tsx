@@ -7,7 +7,6 @@ import { RealtimeConnProvider } from '../../cloud/lib/stores/realtimeConn'
 import { V2ToastProvider } from '../../shared/lib/stores/toast'
 import { useEffectOnce } from 'react-use'
 import { initAccessToken } from '../../cloud/lib/stores/electron'
-import { nodeEnv } from '../../cloud/lib/consts'
 import '../../cloud/lib/i18n'
 
 const App = () => {
@@ -15,9 +14,7 @@ const App = () => {
 
   useEffectOnce(() => {
     ;(async () => {
-      if (nodeEnv !== 'production') {
-        await initAccessToken()
-      }
+      await initAccessToken()
       setAccessTokenInitialized(true)
     })()
   })

@@ -27,6 +27,9 @@ const MobileFormControl = styled.div`
   button {
     display: block;
     width: 100%;
+    .button__label {
+      justify-content: center;
+    }
   }
 `
 

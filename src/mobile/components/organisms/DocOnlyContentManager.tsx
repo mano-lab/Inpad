@@ -20,11 +20,11 @@ import SortingOption, {
 import Spinner from '../../../shared/components/atoms/Spinner'
 import ContentManagerDocRow from '../molecules/ContentManagerDocRow'
 import { difference } from 'ramda'
-import DocOnlyContentManagerBulkActions from '../../../cloud/components/molecules/ContentManager/Actions/DocOnlyContentManagerBulkActions'
 import { usePreferences } from '../../lib/preferences'
 import { StyledContentManagerHeader } from '../../../cloud/components/molecules/ContentManager'
 import EmptyRow from '../../../cloud/components/molecules/ContentManager/Rows/EmptyRow'
 import cc from 'classcat'
+import MobileContentManagerBulkActions from '../molecules/MobileContentManagerBulkActions'
 
 interface DocOnlyContentManagerProps {
   team: SerializedTeam
@@ -123,7 +123,7 @@ const DocOnlyContentManager = ({
               ])}
               onChange={selectingAllDocs ? resetDocs : selectAllDocs}
             />
-            <DocOnlyContentManagerBulkActions
+            <MobileContentManagerBulkActions
               selectedDocs={selectedDocSet}
               documentsMap={currentDocumentsRef.current}
               workspacesMap={workspacesMap}
