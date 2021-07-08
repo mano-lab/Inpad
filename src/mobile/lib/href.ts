@@ -6,6 +6,7 @@ import {
   getDocURL,
   getTeamURL,
   getFolderURL,
+  getWorkspaceURL,
 } from '../../cloud/lib/utils/patterns'
 import {
   TeamIdProps,
@@ -13,6 +14,8 @@ import {
 } from '../../cloud/components/atoms/Link/TeamLink'
 import { SerializedSmartFolder } from '../../cloud/interfaces/db/smartFolder'
 import { SerializedFolder } from '../../cloud/interfaces/db/folder'
+import { SerializedTag } from '../../cloud/interfaces/db/tag'
+import { SerializedWorkspace } from '../../cloud/interfaces/db/workspace'
 
 export function getTeamLinkHref(
   team: TeamIdProps,
@@ -88,5 +91,39 @@ export function getDocStatusHref(
 ) {
   const basePathname = `${getTeamURL(team)}/status`
   const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
+  return `${basePathname}/${intent}${queryPathName}`
+}
+
+export function getWorkspaceHref(
+  workspace: SerializedWorkspace,
+  team: SerializedTeam,
+  intent: 'index',
+  query?: any
+) {
+  if (workspace.default) {
+    return getTeamURL(team)
+  }
+
+  const basePathname = `${getTeamURL(team)}${getWorkspaceURL(workspace)}`
+  const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
+  if (intent === 'index') {
+    return `${basePathname}${queryPathName}`
+  }
+  return `${basePathname}/${intent}${queryPathName}`
+}
+
+export function getTagHref(
+  tag: SerializedTag,
+  team: SerializedTeam,
+  intent: 'index',
+  query?: any
+) {
+  const basePathname = `${getTeamURL(team)}/labels/${encodeURIComponent(
+    tag.text
+  )}`
+  const queryPathName = query != null ? `?${querystring.stringify(query)}` : ''
+  if (intent === 'index') {
+    return `${basePathname}${queryPathName}`
+  }
   return `${basePathname}/${intent}${queryPathName}`
 }
