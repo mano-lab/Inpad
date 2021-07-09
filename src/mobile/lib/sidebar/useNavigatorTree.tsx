@@ -8,7 +8,6 @@ import {
   mdiFolderCogOutline,
   mdiFolderPlusOutline,
   mdiLock,
-  mdiPaperclip,
   mdiPauseCircleOutline,
   mdiPencil,
   mdiPlayCircleOutline,
@@ -741,18 +740,6 @@ export function useNavigatorTree() {
     tree.push({
       label: 'More',
       rows: [
-        {
-          id: 'sidenav-attachment',
-          label: 'Attachments',
-          defaultIcon: mdiPaperclip,
-          href: getTeamLinkHref(team, 'uploads'),
-          active: getTeamLinkHref(team, 'uploads') === pathname,
-          navigateTo: () => {
-            setShowingNavigator(false)
-            push(getTeamLinkHref(team, 'uploads'))
-          },
-          depth: 0,
-        },
         {
           id: 'sidenav-shared',
           label: 'Shared',
