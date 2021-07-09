@@ -22,9 +22,9 @@ import RowAction, {
 } from '../../../cloud/components/molecules/ContentManager/Actions/RowAction'
 import Flexbox from '../../../cloud/components/atoms/Flexbox'
 import { getFolderId } from '../../../cloud/lib/utils/patterns'
-import MoveItemModal from '../../../cloud/components/organisms/Modal/contents/Forms/MoveItemModal'
 import { useToast } from '../../../shared/lib/stores/toast'
 import { useModal } from '../../../shared/lib/stores/modal'
+import MobileResourceMoveModal from '../organisms/modals/MobileResourceMoveModal'
 
 interface ContentManagerFolderRowProps {
   team: SerializedTeam
@@ -135,7 +135,7 @@ const ContentmanagerFolderRow = ({
   const openMoveForm = useCallback(
     (folder: SerializedFolderWithBookmark) => {
       openModal(
-        <MoveItemModal
+        <MobileResourceMoveModal
           onSubmit={(workspaceId, parentFolderId) =>
             moveFolder(folder, workspaceId, parentFolderId)
           }

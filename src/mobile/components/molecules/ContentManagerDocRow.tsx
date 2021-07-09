@@ -21,7 +21,6 @@ import {
 } from '../../../cloud/api/teams/docs/bookmarks'
 import { useNav } from '../../../cloud/lib/stores/nav'
 import Flexbox from '../../../cloud/components/atoms/Flexbox'
-import MoveItemModal from '../../../cloud/components/organisms/Modal/contents/Forms/MoveItemModal'
 import { SerializedWorkspace } from '../../../cloud/interfaces/db/workspace'
 import { usePage } from '../../../cloud/lib/stores/pageStore'
 import { SerializedUser } from '../../../cloud/interfaces/db/user'
@@ -30,6 +29,7 @@ import { useModal } from '../../../shared/lib/stores/modal'
 import RowAction, {
   ContentManagerRowAction,
 } from '../../../cloud/components/molecules/ContentManager/Actions/RowAction'
+import MobileResourceMoveModal from '../organisms/modals/MobileResourceMoveModal'
 
 interface ContentManagerDocRowProps {
   team: SerializedTeam
@@ -148,7 +148,7 @@ const ContentManagerDocRow = ({
   const openMoveForm = useCallback(
     (doc: SerializedDocWithBookmark) => {
       openModal(
-        <MoveItemModal
+        <MobileResourceMoveModal
           onSubmit={(workspaceId, parentFolderId) =>
             moveDoc(doc, workspaceId, parentFolderId)
           }
