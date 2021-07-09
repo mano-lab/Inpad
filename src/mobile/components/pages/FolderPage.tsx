@@ -9,6 +9,8 @@ import { SerializedWorkspace } from '../../../cloud/interfaces/db/workspace'
 import ErrorLayout from '../../../shared/components/templates/ErrorLayout'
 import AppLayout from '../layouts/AppLayout'
 import FolderContextMenu from '../../../cloud/components/organisms/Topbar/Controls/ControlsContextMenu/FolderContextMenu'
+import EmojiIcon from '../../../cloud/components/atoms/EmojiIcon'
+import { mdiFolder } from '@mdi/js'
 
 const FolderPage = () => {
   const { pageFolder, team, currentUserIsCoreMember } = usePage()
@@ -100,7 +102,19 @@ const FolderPage = () => {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      title={
+        <>
+          <EmojiIcon
+            className='emoji-icon'
+            defaultIcon={mdiFolder}
+            emoji={currentFolder.emoji}
+            size={16}
+          />{' '}
+          {currentFolder.name}
+        </>
+      }
+    >
       {showContextMenu && (
         <FolderContextMenu
           currentFolder={currentFolder}
