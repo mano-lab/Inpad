@@ -610,7 +610,7 @@ export function useNavigatorTree() {
     })
 
     tree.push({
-      label: 'Workspaces',
+      label: 'Folders',
       rows: navTree,
       controls: currentUserIsCoreMember
         ? [
