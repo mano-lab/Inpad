@@ -56,6 +56,7 @@ import Modal from './organisms/modals/Modal'
 import { AppStatusProvider } from '../lib/appStatus'
 import WorkspacePage from './pages/WorkspacePage'
 import SettingsPage from './pages/SettingsPage'
+import MobileGlobalStyle from './MobileGlobalStyle'
 
 const CombinedProvider = combineProviders(
   SidebarCollapseProvider,
@@ -241,6 +242,7 @@ const Router = () => {
                 {<pageInfo.Component {...pageInfo.pageProps} />}
 
                 <GlobalStyle />
+                <MobileGlobalStyle />
                 <CodeMirrorStyle />
                 <Toast />
                 <MobileContextMenu />
