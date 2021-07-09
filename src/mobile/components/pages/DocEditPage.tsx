@@ -12,7 +12,6 @@ import attachFileHandlerToCodeMirrorEditor, {
   OnFileCallback,
 } from '../../../cloud/lib/editor/plugins/fileHandler'
 import { uploadFile, buildTeamFileUrl } from '../../../cloud/api/teams/files'
-import { createAbsolutePositionFromRelativePosition } from 'yjs'
 import { SerializedTeam } from '../../../cloud/interfaces/db/team'
 import { getDocTitle } from '../../../cloud/lib/utils/patterns'
 import { SerializedUser } from '../../../cloud/interfaces/db/user'
@@ -37,8 +36,6 @@ import CodeMirrorEditor from '../../../cloud/lib/editor/components/CodeMirrorEdi
 import MarkdownView from '../../../cloud/components/atoms/MarkdownView'
 import { useToast } from '../../../shared/lib/stores/toast'
 import Icon from '../../../cloud/components/atoms/Icon'
-import useCommentManagerState from '../../../cloud/lib/hooks/useCommentManagerState'
-import { HighlightRange } from '../../../cloud/lib/rehypeHighlight'
 import EditorSelectionStatus from '../../../cloud/components/molecules/Editor/EditorSelectionStatus'
 import EditorThemeSelect from '../../../cloud/components/molecules/Editor/EditorThemeSelect'
 import AppLayout from '../layouts/AppLayout'
@@ -124,75 +121,6 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
     id: doc.id,
     userInfo,
   })
-
-  const [commentState, commentActions] = useCommentManagerState(doc.id)
-
-  const [viewComments, setViewComments] = useState<HighlightRange[]>([])
-  const calculatePositions = useCallback(() => {
-    if (commentState.mode === 'list_loading' || realtime == null) {
-      return
-    }
-
-    const comments: HighlightRange[] = []
-    for (const thread of commentState.threads) {
-      if (thread.selection != null && thread.status.type !== 'outdated') {
-        const absoluteAnchor = createAbsolutePositionFromRelativePosition(
-          thread.selection.anchor,
-          realtime.doc
-        )
-        const absoluteHead = createAbsolutePositionFromRelativePosition(
-          thread.selection.head,
-          realtime.doc
-        )
-
-        if (
-          absoluteAnchor != null &&
-          absoluteHead != null &&
-          absoluteAnchor.index !== absoluteHead.index
-        ) {
-          if (thread.status.type === 'open') {
-            comments.push({
-              id: thread.id,
-              start: absoluteAnchor.index,
-              end: absoluteHead.index,
-              active:
-                commentState.mode === 'thread' &&
-                thread.id === commentState.thread.id,
-            })
-          }
-        } else if (connState === 'synced') {
-          commentActions.threadOutdated(thread)
-        }
-      }
-    }
-    setViewComments(comments)
-  }, [commentState, realtime, commentActions, connState])
-
-  useEffect(() => {
-    if (realtime != null) {
-      realtime.doc.on('update', calculatePositions)
-      return () => realtime.doc.off('update', calculatePositions)
-    }
-    return undefined
-  }, [realtime, calculatePositions])
-
-  useEffect(() => {
-    calculatePositions()
-  }, [calculatePositions])
-
-  const commentClick = useCallback(
-    (ids: string[]) => {
-      if (commentState.mode !== 'list_loading') {
-        const idSet = new Set(ids)
-        setPreferences({ docContextMode: 'comment' })
-        commentActions.setMode({
-          mode: 'list',
-          filter: (thread) => idSet.has(thread.id),
-        })
-      }
-    },
-    [commentState, commentActions, setPreferences]
-  )
 
   const docIsNew = !!state?.new
   useEffect(() => {
@@ -600,8 +528,6 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
               className='scroller'
               getEmbed={getEmbed}
               scrollerRef={previewRef}
-              comments={viewComments}
-              commentClick={commentClick}
             />
           </StyledPreview>
         </StyledEditor>
@@ -708,11 +634,6 @@ const StyledPreview = styled.div`
   }
   &.layout-edit {
     display: none;
-  }
-
-  & .inline-comment.active,
-  .inline-comment.hv-active {
-    background-color: rgba(112, 84, 0, 0.8);
   }
 `
 
