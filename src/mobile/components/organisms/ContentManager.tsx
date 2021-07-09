@@ -44,8 +44,8 @@ import { isChildNode } from '../../../shared/lib/dom'
 import { usePreferences } from '../../lib/preferences'
 import EmptyRow from '../../../cloud/components/molecules/ContentManager/Rows/EmptyRow'
 import cc from 'classcat'
-import { useCloudResourceModals } from '../../../cloud/lib/hooks/useCloudResourceModals'
 import MobileContentManagerBulkActions from '../molecules/MobileContentManagerBulkActions'
+import { useMobileResourceModals } from '../../lib/useMobileResourceModals'
 
 export type ContentManagerParent =
   | { type: 'folder'; item: SerializedFolderWithBookmark }
@@ -78,7 +78,7 @@ const ContentManager = ({
   const [sendingAction, setSendingAction] = useState<
     'new-doc' | 'new-folder' | undefined
   >()
-  const { openNewDocForm, openNewFolderForm } = useCloudResourceModals()
+  const { openNewDocForm, openNewFolderForm } = useMobileResourceModals()
   const [order, setOrder] = useState<typeof sortingOrders[number]['data']>(
     preferences.folderSortingOrder
   )
