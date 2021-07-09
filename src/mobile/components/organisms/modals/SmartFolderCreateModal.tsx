@@ -58,7 +58,6 @@ const SmartFolderCreateModal = () => {
     <ModalContainer title='Create a smart folder'>
       <SmartFolderForm
         action='Create'
-        onCancel={closeModal}
         onSubmit={submit}
         defaultConditionType='and'
         buttonsAreDisabled={sending}

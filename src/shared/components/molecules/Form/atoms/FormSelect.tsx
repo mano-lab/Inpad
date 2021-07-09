@@ -82,6 +82,7 @@ const FormSelect = ({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onMenuOpen={onMenuOpen}
+        menuPosition='fixed'
       />
     </Container>
   )

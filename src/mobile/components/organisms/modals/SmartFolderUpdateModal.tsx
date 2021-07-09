@@ -67,7 +67,6 @@ const SmartFolderUpdateModal = ({
     <ModalContainer title='Edit a smart folder'>
       <SmartFolderForm
         action='Update'
-        onCancel={closeModal}
         onSubmit={submit}
         buttonsAreDisabled={sending}
         isPersonalTeam={team.personal}

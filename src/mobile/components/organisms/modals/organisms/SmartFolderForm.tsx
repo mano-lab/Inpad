@@ -1,10 +1,7 @@
 import { mdiPlus } from '@mdi/js'
 import { TFunction } from 'i18next'
 import React, { useCallback, useState } from 'react'
-import Button, {
-  LoadingButton,
-} from '../../../../../shared/components/atoms/Button'
-import ButtonGroup from '../../../../../shared/components/atoms/ButtonGroup'
+import { LoadingButton } from '../../../../../shared/components/atoms/Button'
 import Switch from '../../../../../shared/components/atoms/Switch'
 import Form from '../../../../../shared/components/molecules/Form'
 import { FormSelectOption } from '../../../../../shared/components/molecules/Form/atoms/FormSelect'
@@ -20,6 +17,7 @@ import { lngKeys } from '../../../../../cloud/lib/i18n/types'
 import { EditibleSecondaryCondition } from '../../../../../cloud/components/organisms/Modal/contents/SmartFolder/interfaces'
 import SecondaryConditionItem from '../../../../../cloud/components/organisms/Modal/contents/SmartFolder/SecondaryConditionItem'
 import { StyledModalSeparator } from '../../../../../cloud/components/organisms/Modal/contents/Forms/styled'
+import MobileFormControl from '../../../atoms/MobileFormControl'
 
 interface SmartFolderFormProps {
   action: 'Create' | 'Update'
@@ -31,7 +29,6 @@ interface SmartFolderFormProps {
   onSubmit: (
     body: CreateSmartFolderRequestBody | UpdateSmartFolderRequestBody
   ) => void
-  onCancel?: () => void
   buttonsAreDisabled?: boolean
 }
 
@@ -43,7 +40,6 @@ const SmartFolderForm = ({
   defaultSecondaryConditions,
   isPersonalTeam,
   buttonsAreDisabled,
-  onCancel,
   onSubmit,
 }: SmartFolderFormProps) => {
   const [name, setName] = useState(defaultName)
@@ -125,69 +121,76 @@ const SmartFolderForm = ({
             items: [{ type: 'node', element: <StyledModalSeparator /> }],
           }}
         />
-        <FormRow fullWidth={true}>
-          <FormRowItem
-            className='form__row__item--shrink'
-            item={{
-              type: 'select',
-              props: {
-                options: [
-                  { label: translate(lngKeys.GeneralAll), value: 'and' },
-                  { label: translate(lngKeys.GeneralAny), value: 'or' },
-                ],
-                value: getPrimaryConditionOptionByType(
-                  translate,
-                  primaryConditionType
-                ),
-                onChange: updatePrimaryConditionType,
-              },
-            }}
-          />
-          <FormRowItem
-            className='form__row__item--shrink'
-            item={{
-              type: 'button',
-              props: {
-                iconPath: mdiPlus,
-                variant: 'secondary',
-                label: '',
-                onClick: () =>
-                  insertSecondaryConditionByIndex({ type: 'null' }, 0),
-              },
-            }}
-          />
-        </FormRow>
 
-        {secondaryConditions.map((condition, index) => {
-          const updateSecondaryCondition = (
-            updatedSecondaryCondition: EditibleSecondaryCondition
-          ) => {
-            setSecondaryConditions((previousConditions) => {
-              const newSecondaryConditions = [...previousConditions]
-              newSecondaryConditions.splice(index, 1, updatedSecondaryCondition)
-              return newSecondaryConditions
-            })
-          }
-
-          const insertConditionNext = () => {
-            insertSecondaryConditionByIndex({ type: 'null' }, index)
-          }
-
-          const removeCondition = () => {
-            removeSecondaryConditionByIndex(index)
-          }
-
-          return (
-            <SecondaryConditionItem
-              key={index}
-              condition={condition}
-              update={updateSecondaryCondition}
-              addNext={insertConditionNext}
-              remove={removeCondition}
-              personalOnly={isPersonalTeam}
+        <div className='smart__folder__form__scrollable'>
+          <FormRow fullWidth={true}>
+            <FormRowItem
+              className='form__row__item--shrink'
+              item={{
+                type: 'select',
+                props: {
+                  options: [
+                    { label: translate(lngKeys.GeneralAll), value: 'and' },
+                    { label: translate(lngKeys.GeneralAny), value: 'or' },
+                  ],
+                  value: getPrimaryConditionOptionByType(
+                    translate,
+                    primaryConditionType
+                  ),
+                  onChange: updatePrimaryConditionType,
+                },
+              }}
             />
-          )
-        })}
+            <FormRowItem
+              className='form__row__item--shrink'
+              item={{
+                type: 'button',
+                props: {
+                  iconPath: mdiPlus,
+                  variant: 'secondary',
+                  label: '',
+                  onClick: () =>
+                    insertSecondaryConditionByIndex({ type: 'null' }, 0),
+                },
+              }}
+            />
+          </FormRow>
+
+          {secondaryConditions.map((condition, index) => {
+            const updateSecondaryCondition = (
+              updatedSecondaryCondition: EditibleSecondaryCondition
+            ) => {
+              setSecondaryConditions((previousConditions) => {
+                const newSecondaryConditions = [...previousConditions]
+                newSecondaryConditions.splice(
+                  index,
+                  1,
+                  updatedSecondaryCondition
+                )
+                return newSecondaryConditions
+              })
+            }
+
+            const insertConditionNext = () => {
+              insertSecondaryConditionByIndex({ type: 'null' }, index)
+            }
+
+            const removeCondition = () => {
+              removeSecondaryConditionByIndex(index)
+            }
+
+            return (
+              <SecondaryConditionItem
+                key={index}
+                condition={condition}
+                update={updateSecondaryCondition}
+                addNext={insertConditionNext}
+                remove={removeCondition}
+                personalOnly={isPersonalTeam}
+              />
+            )
+          })}
+        </div>
 
         <FormRow
           fullWidth={true}
@@ -224,29 +227,18 @@ const SmartFolderForm = ({
             />
           </FormRowItem>
         </FormRow>
-        <FormRow>
-          <ButtonGroup layout='spread'>
-            {onCancel != null && (
-              <Button
-                variant='secondary'
-                onClick={onCancel}
-                disabled={buttonsAreDisabled}
-              >
-                {translate(lngKeys.GeneralCancel)}
-              </Button>
-            )}
-            <LoadingButton
-              spinning={buttonsAreDisabled}
-              type='submit'
-              variant='primary'
-              disabled={buttonsAreDisabled}
-            >
-              {action === 'Create'
-                ? translate(lngKeys.GeneralCreate)
-                : translate(lngKeys.GeneralUpdateVerb)}
-            </LoadingButton>
-          </ButtonGroup>
-        </FormRow>
+        <MobileFormControl>
+          <LoadingButton
+            spinning={buttonsAreDisabled}
+            type='submit'
+            variant='primary'
+            disabled={buttonsAreDisabled}
+          >
+            {action === 'Create'
+              ? translate(lngKeys.GeneralCreate)
+              : translate(lngKeys.GeneralUpdateVerb)}
+          </LoadingButton>
+        </MobileFormControl>
       </Form>
     </Container>
   )
@@ -260,6 +252,12 @@ const Container = styled.div`
   .modal__heading,
   .form__row__item {
     color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  .smart__folder__form__scrollable {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 12px;
   }
 
   .form__row__item.form__row__item--shrink {
