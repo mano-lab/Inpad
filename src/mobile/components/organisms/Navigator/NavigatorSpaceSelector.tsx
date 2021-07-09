@@ -14,6 +14,7 @@ import Icon from '../../../../shared/components/atoms/Icon'
 import { mdiUnfoldMoreHorizontal } from '@mdi/js'
 import styled from '../../../../shared/lib/styled'
 import SpaceMenuItemLabel from './SpaceMenuItemLabel'
+import useSignOut from '../../../lib/signOut'
 
 interface NavigatorSpaceSelectorProps {
   currentTeam?: SerializedTeam
@@ -28,6 +29,7 @@ const NavigatorSpaceSelector = ({
 }: NavigatorSpaceSelectorProps) => {
   const { popup } = useContextMenu()
   const { push } = useRouter()
+  const signOut = useSignOut()
 
   const popupSpaceSelect = useCallback(
     (event: React.MouseEvent) => {
@@ -66,9 +68,19 @@ const NavigatorSpaceSelector = ({
             push('/cooperate')
           },
         },
+        {
+          type: MenuTypes.Separator,
+        },
+        {
+          type: MenuTypes.Normal,
+          label: 'Sign Out',
+          onClick: () => {
+            signOut()
+          },
+        },
       ] as NormalMenuItem[])
     },
-    [popup, teams, invites, currentTeam, push]
+    [popup, teams, invites, currentTeam, push, signOut]
   )
   return (
     <Container className='space-selector' onClick={popupSpaceSelect}>
