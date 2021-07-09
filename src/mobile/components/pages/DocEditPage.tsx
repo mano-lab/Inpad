@@ -653,7 +653,7 @@ const StyledEditor = styled.div`
     ${rightSidePageLayout}
     margin: auto;
     .scroller {
-      padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px
+      padding: 0 ${({ theme }) => theme.sizes.spaces.md}px
         ${({ theme }) => theme.sizes.spaces.xl}px;
     }
   }

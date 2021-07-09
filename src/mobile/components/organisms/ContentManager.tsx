@@ -513,7 +513,7 @@ export const StyledContentManagerHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
+  padding: 0 ${({ theme }) => theme.sizes.spaces.md}px;
   .header__left {
     display: flex;
     align-items: center;
@@ -534,7 +534,7 @@ export const StyledContentManagerListHeader = styled.div`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.background.secondary};
   position: relative;
-  padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
+  padding: 0 ${({ theme }) => theme.sizes.spaces.md}px;
   .header__label {
     flex: 1;
     line-height: 24px;

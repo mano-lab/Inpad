@@ -57,7 +57,7 @@ const StyledContentManagerRow = styled.div`
   }
   border-bottom: 1px solid ${({ theme }) => theme.colors.border.second};
   font-size: 13px;
-  padding: 0 ${({ theme }) => theme.sizes.spaces.sm}px;
+  padding: 0 ${({ theme }) => theme.sizes.spaces.md}px;
 
   .actions {
     display: none;
