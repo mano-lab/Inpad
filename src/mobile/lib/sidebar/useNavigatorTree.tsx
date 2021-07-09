@@ -17,6 +17,7 @@ import {
   mdiTag,
   mdiTrashCanOutline,
   mdiWeb,
+  mdiDotsHorizontal,
 } from '@mdi/js'
 import { FoldingProps } from '../../../shared/components/atoms/FoldingWrapper'
 import { SidebarTreeSortingOrder } from '../../../shared/lib/sidebar'
@@ -103,7 +104,9 @@ export function useNavigatorTree() {
 
   const {
     deleteWorkspace,
+    deleteFolder,
     deleteDoc,
+    openRenameFolderForm,
     openRenameDocForm,
     openWorkspaceEditForm,
   } = useMobileResourceModals()
@@ -322,6 +325,41 @@ export function useNavigatorTree() {
                       },
                     },
                   ] as MenuItem[])
+                },
+              },
+              {
+                icon: mdiDotsHorizontal,
+                onClick: (event) => {
+                  popup(event, [
+                    {
+                      type: MenuTypes.Normal,
+                      icon: folder.bookmarked ? mdiStar : mdiStarOutline,
+                      label:
+                        treeSendingMap.get(folder.id) === 'bookmark'
+                          ? '...'
+                          : folder.bookmarked
+                          ? 'Bookmarked'
+                          : 'Bookmark',
+                      onClick: () =>
+                        toggleFolderBookmark(
+                          folder.teamId,
+                          folder.id,
+                          folder.bookmarked
+                        ),
+                    },
+                    {
+                      type: MenuTypes.Normal,
+                      icon: mdiPencil,
+                      label: 'Rename',
+                      onClick: () => openRenameFolderForm(folder),
+                    },
+                    {
+                      type: MenuTypes.Normal,
+                      icon: mdiTrashCanOutline,
+                      label: 'Delete',
+                      onClick: () => deleteFolder(folder),
+                    },
+                  ])
                 },
               },
             ],
@@ -844,6 +882,8 @@ export function useNavigatorTree() {
     toggleFolderBookmark,
     treeSendingMap,
     toggleDocBookmark,
+    openRenameFolderForm,
+    deleteFolder,
     openRenameDocForm,
     deleteDoc,
     openModal,
