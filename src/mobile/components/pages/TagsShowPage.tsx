@@ -10,6 +10,8 @@ import { SerializedWorkspace } from '../../../cloud/interfaces/db/workspace'
 import { GetInitialPropsParameters } from '../../../cloud/interfaces/pages'
 import DocOnlyContentManager from '../organisms/DocOnlyContentManager'
 import AppLayout from '../layouts/AppLayout'
+import EmojiIcon from '../../../cloud/components/atoms/EmojiIcon'
+import { mdiTag } from '@mdi/js'
 
 const TagsShowPage = ({ pageTag: pagePropsTag }: TagsShowPageResponseBody) => {
   const { docsMap, tagsMap, workspacesMap } = useNav()
@@ -59,7 +61,14 @@ const TagsShowPage = ({ pageTag: pagePropsTag }: TagsShowPageResponseBody) => {
   }
 
   return (
-    <AppLayout>
+    <AppLayout
+      title={
+        <>
+          <EmojiIcon className='emoji-icon' defaultIcon={mdiTag} size={16} />{' '}
+          {pageTag.text}
+        </>
+      }
+    >
       <DocOnlyContentManager
         team={team}
         documents={docs}

@@ -79,9 +79,9 @@ const DocStatusShowPage = () => {
   return (
     <AppLayout
       title={
-        <div>
+        <>
           <DocStatusIcon status={docStatus} /> {docStatusLabel}
-        </div>
+        </>
       }
     >
       <DocOnlyContentManager
