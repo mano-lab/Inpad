@@ -14,6 +14,7 @@ import { mdiUnfoldMoreHorizontal } from '@mdi/js'
 import UserIcon from '../../../cloud/components/atoms/UserIcon'
 import Button from '../../../shared/components/atoms/Button'
 import useSignOut from '../../lib/signOut'
+import { mobileBaseUrl } from '../../../cloud/lib/consts'
 
 const RootPage = () => {
   const { globalData } = useGlobalData()
@@ -65,11 +66,7 @@ const RootPage = () => {
             developer teams.
           </p>
         </div>
-        <SignInForm
-          redirectTo='http://localhost:3005'
-          width='100%'
-          mobile={true}
-        />
+        <SignInForm redirectTo={mobileBaseUrl} width='100%' mobile={true} />
       </Container>
     )
   }
