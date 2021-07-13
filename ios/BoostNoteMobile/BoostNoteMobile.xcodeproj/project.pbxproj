@@ -1,0 +1,600 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08E6257A26996209003B4DCE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E6257926996209003B4DCE /* AppDelegate.swift */; };
+		08E6257C26996209003B4DCE /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E6257B26996209003B4DCE /* SceneDelegate.swift */; };
+		08E6257E26996209003B4DCE /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E6257D26996209003B4DCE /* ViewController.swift */; };
+		08E6258126996209003B4DCE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 08E6257F26996209003B4DCE /* Main.storyboard */; };
+		08E625832699620B003B4DCE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08E625822699620B003B4DCE /* Assets.xcassets */; };
+		08E625862699620B003B4DCE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 08E625842699620B003B4DCE /* LaunchScreen.storyboard */; };
+		08E625912699620B003B4DCE /* BoostNoteMobileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E625902699620B003B4DCE /* BoostNoteMobileTests.swift */; };
+		08E6259C2699620B003B4DCE /* BoostNoteMobileUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08E6259B2699620B003B4DCE /* BoostNoteMobileUITests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		08E6258D2699620B003B4DCE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08E6256E26996209003B4DCE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 08E6257526996209003B4DCE;
+			remoteInfo = BoostNoteMobile;
+		};
+		08E625982699620B003B4DCE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 08E6256E26996209003B4DCE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 08E6257526996209003B4DCE;
+			remoteInfo = BoostNoteMobile;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		08E6257626996209003B4DCE /* BoostNoteMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BoostNoteMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		08E6257926996209003B4DCE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		08E6257B26996209003B4DCE /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		08E6257D26996209003B4DCE /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		08E6258026996209003B4DCE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		08E625822699620B003B4DCE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		08E625852699620B003B4DCE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		08E625872699620B003B4DCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		08E6258C2699620B003B4DCE /* BoostNoteMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoostNoteMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		08E625902699620B003B4DCE /* BoostNoteMobileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostNoteMobileTests.swift; sourceTree = "<group>"; };
+		08E625922699620B003B4DCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		08E625972699620B003B4DCE /* BoostNoteMobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BoostNoteMobileUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		08E6259B2699620B003B4DCE /* BoostNoteMobileUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoostNoteMobileUITests.swift; sourceTree = "<group>"; };
+		08E6259D2699620B003B4DCE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		08E6257326996209003B4DCE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E625892699620B003B4DCE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E625942699620B003B4DCE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08E6256D26996209003B4DCE = {
+			isa = PBXGroup;
+			children = (
+				08E6257826996209003B4DCE /* BoostNoteMobile */,
+				08E6258F2699620B003B4DCE /* BoostNoteMobileTests */,
+				08E6259A2699620B003B4DCE /* BoostNoteMobileUITests */,
+				08E6257726996209003B4DCE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		08E6257726996209003B4DCE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				08E6257626996209003B4DCE /* BoostNoteMobile.app */,
+				08E6258C2699620B003B4DCE /* BoostNoteMobileTests.xctest */,
+				08E625972699620B003B4DCE /* BoostNoteMobileUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		08E6257826996209003B4DCE /* BoostNoteMobile */ = {
+			isa = PBXGroup;
+			children = (
+				08E6257926996209003B4DCE /* AppDelegate.swift */,
+				08E6257B26996209003B4DCE /* SceneDelegate.swift */,
+				08E6257D26996209003B4DCE /* ViewController.swift */,
+				08E6257F26996209003B4DCE /* Main.storyboard */,
+				08E625822699620B003B4DCE /* Assets.xcassets */,
+				08E625842699620B003B4DCE /* LaunchScreen.storyboard */,
+				08E625872699620B003B4DCE /* Info.plist */,
+			);
+			path = BoostNoteMobile;
+			sourceTree = "<group>";
+		};
+		08E6258F2699620B003B4DCE /* BoostNoteMobileTests */ = {
+			isa = PBXGroup;
+			children = (
+				08E625902699620B003B4DCE /* BoostNoteMobileTests.swift */,
+				08E625922699620B003B4DCE /* Info.plist */,
+			);
+			path = BoostNoteMobileTests;
+			sourceTree = "<group>";
+		};
+		08E6259A2699620B003B4DCE /* BoostNoteMobileUITests */ = {
+			isa = PBXGroup;
+			children = (
+				08E6259B2699620B003B4DCE /* BoostNoteMobileUITests.swift */,
+				08E6259D2699620B003B4DCE /* Info.plist */,
+			);
+			path = BoostNoteMobileUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		08E6257526996209003B4DCE /* BoostNoteMobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08E625A02699620B003B4DCE /* Build configuration list for PBXNativeTarget "BoostNoteMobile" */;
+			buildPhases = (
+				08E6257226996209003B4DCE /* Sources */,
+				08E6257326996209003B4DCE /* Frameworks */,
+				08E6257426996209003B4DCE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BoostNoteMobile;
+			productName = BoostNoteMobile;
+			productReference = 08E6257626996209003B4DCE /* BoostNoteMobile.app */;
+			productType = "com.apple.product-type.application";
+		};
+		08E6258B2699620B003B4DCE /* BoostNoteMobileTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08E625A32699620B003B4DCE /* Build configuration list for PBXNativeTarget "BoostNoteMobileTests" */;
+			buildPhases = (
+				08E625882699620B003B4DCE /* Sources */,
+				08E625892699620B003B4DCE /* Frameworks */,
+				08E6258A2699620B003B4DCE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				08E6258E2699620B003B4DCE /* PBXTargetDependency */,
+			);
+			name = BoostNoteMobileTests;
+			productName = BoostNoteMobileTests;
+			productReference = 08E6258C2699620B003B4DCE /* BoostNoteMobileTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		08E625962699620B003B4DCE /* BoostNoteMobileUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 08E625A62699620B003B4DCE /* Build configuration list for PBXNativeTarget "BoostNoteMobileUITests" */;
+			buildPhases = (
+				08E625932699620B003B4DCE /* Sources */,
+				08E625942699620B003B4DCE /* Frameworks */,
+				08E625952699620B003B4DCE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				08E625992699620B003B4DCE /* PBXTargetDependency */,
+			);
+			name = BoostNoteMobileUITests;
+			productName = BoostNoteMobileUITests;
+			productReference = 08E625972699620B003B4DCE /* BoostNoteMobileUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08E6256E26996209003B4DCE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
+				TargetAttributes = {
+					08E6257526996209003B4DCE = {
+						CreatedOnToolsVersion = 12.5.1;
+					};
+					08E6258B2699620B003B4DCE = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = 08E6257526996209003B4DCE;
+					};
+					08E625962699620B003B4DCE = {
+						CreatedOnToolsVersion = 12.5.1;
+						TestTargetID = 08E6257526996209003B4DCE;
+					};
+				};
+			};
+			buildConfigurationList = 08E6257126996209003B4DCE /* Build configuration list for PBXProject "BoostNoteMobile" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 08E6256D26996209003B4DCE;
+			productRefGroup = 08E6257726996209003B4DCE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				08E6257526996209003B4DCE /* BoostNoteMobile */,
+				08E6258B2699620B003B4DCE /* BoostNoteMobileTests */,
+				08E625962699620B003B4DCE /* BoostNoteMobileUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		08E6257426996209003B4DCE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08E625862699620B003B4DCE /* LaunchScreen.storyboard in Resources */,
+				08E625832699620B003B4DCE /* Assets.xcassets in Resources */,
+				08E6258126996209003B4DCE /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E6258A2699620B003B4DCE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E625952699620B003B4DCE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		08E6257226996209003B4DCE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08E6257E26996209003B4DCE /* ViewController.swift in Sources */,
+				08E6257A26996209003B4DCE /* AppDelegate.swift in Sources */,
+				08E6257C26996209003B4DCE /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E625882699620B003B4DCE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08E625912699620B003B4DCE /* BoostNoteMobileTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		08E625932699620B003B4DCE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08E6259C2699620B003B4DCE /* BoostNoteMobileUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		08E6258E2699620B003B4DCE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 08E6257526996209003B4DCE /* BoostNoteMobile */;
+			targetProxy = 08E6258D2699620B003B4DCE /* PBXContainerItemProxy */;
+		};
+		08E625992699620B003B4DCE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 08E6257526996209003B4DCE /* BoostNoteMobile */;
+			targetProxy = 08E625982699620B003B4DCE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		08E6257F26996209003B4DCE /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				08E6258026996209003B4DCE /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		08E625842699620B003B4DCE /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				08E625852699620B003B4DCE /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		08E6259E2699620B003B4DCE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		08E6259F2699620B003B4DCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		08E625A12699620B003B4DCE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = TG7C97ZRU2;
+				INFOPLIST_FILE = BoostNoteMobile/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boostio.boostnote-2021";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		08E625A22699620B003B4DCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 3;
+				DEVELOPMENT_TEAM = TG7C97ZRU2;
+				INFOPLIST_FILE = BoostNoteMobile/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.boostio.boostnote-2021";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		08E625A42699620B003B4DCE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG7C97ZRU2;
+				INFOPLIST_FILE = BoostNoteMobileTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = boostio.BoostNoteMobileTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BoostNoteMobile.app/BoostNoteMobile";
+			};
+			name = Debug;
+		};
+		08E625A52699620B003B4DCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG7C97ZRU2;
+				INFOPLIST_FILE = BoostNoteMobileTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = boostio.BoostNoteMobileTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BoostNoteMobile.app/BoostNoteMobile";
+			};
+			name = Release;
+		};
+		08E625A72699620B003B4DCE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG7C97ZRU2;
+				INFOPLIST_FILE = BoostNoteMobileUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = boostio.BoostNoteMobileUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = BoostNoteMobile;
+			};
+			name = Debug;
+		};
+		08E625A82699620B003B4DCE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = TG7C97ZRU2;
+				INFOPLIST_FILE = BoostNoteMobileUITests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = boostio.BoostNoteMobileUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = BoostNoteMobile;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		08E6257126996209003B4DCE /* Build configuration list for PBXProject "BoostNoteMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08E6259E2699620B003B4DCE /* Debug */,
+				08E6259F2699620B003B4DCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08E625A02699620B003B4DCE /* Build configuration list for PBXNativeTarget "BoostNoteMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08E625A12699620B003B4DCE /* Debug */,
+				08E625A22699620B003B4DCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08E625A32699620B003B4DCE /* Build configuration list for PBXNativeTarget "BoostNoteMobileTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08E625A42699620B003B4DCE /* Debug */,
+				08E625A52699620B003B4DCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		08E625A62699620B003B4DCE /* Build configuration list for PBXNativeTarget "BoostNoteMobileUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				08E625A72699620B003B4DCE /* Debug */,
+				08E625A82699620B003B4DCE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08E6256E26996209003B4DCE /* Project object */;
+}
