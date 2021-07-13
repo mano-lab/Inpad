@@ -15,6 +15,8 @@ import UserIcon from '../../../cloud/components/atoms/UserIcon'
 import Button from '../../../shared/components/atoms/Button'
 import useSignOut from '../../lib/signOut'
 import { mobileBaseUrl } from '../../../cloud/lib/consts'
+import NativeMobileAuthForm from '../organisms/NativeMobileAuthForm'
+import { agentType } from '../../lib/nativeMobile'
 
 const RootPage = () => {
   const { globalData } = useGlobalData()
@@ -60,13 +62,18 @@ const RootPage = () => {
             width='80'
             height='80'
           />
+
           <h1 className='intro__heading'>Welcome to Boost Note!</h1>
           <p className='intro__description'>
             Boost Note is a powerful, lightspeed collaborative workspace for
             developer teams.
           </p>
         </div>
-        <SignInForm redirectTo={mobileBaseUrl} width='100%' mobile={true} />
+        {agentType === 'ios-native' || agentType === 'android-native' ? (
+          <NativeMobileAuthForm />
+        ) : (
+          <SignInForm redirectTo={mobileBaseUrl} width='100%' mobile={true} />
+        )}
       </Container>
     )
   }

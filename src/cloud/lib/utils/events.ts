@@ -3,21 +3,21 @@ import React, { ChangeEventHandler, EventHandler } from 'react'
 export type SelectChangeEventHandler = ChangeEventHandler<HTMLSelectElement>
 export type ButtonClickEventHandler = EventHandler<React.MouseEvent>
 
-function createCustomEventEmitter(
+export function createCustomEventEmitter(
   name: string
 ): {
   dispatch: () => void
   listen: (handler: (event: CustomEvent) => void) => void
   unlisten: (handler: (event: CustomEvent) => void) => void
 }
-function createCustomEventEmitter<D = any>(
+export function createCustomEventEmitter<D = any>(
   name: string
 ): {
   dispatch: (detail: D) => void
   listen: (handler: (event: CustomEvent<D>) => void) => void
   unlisten: (handler: (event: CustomEvent<D>) => void) => void
 }
-function createCustomEventEmitter<D = any>(name: string) {
+export function createCustomEventEmitter<D = any>(name: string) {
   return {
     dispatch(detail: D) {
       window.dispatchEvent(new CustomEvent(name, { detail }))

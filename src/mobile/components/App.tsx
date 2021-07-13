@@ -8,6 +8,7 @@ import { V2ToastProvider } from '../../shared/lib/stores/toast'
 import { useEffectOnce } from 'react-use'
 import { initAccessToken } from '../../cloud/lib/stores/electron'
 import '../../cloud/lib/i18n'
+import '../lib/nativeMobile'
 
 const App = () => {
   const [accessTokenInitialized, setAccessTokenInitialized] = useState(false)
