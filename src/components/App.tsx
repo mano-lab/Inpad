@@ -413,12 +413,24 @@ const App = () => {
     },
     [storageMap, boostHubTeams, navigateToStorage, push]
   )
+  const toggleSideNavigatorHandler = useCallback(() => {
+    setPreferences((prevPreferences) => {
+      return {
+        'general.showAppNavigator': !prevPreferences[
+          'general.showAppNavigator'
+        ],
+      }
+    })
+  }, [setPreferences])
+
   useEffect(() => {
     addIpcListener('switch-workspace', switchWorkspaceHandler)
+    addIpcListener('toggle-side-navigator', toggleSideNavigatorHandler)
     return () => {
       removeIpcListener('switch-workspace', switchWorkspaceHandler)
+      removeIpcListener('toggle-side-navigator', toggleSideNavigatorHandler)
     }
-  }, [switchWorkspaceHandler])
+  }, [switchWorkspaceHandler, toggleSideNavigatorHandler])
 
   useBoostNoteProtocol()
 
