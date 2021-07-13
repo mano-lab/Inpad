@@ -2,7 +2,6 @@
 
 ```
 NODE_ENV=production
-BOOST_NOTE_BASE_URL=https://note.boostio.co
 
 BOOST_HUB_BASE_URL=
 SSE_URL=
