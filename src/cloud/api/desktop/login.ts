@@ -17,3 +17,15 @@ export async function createDesktopLoginRequest(state: string) {
 
   return data
 }
+
+export async function loginWithStateAndCode(state: string, code: string) {
+  const data = await callApi<{}>('api/desktop/login', {
+    method: 'post',
+    search: {
+      state,
+      code,
+    },
+  })
+
+  return data
+}

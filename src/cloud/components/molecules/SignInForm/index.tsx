@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import GoogleLoginButton from '../../atoms/buttons/login/GoogleLoginButton'
 import GithubLoginButton from '../../atoms/buttons/login/GithubLoginButton'
-import styled from '../../../lib/styled'
+import styled from '../../../../shared/lib/styled'
 import ErrorBlock from '../../atoms/ErrorBlock'
 import EmailForm from './EmailForm'
 import { useRouter } from '../../../lib/router'
@@ -12,6 +12,8 @@ interface SignInFormProps {
   inviteId?: string
   openInviteSlug?: string
   disabled?: boolean
+  width?: string
+  mobile?: boolean
 }
 
 const SignInForm = ({
@@ -20,6 +22,8 @@ const SignInForm = ({
   inviteId,
   disabled: preventAction = false,
   openInviteSlug,
+  width = '400px',
+  mobile,
 }: SignInFormProps) => {
   const [error, setError] = useState<unknown>()
   const [disabled, setDisabled] = useState<boolean>(false)
@@ -42,12 +46,15 @@ const SignInForm = ({
     if (openInviteSlug != null) {
       query.openInviteSlug = openInviteSlug
     }
+    if (mobile) {
+      query.mobile = 'true'
+    }
     return query
-  }, [redirectTo, isSignup, inviteId, openInviteSlug])
+  }, [redirectTo, isSignup, inviteId, openInviteSlug, mobile])
 
   return (
     <>
-      <StyledSignin style={{ marginBottom: 20 }}>
+      <StyledSignin style={{ width }}>
         <GoogleLoginButton
           disabled={disabled || preventAction}
           setDisabled={setDisabled}
@@ -75,7 +82,6 @@ const SignInForm = ({
         <ErrorBlock
           error={error}
           style={{
-            marginBottom: 20,
             maxHeight: 200,
             overflow: 'auto',
           }}
@@ -86,12 +92,12 @@ const SignInForm = ({
 }
 
 const StyledSignin = styled.div`
-  margin: auto;
+  margin: 0 auto ${({ theme }) => theme.sizes.spaces.xsm}px;
   hr {
     background-color: #d2d3d6;
     height: 1px;
     border: none;
-    margin: 32px auto !important;
+    margin: ${({ theme }) => theme.sizes.spaces.l}px auto;
     width: 400px;
   }
 `

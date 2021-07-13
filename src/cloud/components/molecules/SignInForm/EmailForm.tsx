@@ -1,11 +1,11 @@
 import React, { useState, useCallback, FormEventHandler } from 'react'
-import styled from '../../../lib/styled'
-import CustomButton from '../../atoms/buttons/CustomButton'
+import styled from '../../../../shared/lib/styled'
 import { Spinner } from '../../atoms/Spinner'
 import { stringify } from 'querystring'
 import cc from 'classcat'
 import { createLoginEmailRequest } from '../../../api/auth/email'
 import { boostHubBaseUrl } from '../../../lib/consts'
+import Button from '../../../../shared/components/atoms/Button'
 
 interface EmailFormProps {
   query?: any
@@ -68,7 +68,7 @@ const EmailForm = ({
     const linkIsDisabled = code.length < 7 || disabled
     return (
       <StyledEmailForm onSubmit={onSubmit}>
-        <label>EMAIL</label>
+        <label>Email</label>
         <input
           type='text'
           value={email}
@@ -85,7 +85,7 @@ const EmailForm = ({
           placeholder='Paste signin code'
           onChange={codeChangeHandler}
         />
-        <CustomButton
+        <Button
           variant='primary'
           className={cc(['submit-email', linkIsDisabled && 'disabled'])}
           onClick={() => {
@@ -105,7 +105,7 @@ const EmailForm = ({
           ) : (
             'Continue with signin code'
           )}
-        </CustomButton>
+        </Button>
       </StyledEmailForm>
     )
   }
@@ -119,14 +119,15 @@ const EmailForm = ({
         placeholder='Email...'
         onChange={emailChangeHandler}
       />
-      <CustomButton
+      <Button
         className='submit-email'
         variant='primary'
         type='submit'
         disabled={disabled}
+        size='lg'
       >
         {sending ? <Spinner className='relative' /> : 'Continue with email'}
-      </CustomButton>
+      </Button>
     </StyledEmailForm>
   )
 }
@@ -139,30 +140,26 @@ const StyledEmailForm = styled.form`
   color: #9da0a5;
   label {
     display: block;
-    margin: ${({ theme }) => theme.space.xxsmall}px auto;
+    margin: ${({ theme }) => theme.sizes.spaces.sm}px auto;
     text-align: left;
-    width: 400px;
+    width: 100%;
   }
   input {
-    padding: ${({ theme }) => theme.space.xsmall}px
-      ${({ theme }) => theme.space.small}px;
+    padding: ${({ theme }) => theme.sizes.spaces.sm}px
+      ${({ theme }) => theme.sizes.spaces.sm}px;
     border: none;
     border-radius: 2px;
     border: 1px solid #d2d3d6;
     ::placeholder {
       color: #45474b;
     }
-    width: 400px;
+    width: 100%;
     height: 40px;
   }
 
   .submit-email {
-    display: block;
-    padding: 0;
-    width: 400px;
-    font-size: ${({ theme }) => theme.fontSizes.small}px;
-    text-align: center;
-    margin: ${({ theme }) => theme.space.small}px auto !important;
+    width: 100%;
+    margin: ${({ theme }) => theme.sizes.spaces.sm}px 0;
   }
 
   a.submit-email.disabled {
@@ -171,6 +168,6 @@ const StyledEmailForm = styled.form`
   }
 
   .text-center {
-    margin-top: ${({ theme }) => theme.space.small}px;
+    margin-top: ${({ theme }) => theme.sizes.spaces.sm}px;
   }
 `

@@ -22,6 +22,7 @@ const App = () => {
   useEffectOnce(() => {
     ;(async () => {
       await initAccessToken()
+
       setAccessTokenInitialized(true)
     })()
   })

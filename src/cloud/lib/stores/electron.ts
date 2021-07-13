@@ -18,7 +18,6 @@ import {
 import { useGlobalKeyDownHandler, isWithGeneralCtrlKey } from '../keyboard'
 import { IpcRendererEvent } from 'electron'
 import { useEffectOnce } from 'react-use'
-import { nodeEnv } from '../consts'
 import ltSemver from 'semver/functions/lt'
 
 export function sendToHost(channel: string, ...args: any[]) {
@@ -97,9 +96,6 @@ export function initAccessToken(): Promise<string | null> {
 }
 
 export function getAccessToken(): string | null {
-  if (nodeEnv === 'production' && usingLegacyElectron) {
-    return null
-  }
   if (accessTokenHasBeenInitialized) {
     return accessToken
   }

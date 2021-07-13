@@ -65,7 +65,6 @@ module.exports = (env, argv) => {
         'AMPLIFY_AUTH_REGION',
         'AMPLIFY_PINPOINT_APPID',
         'AMPLIFY_PINPOINT_REGION',
-        'BOOST_NOTE_BASE_URL',
         'BOOST_HUB_BASE_URL',
       ]),
       new CopyPlugin({
