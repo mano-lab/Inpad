@@ -86,13 +86,16 @@ function getWorkspaceChildrenOrdered(
   sortingOrder: SidebarTreeSortingOrder,
   workspaceRows: LocalTreeItem[]
 ): LocalTreeItem[] {
+  const compare = (a: LocalTreeItem, b: LocalTreeItem) => {
+    return ~~b.id.startsWith('folder') - ~~a.id.startsWith('folder')
+  }
   switch (sortingOrder) {
     case 'a-z':
-      return sortByAttributeAsc('label', workspaceRows)
+      return sortByAttributeAsc('label', workspaceRows).sort(compare)
     case 'z-a':
-      return sortByAttributeDesc('label', workspaceRows)
+      return sortByAttributeDesc('label', workspaceRows).sort(compare)
     case 'last-updated':
-      return sortByAttributeDesc('lastUpdated', workspaceRows)
+      return sortByAttributeDesc('lastUpdated', workspaceRows).sort(compare)
     case 'drag':
     default:
       return workspaceRows
