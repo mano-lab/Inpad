@@ -30,6 +30,7 @@ import {
   getTagName,
   values,
   isSubPathname,
+  generateFolderId,
 } from './utils'
 import { FOLDER_ID_PREFIX, ATTACHMENTS_ID } from './consts'
 import NoteDb from './NoteDb'
@@ -103,6 +104,7 @@ export default class PouchNoteDb implements NoteDb {
     const now = getNow()
     const folderDocProps = {
       ...(folder || {
+        _realId: generateFolderId(),
         _id: getFolderId(pathname),
         createdAt: now,
         data: {},
@@ -113,12 +115,23 @@ export default class PouchNoteDb implements NoteDb {
     const { rev } = await this.pouchDb.put(folderDocProps)
 
     return {
+      _realId: folderDocProps._realId,
       _id: folderDocProps._id,
       createdAt: folderDocProps.createdAt,
       updatedAt: folderDocProps.updatedAt,
       data: folderDocProps.data,
       _rev: rev,
     }
+  }
+
+  async updateFolderOrderedIds(
+    folderId: string,
+    orderedIds: string[]
+  ): Promise<FolderDoc | undefined> {
+    console.warn(
+      'Ordered IDs not supported in PouchDB' + folderId + ' ' + orderedIds
+    )
+    return undefined
   }
 
   async renameFolder(
@@ -178,10 +191,12 @@ export default class PouchNoteDb implements NoteDb {
           })
         )
       )
+      // todo: [komediruzecki-14. 07. 2021.] See if we need to handle POUCH DB noteId set and other things
+      //  or just remove completely and don't allow any actio in pouch DB storage
       updatedFolders.push({
         ...newFolder,
         pathname: destinationPathname,
-        noteIdSet: new Set(rewrittenNotes.map((note) => note._id)),
+        // noteIdSet: new Set(rewrittenNotes.map((note) => note._id)),
       })
       updatedNotes.push(...rewrittenNotes)
     }

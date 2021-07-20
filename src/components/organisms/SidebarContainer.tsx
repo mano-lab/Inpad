@@ -30,13 +30,11 @@ import { useTranslation } from 'react-i18next'
 import { useSearchModal } from '../../lib/searchModal'
 import styled from '../../shared/lib/styled'
 import cc from 'classcat'
+import { SidebarTreeSortingOrders } from '../../shared/lib/sidebar'
 import { useGeneralStatus } from '../../lib/generalStatus'
 import { AppUser } from '../../shared/lib/mappers/users'
 import { useLocalUI } from '../../lib/v2/hooks/local/useLocalUI'
-import {
-  mapTree,
-  SidebarTreeSortingOrders,
-} from '../../lib/v2/mappers/local/sidebarTree'
+import { mapTree } from '../../lib/v2/mappers/local/sidebarTree'
 import { useLocalDB } from '../../lib/v2/hooks/local/useLocalDB'
 import { useLocalDnd } from '../../lib/v2/hooks/local/useLocalDnd'
 import { CollapsableType } from '../../lib/v2/stores/sidebarCollapse'
@@ -293,14 +291,22 @@ const SidebarContainer = ({
   )
 
   const getFoldEvents = useCallback(
-    (type: CollapsableType, key: string) => {
+    (type: CollapsableType, key: string, reversed?: boolean) => {
+      if (reversed) {
+        return {
+          fold: () => unfoldItem(type, key),
+          unfold: () => foldItem(type, key),
+          toggle: () => toggleItem(type, key),
+        }
+      }
+
       return {
         fold: () => foldItem(type, key),
         unfold: () => unfoldItem(type, key),
         toggle: () => toggleItem(type, key),
       }
     },
-    [foldItem, unfoldItem, toggleItem]
+    [toggleItem, unfoldItem, foldItem]
   )
 
   const tree = useMemo(() => {
@@ -356,11 +362,13 @@ const SidebarContainer = ({
   const sidebarHeaderControls: SidebarControls = useMemo(() => {
     return {
       'View Options': (tree || []).map((category) => {
+        const key = (category.label || '').toLocaleLowerCase()
+        const hideKey = `hide-${key}`
         return {
           type: 'check',
           label: category.label,
-          checked: !sideBarOpenedLinksIdsSet.has(`hide-${category.label}`),
-          onClick: () => toggleItem('links', `hide-${category.label}`),
+          checked: !sideBarOpenedLinksIdsSet.has(hideKey),
+          onClick: () => toggleItem('links', hideKey),
         }
       }),
       Sorting: Object.values(SidebarTreeSortingOrders).map((sort) => {

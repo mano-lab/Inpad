@@ -18,6 +18,7 @@ import {
   selectStyle,
 } from '../../shared/lib/styled/styleFunctions'
 import styled from '../../shared/lib/styled'
+import { NOTE_ID_PREFIX } from '../../lib/db/consts'
 
 interface FolderDetailProps {
   storage: NoteStorage
@@ -46,7 +47,11 @@ const FolderDetail = ({ storage, folderPathname }: FolderDetailProps) => {
       return []
     }
 
-    return [...folder.noteIdSet]
+    return [
+      ...(folder.orderedIds || []).filter((orderId) =>
+        orderId.startsWith(NOTE_ID_PREFIX)
+      ),
+    ]
       .reduce((notes, noteId) => {
         const note = storage.noteMap[noteId]
         if (note != null && !note.trashed) {

@@ -1,6 +1,12 @@
 import PouchNoteDb from './PouchNoteDb'
 import PouchDB from './PouchDB'
-import { getFolderId, getTagId, generateNoteId, getNow } from './utils'
+import {
+  getFolderId,
+  getTagId,
+  generateNoteId,
+  getNow,
+  generateFolderId,
+} from './utils'
 import { sortNotesByKeys } from '../sort'
 import { NoteDoc, FolderDoc, ExceptRev } from './types'
 
@@ -27,6 +33,7 @@ describe('PouchNoteDb', () => {
       const now = new Date().toISOString()
       await noteDb.pouchDb.put<FolderDoc>({
         _id: getFolderId('/test'),
+        _realId: generateFolderId(),
         createdAt: now,
         updatedAt: now,
         data: {},

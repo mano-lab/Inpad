@@ -59,12 +59,14 @@ export type NoteDoc = {
 
 export type FolderDoc = {
   _id: string // folder:${FOLDER_PATHNAME}
+  _realId: string // identification for reordering (unique across any property change)
   createdAt: string
   updatedAt: string
   _rev?: string
 } & FolderDocEditibleProps
 
 export type FolderDocEditibleProps = {
+  orderedIds?: string[]
   data: JsonObject
 }
 
@@ -116,7 +118,6 @@ export type FSNoteStorage = FSNoteStorageData &
 export type NoteStorage = PouchNoteStorage | FSNoteStorage
 export type PopulatedFolderDoc = FolderDoc & {
   pathname: string
-  noteIdSet: NoteIdSet
 }
 
 export type PopulatedTagDoc = TagDoc & {
@@ -130,4 +131,12 @@ export interface AllPopulatedDocsMap {
   tagMap: ObjectMap<PopulatedTagDoc>
   attachmentMap: ObjectMap<Attachment>
   bookmarkedItemIds: string[]
+}
+
+export interface LiteStorageStorageItem {
+  id?: string
+  name?: string
+  type?: 'fs'
+  location?: string
+  cloudStorage?: CloudNoteStorageData
 }

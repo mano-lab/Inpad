@@ -13,7 +13,7 @@ import { useActiveStorageId } from '../../../routeParams'
 const initialContent: CollapsableContent = {
   folders: [],
   workspaces: [],
-  links: [`hide-labels`, 'hide-status'],
+  links: [],
 }
 
 function useSidebarCollapseStore(): SidebarCollapseContext {

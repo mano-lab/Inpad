@@ -11,9 +11,6 @@ import {
   mdiFolderPlusOutline,
   mdiPaperclip,
   mdiPencil,
-  mdiSortAlphabeticalAscending,
-  mdiSortAlphabeticalDescending,
-  mdiSortClockAscending,
   mdiStar,
   mdiStarOutline,
   mdiTag,
@@ -84,7 +81,9 @@ type LocalTreeItem = {
 
 function getWorkspaceChildrenOrdered(
   sortingOrder: SidebarTreeSortingOrder,
-  workspaceRows: LocalTreeItem[]
+  workspaceRows: LocalTreeItem[],
+  map: Map<string, LocalTreeItem>,
+  orderedIds?: string[]
 ): LocalTreeItem[] {
   switch (sortingOrder) {
     case 'a-z':
@@ -95,8 +94,17 @@ function getWorkspaceChildrenOrdered(
       return sortByAttributeDesc('lastUpdated', workspaceRows)
     case 'drag':
     default:
-      return workspaceRows
-    // todo: [komediruzecki-09/06/2021] Implement drag and drop (ordered Ids)
+      if (orderedIds == null) {
+        return workspaceRows
+      }
+      const orderedWorkspaceRows: LocalTreeItem[] = []
+      orderedIds.forEach((orderId) => {
+        const workspaceChildItem = map.get(orderId)
+        if (workspaceChildItem != null) {
+          orderedWorkspaceRows.push(workspaceChildItem)
+        }
+      })
+      return orderedWorkspaceRows
   }
 }
 
@@ -116,7 +124,7 @@ function getFolderChildrenOrderedIds(
   folders.forEach((folder) => {
     const folderPathname = getFolderPathname(folder._id)
     if (isDirectSubPathname(parentFolderPathname, folderPathname)) {
-      children.push(folder._id)
+      children.push(folder._realId)
     }
   })
 
@@ -159,7 +167,11 @@ export function mapTree(
   sideBarOpenedLinksIdsSet: Set<string>,
   sideBarOpenedFolderIdsSet: Set<string>,
   toggleItem: (type: CollapsableType, id: string) => void,
-  getFoldEvents: (type: CollapsableType, key: string) => FoldingProps,
+  getFoldEvents: (
+    type: CollapsableType,
+    key: string,
+    reversed?: boolean
+  ) => FoldingProps,
   push: (url: string) => void,
   toggleNoteBookmark: (
     workspaceId: string,
@@ -178,8 +190,8 @@ export function mapTree(
   createFolder: (body: CreateFolderRequestBody) => Promise<void>,
   createNote: (body: CreateNoteRequestBody) => Promise<void>,
   draggedResource: React.MutableRefObject<NavResource | undefined>,
-  dropInFolderOrDoc: (
-    workspaceId: string,
+  dropInDocOrFolder: (
+    workspace: NoteStorage,
     targetedResource: NavResource,
     targetedPosition: SidebarDragState
   ) => void,
@@ -199,8 +211,8 @@ export function mapTree(
   )}/${currentRouterPath}`
   const items = new Map<string, LocalTreeItem>()
   const [notes, folders] = [values(docMap), values(folderMap)]
-
   folders.forEach((folder) => {
+    const folderRealId = folder._realId
     const folderId = folder._id
     const folderPathname = getFolderPathname(folderId)
     if (folderPathname == '/') {
@@ -212,20 +224,20 @@ export function mapTree(
     const parentFolderDoc = folderMap[parentFolderPathname]
     const parentFolderId =
       parentFolderDoc != null && parentFolderPathname != '/'
-        ? parentFolderDoc._id
+        ? parentFolderDoc._realId
         : workspace.id
-    items.set(folderId, {
-      id: folderId,
+    items.set(folderRealId, {
+      id: folderRealId,
       lastUpdated: folder.updatedAt,
       label: folderName,
-      folded: !sideBarOpenedFolderIdsSet.has(folderId),
-      folding: getFoldEvents('folders', folderId),
+      folded: !sideBarOpenedFolderIdsSet.has(folderRealId),
+      folding: getFoldEvents('folders', folderRealId),
       href,
       active: href === currentPathWithWorkspace,
       navigateTo: () => push(href),
       onDrop: (position: SidebarDragState) =>
-        dropInFolderOrDoc(
-          workspace.id,
+        dropInDocOrFolder(
+          workspace,
           { type: 'folder', result: folder },
           position
         ),
@@ -304,7 +316,10 @@ export function mapTree(
         },
       ],
       parentId: parentFolderId,
-      children: getFolderChildrenOrderedIds(folder, notes, folders),
+      children:
+        folder.orderedIds != null
+          ? folder.orderedIds
+          : getFolderChildrenOrderedIds(folder, notes, folders),
     })
   })
 
@@ -320,7 +335,7 @@ export function mapTree(
       parentFolderDoc != null
         ? parentFolderDoc.pathname == '/'
           ? workspace.id
-          : parentFolderDoc._id
+          : parentFolderDoc._realId
         : workspace.id
     items.set(noteId, {
       id: noteId,
@@ -335,7 +350,7 @@ export function mapTree(
       dropAround: sortingOrder === 'drag',
       navigateTo: () => push(href),
       onDrop: (position: SidebarDragState) =>
-        dropInFolderOrDoc(workspace.id, { type: 'doc', result: doc }, position),
+        dropInDocOrFolder(workspace, { type: 'doc', result: doc }, position),
       onDragStart: () => {
         draggedResource.current = { type: 'doc', result: doc }
       },
@@ -386,9 +401,12 @@ export function mapTree(
   const workspaceRows = arrayItems.filter(
     (item) => item.parentId == workspace.id
   )
+  const rootFolder = workspace.folderMap['/']
   const orderedWorkspaceRows = getWorkspaceChildrenOrdered(
     sortingOrder,
-    workspaceRows
+    workspaceRows,
+    items,
+    rootFolder != null ? rootFolder.orderedIds : undefined
   )
   const navTree = orderedWorkspaceRows.reduce((acc, val) => {
     acc.push({
@@ -512,7 +530,7 @@ export function mapTree(
     const foldKey = `fold-${key}`
     const hideKey = `hide-${key}`
     category.folded = sideBarOpenedLinksIdsSet.has(foldKey)
-    category.folding = getFoldEvents('links', foldKey)
+    category.folding = getFoldEvents('links', foldKey, true)
     category.hidden = sideBarOpenedLinksIdsSet.has(hideKey)
     category.toggleHidden = () => toggleItem('links', hideKey)
   })
@@ -557,38 +575,7 @@ function buildChildrenNavRows(
     case 'last-updated':
       return sortByAttributeDesc('lastUpdated', rows)
     case 'drag':
-    // todo: [komediruzecki-05/06/2021] Implement dragged based order (orderedIds)
     default:
       return rows
-  }
-}
-
-export const SidebarTreeSortingOrders = {
-  lastUpdated: {
-    value: 'last-updated',
-    label: 'Last updated',
-    icon: mdiSortClockAscending,
-  },
-  aZ: {
-    value: 'a-z',
-    label: 'Title A-Z',
-    icon: mdiSortAlphabeticalAscending,
-  },
-  zA: {
-    value: 'z-a',
-    label: 'Title Z-A',
-    icon: mdiSortAlphabeticalDescending,
-  },
-  // todo: [komediruzecki-05/06/2021] Enable once implemented (or use shared one)
-  // dragDrop: {
-  //   value: 'drag',
-  //   label: 'Drag and drop',
-  //   icon: mdiMouseMoveDown,
-  // },
-} as {
-  [title: string]: {
-    value: SidebarTreeSortingOrder
-    label: string
-    icon: string
   }
 }

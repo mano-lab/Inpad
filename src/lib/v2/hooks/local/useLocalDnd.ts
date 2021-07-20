@@ -1,63 +1,184 @@
 import { useCallback, useRef } from 'react'
 import { NavResource } from '../../interfaces/resources'
 import { useToast } from '../../../../shared/lib/stores/toast'
-import { FolderDoc } from '../../../db/types'
-import {
-  UpdateFolderRequestBody,
-  UpdateDocRequestBody,
-  useLocalDB,
-} from './useLocalDB'
+import { NoteStorage } from '../../../db/types'
+import { useLocalDB } from './useLocalDB'
 import { getFolderName, getFolderPathname } from '../../../db/utils'
-import { DraggedTo, SidebarDragState } from '../../../../shared/lib/dnd'
-import { getResourceId } from '../../../db/patterns'
+import { SidebarDragState } from '../../../../shared/lib/dnd'
+import { getResourceId, getResourceParentPathname } from '../../../db/patterns'
 import { join } from 'path'
+import arrayMove from 'array-move'
 
 export function useLocalDnd() {
   const draggedResource = useRef<NavResource>()
-  const { pushApiErrorMessage, pushMessage } = useToast()
-  const { updateDocApi, updateFolder } = useLocalDB()
+  const { pushApiErrorMessage } = useToast()
+  const {
+    updateDocApi,
+    renameFolderApi,
+    updateFolderOrderedIdsApi,
+  } = useLocalDB()
 
-  const dropInWorkspace = useCallback(
+  const moveInSameFolder = useCallback(
     async (
       workspaceId: string,
-      updateFolder: (folder: FolderDoc, body: UpdateFolderRequestBody) => void,
-      updateDoc: (docId: string, body: UpdateDocRequestBody) => void
+      sourceIndex: number,
+      targetedIndex: number,
+      orderedIds: string[],
+      resourceId: string
     ) => {
-      if (draggedResource.current == null) {
-        return
+      const rawOrderedIds = [...orderedIds]
+      arrayMove.mutate(rawOrderedIds, sourceIndex, targetedIndex)
+      await updateFolderOrderedIdsApi(resourceId, {
+        workspaceId: workspaceId,
+        orderedIds: rawOrderedIds,
+      })
+    },
+    [updateFolderOrderedIdsApi]
+  )
+
+  const isMoveInsideSameFolder = useCallback(
+    ({
+      workspace,
+      targetedResource,
+      draggedResource,
+      targetedPosition,
+    }: {
+      workspace: NoteStorage
+      targetedResource: NavResource
+      draggedResource: NavResource
+      targetedPosition: SidebarDragState
+    }) => {
+      const targetParentFolder =
+        workspace.folderMap[
+          getResourceParentPathname(targetedResource, targetedPosition)
+        ]
+      const sourceParentFolder =
+        workspace.folderMap[
+          getResourceParentPathname(draggedResource, targetedPosition)
+        ]
+      const originalPath =
+        sourceParentFolder != null ? sourceParentFolder.pathname : '/'
+      const targetedPath =
+        targetParentFolder != null ? targetParentFolder.pathname : '/'
+      return targetedPath === originalPath
+    },
+    []
+  )
+
+  const updateFolderOrDocOrder = useCallback(
+    async ({
+      workspace,
+      targetedResource,
+      draggedResource,
+      targetedPosition,
+    }: {
+      workspace: NoteStorage
+      targetedResource: NavResource
+      draggedResource: NavResource
+      targetedPosition: SidebarDragState
+    }) => {
+      const originalResourceId = getResourceId(draggedResource)
+      const targetParentFolder =
+        workspace.folderMap[
+          getResourceParentPathname(targetedResource, targetedPosition)
+        ]
+      // note on note (reorder them)
+      const targetedPath =
+        targetParentFolder != null ? targetParentFolder.pathname : '/'
+      const isInterFolderMove = isMoveInsideSameFolder({
+        workspace,
+        targetedResource,
+        draggedResource,
+        targetedPosition,
+      })
+      const orderedIds: string[] | undefined =
+        targetParentFolder != null
+          ? targetParentFolder.orderedIds || []
+          : undefined
+      if (orderedIds == null) {
+        console.warn(
+          'Error during drag and drop, ordered IDs not initialized',
+          orderedIds
+        )
+        throw new Error('The drag and drop transfer data is incorrect')
       }
 
-      if (draggedResource.current.result._id === workspaceId) {
-        pushMessage({
-          title: 'Oops',
-          description: 'Resource is already present in this space',
-        })
-        return
-      }
-
-      if (draggedResource.current.type === 'folder') {
-        const folder = draggedResource.current.result
-        updateFolder(folder, {
-          workspaceId: workspaceId,
-          oldPathname: getFolderPathname(folder._id),
-          newPathname: '/' + getFolderName(folder),
-        })
-      } else if (draggedResource.current.type === 'doc') {
-        const doc = draggedResource.current.result
-        updateDoc(doc._id, {
-          workspaceId: workspaceId,
+      let sourceOriginalIndex = -1
+      let targetOriginalIndex = -1
+      let targetedPositionIndex = -1
+      if (isInterFolderMove) {
+        // check indexes
+        sourceOriginalIndex = orderedIds.indexOf(originalResourceId)
+        targetOriginalIndex = orderedIds.indexOf(
+          getResourceId(targetedResource)
+        )
+      } else {
+        // outer folder move - for now just add it to destination folder (DB updates ordered IDs
+        await updateDocApi(originalResourceId, {
+          workspaceId: workspace.id,
           docProps: {
-            folderPathname: '/',
+            folderPathname: targetedPath,
           },
         })
+        return
+      }
+
+      if (sourceOriginalIndex === -1 || targetOriginalIndex === -1) {
+        // do nothing...
+        console.warn(
+          '[ERROR] - Doing nothing on move, source and targets were invalid',
+          sourceOriginalIndex,
+          targetOriginalIndex
+        )
+        return
+      }
+
+      const isMoveAfter = sourceOriginalIndex < targetOriginalIndex
+
+      switch (targetedPosition) {
+        case 0:
+          throw new Error('The drag and drop transfer data is incorrect')
+        case 1:
+          // move after
+          targetedPositionIndex = isMoveAfter
+            ? targetOriginalIndex
+            : targetOriginalIndex + 1
+          break
+        case -1:
+          // move before
+          targetedPositionIndex = isMoveAfter
+            ? targetOriginalIndex - 1
+            : targetOriginalIndex
+          break
+      }
+
+      /* move onto itself, do nothing */
+      if (isInterFolderMove && targetedPositionIndex === sourceOriginalIndex) {
+        // do nothing
+        console.log(
+          '[ERROR] - target and source indexes are the same, ignoring Drag And Drop update'
+        )
+        return
+      } else {
+        const updateResourceId =
+          targetParentFolder != null ? targetParentFolder._id : workspace.id
+        if (isInterFolderMove) {
+          await moveInSameFolder(
+            workspace.id,
+            sourceOriginalIndex,
+            targetedPositionIndex,
+            orderedIds,
+            updateResourceId
+          )
+        }
       }
     },
-    [pushMessage]
+    [isMoveInsideSameFolder, moveInSameFolder, updateDocApi]
   )
 
   const dropInDocOrFolder = useCallback(
     async (
-      workspaceId: string,
+      workspace: NoteStorage,
       targetedResource: NavResource,
       targetedPosition: SidebarDragState
     ) => {
@@ -75,41 +196,65 @@ export function useLocalDnd() {
       try {
         const originalResourceId = getResourceId(draggedResource.current)
         if (draggedResource.current.type == 'doc') {
-          if (targetedResource.type == 'folder') {
-            // move doc to target item (folder) at position (before, in, after)
-            if (targetedPosition == DraggedTo.insideFolder) {
-              await updateDocApi(originalResourceId, {
-                workspaceId: workspaceId,
-                docProps: {
-                  folderPathname: getFolderPathname(
-                    targetedResource.result._id
-                  ),
-                },
-              })
-            }
+          const isInterFolderMove = isMoveInsideSameFolder({
+            workspace,
+            targetedResource,
+            draggedResource: draggedResource.current,
+            targetedPosition,
+          })
+          if (isInterFolderMove) {
+            await updateFolderOrDocOrder({
+              workspace,
+              targetedResource,
+              draggedResource: draggedResource.current,
+              targetedPosition,
+            })
+          } else {
+            const targetFolderPathname = getResourceParentPathname(
+              targetedResource,
+              targetedPosition
+            )
+
+            await updateDocApi(originalResourceId, {
+              workspaceId: workspace.id,
+              docProps: {
+                folderPathname: targetFolderPathname,
+              },
+            })
           }
         } else {
           // move folder
-          if (targetedResource.type == 'folder') {
+          const isInterFolderMove = isMoveInsideSameFolder({
+            workspace,
+            targetedResource,
+            draggedResource: draggedResource.current,
+            targetedPosition,
+          })
+          if (isInterFolderMove) {
+            await updateFolderOrDocOrder({
+              workspace,
+              targetedResource,
+              draggedResource: draggedResource.current,
+              targetedPosition,
+            })
+          } else {
             // move folder inside target folder
-            if (targetedPosition == DraggedTo.insideFolder) {
-              const folderResource = draggedResource.current?.result
-              const folderOriginalPathname = getFolderPathname(
-                folderResource._id
-              )
-              const targetFolderPathname = getFolderPathname(
-                targetedResource.result._id
-              )
-              const newFolderPathname = join(
-                targetFolderPathname,
-                getFolderName(folderResource)
-              )
-              await updateFolder(draggedResource.current?.result, {
-                workspaceId: workspaceId,
-                oldPathname: folderOriginalPathname,
-                newPathname: newFolderPathname,
-              })
-            }
+            const folderResource = draggedResource.current?.result
+            const folderOriginalPathname = getFolderPathname(folderResource._id)
+            const targetFolderPathname = getResourceParentPathname(
+              targetedResource,
+              targetedPosition
+            )
+            const newFolderPathname = join(
+              targetFolderPathname,
+              getFolderName(folderResource)
+            )
+            // database updates ordered IDs on folder renames
+            await renameFolderApi(draggedResource.current?.result, {
+              workspaceId: workspace.id,
+              oldPathname: folderOriginalPathname,
+              newPathname: newFolderPathname,
+            })
           }
         }
       } catch (error) {
@@ -117,12 +262,17 @@ export function useLocalDnd() {
         pushApiErrorMessage(error)
       }
     },
-    [pushApiErrorMessage, updateDocApi, updateFolder]
+    [
+      isMoveInsideSameFolder,
+      updateFolderOrDocOrder,
+      updateDocApi,
+      renameFolderApi,
+      pushApiErrorMessage,
+    ]
   )
 
   return {
     draggedResource,
-    dropInWorkspace,
     dropInDocOrFolder,
   }
 }

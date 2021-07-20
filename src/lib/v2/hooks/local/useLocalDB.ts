@@ -26,6 +26,7 @@ export function useLocalDB() {
     unbookmarkNote,
     updateNote,
     renameFolder,
+    updateFolderOrderedIds,
     storageMap: workspaceMap,
   } = useDb()
   const { push } = useRouter()
@@ -145,7 +146,7 @@ export function useLocalDB() {
       await send(workspace.id, 'delete', {
         api: () => removeStorage(workspace.id),
         cb: () => {
-          // maybe push message to notify successfully update
+          // maybe push message to notify successful update
         },
       })
     },
@@ -157,7 +158,7 @@ export function useLocalDB() {
       await send(target.workspaceId, 'delete', {
         api: () => removeFolder(target.workspaceId, target.pathname),
         cb: () => {
-          // maybe push message to notify successfully update
+          // maybe push message to notify successful update
         },
       })
     },
@@ -169,25 +170,37 @@ export function useLocalDB() {
       return send(target.workspaceId, 'delete', {
         api: () => deleteNote(target.workspaceId, target.docId),
         cb: () => {
-          // maybe push message to notify successfully update
+          // maybe push message to notify successful update
         },
       })
     },
     [send, deleteNote]
   )
 
-  const updateFolderApi = useCallback(
+  const renameFolderApi = useCallback(
     async (target: FolderDoc, body: UpdateFolderRequestBody) => {
       await send(target._id, 'update', {
         api: () =>
-          // generic update not available, rename instead
           renameFolder(body.workspaceId, body.oldPathname, body.newPathname),
         cb: () => {
-          // maybe push message to notify successfully update
+          // maybe push message to notify successful update
         },
       })
     },
     [send, renameFolder]
+  )
+
+  const updateFolderOrderedIdsApi = useCallback(
+    async (resourceId, body: UpdateFolderOrderedIdsRequestBody) => {
+      await send(resourceId, 'update', {
+        api: () =>
+          updateFolderOrderedIds(body.workspaceId, resourceId, body.orderedIds),
+        cb: () => {
+          // maybe push message to notify successful update
+        },
+      })
+    },
+    [send, updateFolderOrderedIds]
   )
 
   const updateDocApi = useCallback(
@@ -195,10 +208,7 @@ export function useLocalDB() {
       await send(docId, 'update', {
         api: () => updateNote(body.workspaceId, docId, body.docProps),
         cb: () => {
-          // if (pageDoc != null && doc.id === pageDoc.id) {
-          //   setPartialPageData({ pageDoc: doc })
-          //   setCurrentPath(doc.folderPathname)
-          // }
+          // maybe push message to notify successful update
         },
       })
     },
@@ -217,7 +227,8 @@ export function useLocalDB() {
     deleteFolderApi,
     deleteDocApi,
     updateDocApi,
-    updateFolder: updateFolderApi,
+    renameFolderApi,
+    updateFolderOrderedIdsApi,
     workspaceMap,
   }
 }
@@ -242,6 +253,11 @@ export interface UpdateFolderRequestBody {
   workspaceId: string
   oldPathname: string
   newPathname: string
+}
+
+export interface UpdateFolderOrderedIdsRequestBody {
+  workspaceId: string
+  orderedIds: string[]
 }
 
 export interface UpdateDocRequestBody {

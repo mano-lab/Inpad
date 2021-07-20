@@ -28,6 +28,8 @@ import {
   values,
   isSubPathname,
   keys,
+  getFolderPathname,
+  generateFolderId,
 } from './utils'
 import { escapeRegExp, generateId, getHexatrigesimalString } from '../string'
 import {
@@ -38,6 +40,7 @@ import {
   writeFile,
   unlinkFile,
 } from '../electronOnly'
+import { removeDuplicates } from '../../shared/lib/utils/array'
 
 interface StorageJSONData {
   folderMap: ObjectMap<FolderDoc>
@@ -85,6 +88,18 @@ class FSNoteDb implements NoteDb {
       ),
       ...[...missingTagNameSet].map((tagName) => this.upsertTag(tagName)),
     ])
+
+    const allFolders = await this.getAllFolders()
+    let anyFolderDocUpdated = false
+    allFolders.forEach((folderDoc) => {
+      if (folderDoc._realId === undefined) {
+        folderDoc._realId = generateFolderId()
+        anyFolderDocUpdated = true
+      }
+    })
+    if (anyFolderDocUpdated) {
+      await this.saveBoostNoteJSON()
+    }
   }
 
   async getFolder(pathname: string): Promise<FolderDoc | null> {
@@ -106,14 +121,16 @@ class FSNoteDb implements NoteDb {
 
   async upsertFolder(
     pathname: string,
-    props?: Partial<FolderDocEditibleProps>
+    props?: Partial<FolderDocEditibleProps>,
+    oldRealId?: string,
+    skipParentFolderCreation?: boolean
   ): Promise<FolderDoc> {
     if (!isFolderPathnameValid(pathname)) {
       throw createUnprocessableEntityError(
         `pathname is invalid, got \`${pathname}\``
       )
     }
-    if (pathname !== '/') {
+    if (pathname !== '/' && skipParentFolderCreation === false) {
       await this.doesParentFolderExistOrCreate(pathname)
     }
 
@@ -122,16 +139,22 @@ class FSNoteDb implements NoteDb {
       return folder
     }
     const now = getNow()
+    const newRealId =
+      folder != null && folder._realId != null ? folder._realId : oldRealId
     const newFolderDoc = {
       ...(folder || {
         _id: getFolderId(pathname),
-        createdAt: now,
+        createdAt: now, // todo: [komediruzecki-10/07/2021] FIXME: should be updated at when renaming folder!
         data: {},
       }),
+      _realId: newRealId != null ? newRealId : generateFolderId(),
       ...props,
+      orderedIds: removeDuplicates([
+        ...(props != null ? props.orderedIds || [] : []),
+        ...(folder != null ? folder.orderedIds || [] : []),
+      ]),
       updatedAt: now,
     }
-
     this.data!.folderMap[pathname] = newFolderDoc
     await this.saveBoostNoteJSON()
 
@@ -156,6 +179,19 @@ class FSNoteDb implements NoteDb {
     foldersToDelete.forEach((folderPathname) => {
       delete newFolderMap[folderPathname]
     })
+
+    // update parent folder ordered IDs
+    const parentFolder = await this.getFolder(getParentFolderPathname(pathname))
+    const folderToDelete = await this.getFolder(pathname)
+    if (parentFolder != null && folderToDelete != null) {
+      const newParentOrderedIds = (parentFolder.orderedIds || []).filter(
+        (orderId) => orderId != folderToDelete._realId
+      )
+      newFolderMap[getParentFolderPathname(pathname)] = {
+        ...parentFolder,
+        orderedIds: newParentOrderedIds,
+      }
+    }
     this.data!.folderMap = newFolderMap
     await this.saveBoostNoteJSON()
   }
@@ -273,7 +309,9 @@ class FSNoteDb implements NoteDb {
       _rev: generateId(),
     }
 
-    await this.upsertFolder(noteDoc.folderPathname)
+    await this.upsertFolder(noteDoc.folderPathname, {
+      orderedIds: [noteDoc._id],
+    })
     await Promise.all(noteDoc.tags.map((tagName) => this.upsertTag(tagName)))
 
     await writeFile(
@@ -291,8 +329,11 @@ class FSNoteDb implements NoteDb {
     // TODO: If note doesn't exist, throw not found error
 
     if (noteProps.folderPathname) {
-      await this.upsertFolder(noteProps.folderPathname)
+      await this.upsertFolder(noteProps.folderPathname, {
+        orderedIds: [noteDoc._id],
+      })
     }
+
     if (noteProps.tags) {
       await Promise.all(
         noteProps.tags.map((tagName) => this.upsertTag(tagName))
@@ -487,6 +528,30 @@ class FSNoteDb implements NoteDb {
     await this.saveBoostNoteJSON()
   }
 
+  async updateFolderOrderedIds(
+    folderId: string,
+    orderedIds: string[]
+  ): Promise<FolderDoc | undefined> {
+    const folderPathname = getFolderPathname(folderId)
+
+    const newFolderMap = this.data!.folderMap
+    const folder = newFolderMap[folderPathname]
+    if (folder == null) {
+      throw createUnprocessableEntityError(
+        `Folder resource not found, cannot update order ${folderId}`
+      )
+    }
+    newFolderMap[folderPathname] = {
+      ...folder,
+      orderedIds: orderedIds,
+    }
+
+    this.data!.folderMap = newFolderMap
+    await this.saveBoostNoteJSON()
+
+    return newFolderMap[folderPathname]
+  }
+
   async renameFolder(pathname: string, newPathname: string) {
     if (!isFolderPathnameValid(pathname)) {
       throw createUnprocessableEntityError(
@@ -526,16 +591,80 @@ class FSNoteDb implements NoteDb {
         newPathname
       )
     }
-    await Promise.all(
-      allFoldersToRename.map(async (folderPathname) => {
-        const newFolderPathname = replacePathname(folderPathname)
-        updatedFolderMap.set(newFolderPathname, {
-          ...(await this.upsertFolder(newFolderPathname)),
-          pathname: newFolderPathname,
-          noteIdSet: new Set<string>(),
-        })
+
+    // we want this sequentially to avoid any parent folder creation even though flag is added to explicitly not
+    // create parent folders and they wont be created since creation order is from parent towards children
+    for (const folderPathname of allFoldersToRename) {
+      const newFolderPathname = replacePathname(folderPathname)
+      const oldFolderDoc = await this.getFolder(folderPathname)
+      const oldRealId = oldFolderDoc != null ? oldFolderDoc._realId : undefined
+      const newFolder = await this.upsertFolder(
+        newFolderPathname,
+        {
+          orderedIds:
+            oldFolderDoc != null ? oldFolderDoc.orderedIds : undefined,
+        },
+        oldRealId,
+        true
+      )
+      updatedFolderMap.set(newFolderPathname, {
+        ...newFolder,
+        pathname: newFolderPathname,
       })
-    )
+    }
+
+    const folderLocationIsChanged =
+      getParentFolderPathname(pathname) !== getParentFolderPathname(newPathname)
+    if (folderLocationIsChanged) {
+      const previousParentFolder = await this.getFolder(
+        getParentFolderPathname(pathname)
+      )
+      const newParentFolder = await this.getFolder(
+        getParentFolderPathname(newPathname)
+      )
+      if (previousParentFolder != null && newParentFolder != null) {
+        const newPreviousParentOrderedIds = removeDuplicates(
+          (previousParentFolder.orderedIds || []).filter(
+            (orderId) => folder._realId != orderId
+          )
+        )
+
+        const previousParentFolderPathname = getParentFolderPathname(pathname)
+
+        // new parent folder update
+        const newParentOrderedIds = removeDuplicates([
+          ...(newParentFolder.orderedIds || []),
+          folder._realId,
+        ])
+        const newParentFolderPathname = getParentFolderPathname(newPathname)
+
+        // save ordered IDs to database for those folders
+        const newPreviousFolderDoc = await this.updateFolderOrderedIds(
+          previousParentFolder._id,
+          newPreviousParentOrderedIds
+        )
+        const newParentFolderDoc = await this.updateFolderOrderedIds(
+          newParentFolder._id,
+          newParentOrderedIds
+        )
+        if (newPreviousFolderDoc != null && newParentFolderDoc != null) {
+          updatedFolderMap.set(previousParentFolderPathname, {
+            ...newPreviousFolderDoc,
+            pathname: previousParentFolderPathname,
+            orderedIds: newPreviousParentOrderedIds,
+          })
+          updatedFolderMap.set(newParentFolderPathname, {
+            ...newParentFolderDoc,
+            pathname: newParentFolderPathname,
+            orderedIds: newParentOrderedIds,
+          })
+        }
+      } else {
+        console.warn(
+          'Cannot update folder IDs - please use other views rather than Drag and Drop one'
+        )
+      }
+    }
 
     const allNotes = await this.loadAllNotes()
     for (const note of allNotes) {
@@ -551,15 +680,6 @@ class FSNoteDb implements NoteDb {
         ...note,
         folderPathname: newFolderPathname,
       }
-
-      const folderToUpdate = updatedFolderMap.get(newFolderPathname)
-      if (folderToUpdate != null && folderToUpdate.noteIdSet != null) {
-        folderToUpdate.noteIdSet.add(updatedNote._id)
-      } else {
-        console.warn(
-          `Folder not updated correctly ${folder}, for note: ${note}, on pathname: ${pathname}`
-        )
-      }
       updatedNotes.push(updatedNote)
     }
 
@@ -573,12 +693,21 @@ class FSNoteDb implements NoteDb {
       { ...this.data!.folderMap }
     )
     updatedFolderMap.forEach((updatedFolderDoc) => {
-      const { _id, createdAt, updatedAt, data } = updatedFolderDoc
-      newFolderMap[updatedFolderDoc.pathname] = {
+      const {
+        _realId,
         _id,
         createdAt,
         updatedAt,
         data,
+        orderedIds,
+      } = updatedFolderDoc
+      newFolderMap[updatedFolderDoc.pathname] = {
+        _realId,
+        _id,
+        createdAt,
+        updatedAt,
+        data,
+        orderedIds,
       }
     })
 
@@ -602,11 +731,13 @@ class FSNoteDb implements NoteDb {
 
   getAllFolderUnderPathname(pathname: string) {
     const allFolderPathnames = keys(this.data!.folderMap)
-    const pathnameRegexp = new RegExp(`^${escapeRegExp(pathname)}/`, 'g')
+    const pathnameRegexp = new RegExp(
+      `^${escapeRegExp(pathname + (pathname == '/' ? '' : '/'))}`
+    )
+
     const subFolderPathnames = allFolderPathnames.filter((pathname) => {
       return pathnameRegexp.test(pathname)
     })
-
     return [pathname, ...subFolderPathnames]
   }
 

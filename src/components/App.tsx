@@ -54,6 +54,7 @@ import CloudIntroModal from './organisms/CloudIntroModal'
 import AppNavigator from './organisms/AppNavigator'
 import Toast from '../shared/components/organisms/Toast'
 import styled from '../shared/lib/styled'
+import { useToast } from '../shared/lib/stores/toast'
 
 const LoadingText = styled.div`
   margin: 30px;
@@ -69,7 +70,7 @@ const AppContainer = styled.div`
 `
 
 const App = () => {
-  const { initialize, storageMap } = useDb()
+  const { initialize, storageMap, getUninitializedStorageData } = useDb()
   const { push, pathname } = useRouter()
   const [initialized, setInitialized] = useState(false)
   const { setGeneralStatus, generalStatus } = useGeneralStatus()
@@ -82,6 +83,7 @@ const App = () => {
   const routeParams = useRouteParams()
   const { navigate: navigateToStorage } = useStorageRouter()
   const { messageBox } = useDialog()
+  const { pushMessage } = useToast()
 
   useEffectOnce(() => {
     const fetchDesktopGlobalDataOfCloud = async () => {
@@ -208,8 +210,21 @@ const App = () => {
           }
         }
         setInitialized(true)
+
+        // notify on failed initializations
+        const uninitializedStorageData = await getUninitializedStorageData()
+        if (uninitializedStorageData.length > 0) {
+          pushMessage({
+            title: 'Error',
+            description: `Failed to initialize some storages, please check console for more info.`,
+          })
+        }
       })
       .catch((error) => {
+        pushMessage({
+          title: 'Error',
+          description: `Failed to initialize some storages, please check console for more info.`,
+        })
         console.error(error)
       })
   })

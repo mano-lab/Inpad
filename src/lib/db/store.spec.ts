@@ -458,7 +458,7 @@ describe('DbStore', () => {
         expect(
           result.current.storageMap[storage!.id]!.folderMap[
             noteDoc!.folderPathname
-          ]!.noteIdSet.has(noteDoc!._id)
+          ]!.orderedIds!.indexOf(noteDoc!._id) == -1
         ).toEqual(false)
       })
     })
@@ -535,8 +535,8 @@ describe('DbStore', () => {
         expect(
           result.current.storageMap[storage!.id]!.folderMap[
             noteDoc!.folderPathname
-          ]!.noteIdSet.has(noteDoc!._id)
-        ).toEqual(false)
+          ]!.orderedIds!.indexOf(noteDoc!._id)
+        ).toEqual(-1)
       })
     })
 
@@ -589,7 +589,7 @@ describe('DbStore', () => {
         expect(
           result.current.storageMap[storage!.id]!.folderMap[
             noteDoc!.folderPathname
-          ]!.noteIdSet.has(noteDoc!._id)
+          ]!.orderedIds!.indexOf(noteDoc!._id) != -1
         ).toEqual(true)
       })
     })

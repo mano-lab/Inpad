@@ -1,39 +1,43 @@
 import {
-  NoteStorage,
-  PouchNoteStorageData,
-  ObjectMap,
+  Attachment,
+  FolderDoc,
+  LiteStorageStorageItem,
   NoteDoc,
   NoteDocEditibleProps,
   NoteDocImportableProps,
+  NoteStorage,
+  NoteStorageData,
+  ObjectMap,
   PopulatedFolderDoc,
   PopulatedTagDoc,
-  Attachment,
+  PouchNoteStorageData,
   TagDoc,
-  NoteStorageData,
   TagDocEditibleProps,
-  FolderDoc,
 } from './types'
-import { useState, useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import ow from 'ow'
-import { schema, isValid } from '../predicates'
+import { isValid, schema } from '../predicates'
 import PouchNoteDb from './PouchNoteDb'
 import {
+  entries,
+  getAllParentFolderPathnames,
   getFolderPathname,
   getParentFolderPathname,
-  getAllParentFolderPathnames,
-  entries,
+  isDirectSubPathname,
+  mapStorageToLiteStorageData,
+  values,
 } from './utils'
 import { generateId } from '../string'
 import PouchDB from './PouchDB'
 import { LiteStorage } from 'ltstrg'
-import { produce, enableMapSet } from 'immer'
+import { enableMapSet, produce } from 'immer'
 import { RouterStore } from '../router'
-import { values } from './utils'
 import { storageDataListKey } from '../localStorageKeys'
 import { TAG_ID_PREFIX } from './consts'
 import { difference } from 'ramda'
 import { useRefState } from '../hooks'
 import FSNoteDb from './FSNoteDb'
+import { removeDuplicates } from '../../shared/lib/utils/array'
 
 enableMapSet()
 
@@ -45,6 +49,7 @@ export interface DbStore {
     name: string,
     props?: { type: 'fs'; location: string }
   ) => Promise<NoteStorage>
+  getUninitializedStorageData: () => Promise<LiteStorageStorageItem[]>
   removeStorage: (id: string) => Promise<void>
   renameStorage: (id: string, name: string) => void
   createFolder: (
@@ -56,6 +61,11 @@ export interface DbStore {
     pathname: string,
     newName: string
   ) => Promise<void>
+  updateFolderOrderedIds: (
+    storageId: string,
+    folderId: string,
+    newOrderedIds: string[]
+  ) => Promise<FolderDoc | undefined>
   removeFolder: (storageId: string, pathname: string) => Promise<void>
   createNote(
     storageId: string,
@@ -104,6 +114,9 @@ export function createDbStoreCreator(
     const router = routerHook()
     const currentPathnameWithoutNoteId = pathnameWithoutNoteIdGetter()
     const [initialized, setInitialized] = useState(false)
+    const [uninitializedStoragesData, setUninitializedStoragesData] = useState<
+      LiteStorageStorageItem[]
+    >([])
     const [storageMap, storageMapRef, setStorageMap] = useRefState<
       ObjectMap<NoteStorage>
     >({})
@@ -130,14 +143,16 @@ export function createDbStoreCreator(
         const folder: PopulatedFolderDoc =
           storage.folderMap[noteDoc.folderPathname] == null
             ? ({
+                // todo: [komediruzecki-11/07/2021] FIXME: Should be upsert folder? Probably never executed code
                 ...(await storage.db.getFolder(noteDoc.folderPathname)!),
                 pathname: noteDoc.folderPathname,
-                noteIdSet: new Set([noteDoc._id]),
+                orderedIds: [noteDoc._id],
               } as PopulatedFolderDoc)
             : {
                 ...storage.folderMap[noteDoc.folderPathname]!,
-                noteIdSet: new Set([
-                  ...storage.folderMap[noteDoc.folderPathname]!.noteIdSet,
+                orderedIds: removeDuplicates([
+                  ...(storage.folderMap[noteDoc.folderPathname]!.orderedIds ||
+                    []),
                   noteDoc._id,
                 ]),
               }
@@ -172,7 +187,6 @@ export function createDbStoreCreator(
               draft[storageId]!.folderMap[aPathname] = {
                 ...folder,
                 pathname: aPathname,
-                noteIdSet: new Set(),
               }
             })
             draft[storageId]!.folderMap[noteDoc.folderPathname] = folder
@@ -199,7 +213,7 @@ export function createDbStoreCreator(
           ...props,
         })
 
-        let newStorageMap: ObjectMap<NoteStorage>
+        let newStorageMap: ObjectMap<NoteStorage> = {}
         setStorageMap((prevStorageMap) => {
           newStorageMap = produce(prevStorageMap, (draft) => {
             draft[id] = storage
@@ -208,29 +222,48 @@ export function createDbStoreCreator(
           return newStorageMap
         })
 
-        saveStorageDataList(liteStorage, newStorageMap!)
+        const localStorageStorageDataList: LiteStorageStorageItem[] = [
+          ...values(newStorageMap).map(mapStorageToLiteStorageData),
+          ...uninitializedStoragesData,
+        ]
+        saveStorageDataList(liteStorage, localStorageStorageDataList)
         return storage
       },
-      [setStorageMap]
+      [setStorageMap, uninitializedStoragesData]
     )
 
     const initialize = useCallback(async () => {
       const storageDataList = getStorageDataListOrFix(liteStorage)
 
+      const storagesFailedAtInit: LiteStorageStorageItem[] = []
       const prepared = await Promise.all(
-        storageDataList.map((storage) => prepareStorage(storage))
+        storageDataList.map((storage) =>
+          prepareStorage(storage).catch((err) => {
+            console.warn(`Skipping loading storage: '${storage.name}'!`)
+            console.warn('[ERROR]', err)
+            storagesFailedAtInit.push(mapStorageToLiteStorageData(storage))
+            return null
+          })
+        )
       )
+
+      setUninitializedStoragesData(storagesFailedAtInit)
       const storageMap = prepared.reduce((map, storage) => {
-        map[storage.id] = storage
+        if (storage != null) {
+          map[storage.id] = storage
+        }
         return map
       }, {} as ObjectMap<NoteStorage>)
 
-      saveStorageDataList(liteStorage, storageMap)
+      const localStorageStorageDataList: LiteStorageStorageItem[] = [
+        ...values(storageMap).map(mapStorageToLiteStorageData),
+        ...storagesFailedAtInit,
+      ]
+      saveStorageDataList(liteStorage, localStorageStorageDataList)
       setStorageMap(storageMap)
       setInitialized(true)
-
       return storageMap
-    }, [setStorageMap])
+    }, [setStorageMap, setUninitializedStoragesData])
 
     const removeStorage = useCallback(
       async (id: string) => {
@@ -243,7 +276,7 @@ export function createDbStoreCreator(
           await storage.db.pouchDb.destroy()
         }
 
-        let newStorageMap: ObjectMap<NoteStorage>
+        let newStorageMap: ObjectMap<NoteStorage> = {}
         setStorageMap((prevStorageMap) => {
           newStorageMap = produce(prevStorageMap, (draft) => {
             delete draft[id]
@@ -252,11 +285,15 @@ export function createDbStoreCreator(
           return newStorageMap
         })
 
-        saveStorageDataList(liteStorage, newStorageMap!)
+        const localStorageStorageDataList: LiteStorageStorageItem[] = [
+          ...values(newStorageMap).map(mapStorageToLiteStorageData),
+          ...uninitializedStoragesData,
+        ]
+        saveStorageDataList(liteStorage, localStorageStorageDataList)
       },
       // FIXME: The callback regenerates every storageMap change.
       // We should move the method to NoteStorage so the method instantiate only once.
-      [setStorageMap, storageMap]
+      [setStorageMap, storageMap, uninitializedStoragesData]
     )
 
     const renameStorage = useCallback(
@@ -273,9 +310,14 @@ export function createDbStoreCreator(
           })
           return newStorageMap
         })
-        saveStorageDataList(liteStorage, newStorageMap)
+
+        const localStorageStorageDataList: LiteStorageStorageItem[] = [
+          ...values(newStorageMap).map(mapStorageToLiteStorageData),
+          ...uninitializedStoragesData,
+        ]
+        saveStorageDataList(liteStorage, localStorageStorageDataList)
       },
-      [setStorageMap, storageMap]
+      [setStorageMap, storageMap, uninitializedStoragesData]
     )
 
     const createFolder = useCallback(
@@ -295,17 +337,44 @@ export function createDbStoreCreator(
           getAllParentFolderPathnames(pathname)
         )
         const createdFolders = [folder, ...parentFolders].reverse()
+        const createdFoldersWithOrderedIds: FolderDoc[] = []
+
+        for (const aFolder of createdFolders) {
+          const aPathname = getFolderPathname(aFolder._id)
+          if (storage.folderMap[aPathname] != null) {
+            continue
+          }
+          const parentFolder =
+            storage.folderMap[getParentFolderPathname(aPathname)]
+          if (parentFolder == null) {
+            continue
+          }
+          const previousOrderedIds = parentFolder.orderedIds || []
+          const newOrderedIds = removeDuplicates([
+            ...previousOrderedIds,
+            aFolder._realId,
+          ])
+          const updatedFolder = await storage.db.upsertFolder(
+            parentFolder.pathname,
+            {
+              orderedIds: newOrderedIds,
+            }
+          )
+          if (updatedFolder != null) {
+            createdFoldersWithOrderedIds.push(updatedFolder)
+          }
+        }
+
+        // add last one which isn't updated - no ordered IDs to update
+        createdFoldersWithOrderedIds.push(folder)
 
         setStorageMap(
           produce((draft: ObjectMap<NoteStorage>) => {
-            createdFolders.forEach((aFolder) => {
+            createdFoldersWithOrderedIds.forEach((aFolder) => {
               const aPathname = getFolderPathname(aFolder._id)
-              if (storage.folderMap[aPathname] == null) {
-                draft[storageId]!.folderMap[aPathname] = {
-                  ...aFolder,
-                  pathname: aPathname,
-                  noteIdSet: new Set(),
-                }
+              draft[storageId]!.folderMap[aPathname] = {
+                ...aFolder,
+                pathname: aPathname,
               }
             })
           })
@@ -340,6 +409,38 @@ export function createDbStoreCreator(
             })
           })
         )
+      },
+      [storageMap, setStorageMap]
+    )
+
+    const updateFolderOrderedIds = useCallback(
+      async (workspaceId: string, resourceId: string, orderedIds: string[]) => {
+        const storage = storageMap[workspaceId]
+        if (storage == null) {
+          return
+        }
+        const folderPathname = getFolderPathname(resourceId)
+        const populatedFolderDoc = storage.folderMap[folderPathname]
+        if (populatedFolderDoc == null) {
+          throw new Error('Missing folder to update: ' + resourceId)
+        }
+        const folderDoc = await storage.db.updateFolderOrderedIds(
+          resourceId,
+          orderedIds
+        )
+
+        if (folderDoc != null) {
+          setStorageMap(
+            produce((draft: ObjectMap<NoteStorage>) => {
+              draft[storage.id]!.folderMap[populatedFolderDoc.pathname] = {
+                pathname: populatedFolderDoc.pathname,
+                ...folderDoc,
+              }
+            })
+          )
+        }
+
+        return folderDoc
       },
       [storageMap, setStorageMap]
     )
@@ -454,16 +555,23 @@ export function createDbStoreCreator(
           const previousFolder =
             storage.folderMap[previousNoteDoc.folderPathname]
           if (previousFolder != null) {
-            const newNoteIdSetForPreviousFolder = new Set(
-              previousFolder.noteIdSet
+            const previousOrderedIds = previousFolder.orderedIds || []
+            const newOrderedIdsForParent = removeDuplicates(
+              previousOrderedIds.filter((orderId) => noteDoc._id != orderId)
             )
-            newNoteIdSetForPreviousFolder.delete(noteId)
+            const updatedPreviousFolder = await storage.db.updateFolderOrderedIds(
+              previousFolder._id,
+              newOrderedIdsForParent
+            )
             folderListToRefresh.push({
               ...previousFolder,
-              noteIdSet: newNoteIdSetForPreviousFolder,
+              ...updatedPreviousFolder,
             })
           }
         }
+
+        // todo: [komediruzecki-14/07/2021] this parent folders update should not happen - but if someone calls update note with
+        //  folders not existing, we should update its ordered IDs as well - not done currently (none should call it like this)
         const parentFolderPathnamesToCheck = [
           ...getAllParentFolderPathnames(noteDoc.folderPathname),
         ].filter((aPathname) => storage.folderMap[aPathname] == null)
@@ -482,17 +590,20 @@ export function createDbStoreCreator(
         const folder: PopulatedFolderDoc =
           storage.folderMap[noteDoc.folderPathname] == null
             ? ({
+                // todo: [komediruzecki-11/07/2021] Should be upsert folder? Not executed?
                 ...(await storage.db.getFolder(noteDoc.folderPathname)!),
                 pathname: noteDoc.folderPathname,
-                noteIdSet: new Set([noteDoc._id]),
+                orderedIds: [noteDoc._id],
               } as PopulatedFolderDoc)
             : {
                 ...storage.folderMap[noteDoc.folderPathname]!,
-                noteIdSet: new Set([
-                  ...storage.folderMap[noteDoc.folderPathname]!.noteIdSet,
+                orderedIds: removeDuplicates([
+                  ...(storage.folderMap[noteDoc.folderPathname]!.orderedIds ||
+                    []),
                   noteDoc._id,
                 ]),
               }
+
         folderListToRefresh.push(folder)
 
         const removedTags: ObjectMap<PopulatedTagDoc> = difference(
@@ -599,13 +710,8 @@ export function createDbStoreCreator(
         let modifiedFolderInOriginalStorage =
           originalStorage.folderMap[originalNote.folderPathname]
         if (modifiedFolderInOriginalStorage != null) {
-          const newNoteIdSet = new Set(
-            modifiedFolderInOriginalStorage.noteIdSet
-          )
-          newNoteIdSet.delete(originalNote._id)
           modifiedFolderInOriginalStorage = {
             ...modifiedFolderInOriginalStorage,
-            noteIdSet: newNoteIdSet,
           }
         }
 
@@ -618,13 +724,8 @@ export function createDbStoreCreator(
                 pathname: targetFolderPathname,
               }
             : targetStorage.folderMap[targetFolderPathname]!
-        const newNoteIdSetForTargetFolder = new Set([
-          ...targetFolder.noteIdSet,
-          newNote._id,
-        ])
         modifiedFoldersInTargetStorage.push({
           ...targetFolder,
-          noteIdSet: newNoteIdSetForTargetFolder,
         })
 
         const parentFolderPathnamesToCheck = [
@@ -702,14 +803,21 @@ export function createDbStoreCreator(
         }
 
         let folder: PopulatedFolderDoc | undefined
-        if (storage.folderMap[noteDoc.folderPathname] != null) {
-          const newFolderNoteIdSet = new Set(
-            storage.folderMap[noteDoc.folderPathname]!.noteIdSet
+        const parentFolder = storage.folderMap[noteDoc.folderPathname]
+        if (parentFolder != null) {
+          const previousOrderedIds = parentFolder.orderedIds || []
+          const newOrderedIdsForParent = removeDuplicates(
+            previousOrderedIds.filter((orderId) => noteDoc._id != orderId)
           )
-          newFolderNoteIdSet.delete(noteDoc._id)
+          // update folder ordered IDs in database
+          const updatedFolder = await storage.db.updateFolderOrderedIds(
+            parentFolder._id,
+            newOrderedIdsForParent
+          )
           folder = {
-            ...storage.folderMap[noteDoc.folderPathname]!,
-            noteIdSet: newFolderNoteIdSet,
+            ...(updatedFolder || storage.folderMap[noteDoc.folderPathname]!),
+            pathname: noteDoc.folderPathname,
+            orderedIds: newOrderedIdsForParent,
           }
         }
 
@@ -761,28 +869,61 @@ export function createDbStoreCreator(
         const folder: PopulatedFolderDoc =
           storage.folderMap[noteDoc.folderPathname] == null
             ? ({
-                ...(await storage.db.getFolder(noteDoc.folderPathname)!),
+                ...(await storage.db.upsertFolder(noteDoc.folderPathname)),
                 pathname: noteDoc.folderPathname,
-                noteIdSet: new Set([noteDoc._id]),
+                orderedIds: [noteDoc._id],
               } as PopulatedFolderDoc)
             : {
                 ...storage.folderMap[noteDoc.folderPathname]!,
-                noteIdSet: new Set([
-                  ...storage.folderMap[noteDoc.folderPathname]!.noteIdSet,
+                orderedIds: removeDuplicates([
+                  ...(storage.folderMap[noteDoc.folderPathname]!.orderedIds ||
+                    []),
                   noteDoc._id,
                 ]),
               }
         const parentFolderPathnames = getAllParentFolderPathnames(
           noteDoc.folderPathname
         )
-        const missingFolders: PopulatedFolderDoc[] = []
+        const foldersToUpdate: PopulatedFolderDoc[] = []
+        const foldersToUpdateParentOrderedIds: PopulatedFolderDoc[] = [folder]
         for (const parentFolderPathname of parentFolderPathnames) {
           if (storage.folderMap[parentFolderPathname] == null) {
-            missingFolders.push({
-              ...(await storage.db.getFolder(parentFolderPathname)),
+            const missingFolder = await storage.db.upsertFolder(
+              parentFolderPathname
+            )
+
+            const missingFolderPopulatedDoc = {
+              ...missingFolder,
               pathname: parentFolderPathname,
               noteIdSet: new Set(),
-            } as PopulatedFolderDoc)
+            } as PopulatedFolderDoc
+            foldersToUpdate.push(missingFolderPopulatedDoc)
+            foldersToUpdateParentOrderedIds.push(missingFolderPopulatedDoc)
+          }
+        }
+
+        for (const folder of foldersToUpdateParentOrderedIds) {
+          const parentFolder = await storage.db.getFolder(
+            getParentFolderPathname(folder.pathname)
+          )
+          if (parentFolder == null) {
+            continue
+          }
+          const previousOrderedIds = parentFolder.orderedIds || []
+          const newOrderedIds = removeDuplicates([
+            ...previousOrderedIds,
+            folder._realId,
+          ])
+
+          const updatedParentFolder = await storage.db.updateFolderOrderedIds(
+            parentFolder._id,
+            newOrderedIds
+          )
+          if (updatedParentFolder != null) {
+            foldersToUpdate.push({
+              ...updatedParentFolder,
+              pathname: getFolderPathname(parentFolder._id),
+            })
           }
         }
 
@@ -812,15 +953,16 @@ export function createDbStoreCreator(
           produce((draft: ObjectMap<NoteStorage>) => {
             draft[storageId]!.noteMap[noteDoc._id] = noteDoc
             draft[storageId]!.folderMap[noteDoc.folderPathname] = folder
-            missingFolders.forEach((missingFolder) => {
+            foldersToUpdate.forEach((folderToUpdate) => {
               draft[storageId]!.folderMap[
-                missingFolder.pathname
-              ] = missingFolder
+                folderToUpdate.pathname
+              ] = folderToUpdate
             })
             draft[storageId]!.tagMap = {
               ...storage.tagMap,
               ...modifiedTags,
             }
+
             if (noteDoc.data.bookmarked) {
               const bookmarkedItemIdSet = new Set(storage.bookmarkedItemIds)
               bookmarkedItemIdSet.add(noteDoc._id)
@@ -834,6 +976,7 @@ export function createDbStoreCreator(
       [storageMap, setStorageMap]
     )
 
+    // unused function - but should be fixed for ordered IDs if ever used!
     const purgeNote = useCallback(
       async (storageId: string, noteId: string) => {
         const storage = storageMap[storageId]
@@ -854,12 +997,8 @@ export function createDbStoreCreator(
             delete noteMap[noteId]
             draft[storageId]!.noteMap = noteMap
 
-            const folder = storage.folderMap[note.folderPathname]
-            if (folder != null) {
-              const newFolderNoteIdSet = new Set(folder.noteIdSet)
-              newFolderNoteIdSet.delete(note._id)
-              folder.noteIdSet = newFolderNoteIdSet
-            }
+            // todo: [komediruzecki-14/07/2021] On note purge remove ordered ID from parent folder
+            //  here note ID set was updated - do we need ordered IDs update
 
             note.tags.forEach((tagName) => {
               const tag = storage.tagMap[tagName]
@@ -1107,6 +1246,10 @@ export function createDbStoreCreator(
       [setStorageMap, storageMapRef]
     )
 
+    const getUninitializedStorageData = useCallback(async () => {
+      return uninitializedStoragesData
+    }, [uninitializedStoragesData])
+
     return {
       initialized,
       storageMap,
@@ -1116,6 +1259,7 @@ export function createDbStoreCreator(
       renameStorage,
       createFolder,
       renameFolder,
+      updateFolderOrderedIds,
       removeFolder,
       createNote,
       updateNote,
@@ -1130,6 +1274,7 @@ export function createDbStoreCreator(
       removeAttachment,
       bookmarkNote,
       unbookmarkNote,
+      getUninitializedStorageData,
     }
   }
 }
@@ -1175,29 +1320,9 @@ function getStorageDataListOrFix(liteStorage: LiteStorage): NoteStorageData[] {
 
 function saveStorageDataList(
   liteStorage: LiteStorage,
-  storageMap: ObjectMap<NoteStorage>
+  storageData: LiteStorageStorageItem[]
 ) {
-  liteStorage.setItem(
-    storageDataListKey,
-    JSON.stringify(
-      values(storageMap).map((storage) => {
-        const { id, name } = storage
-        if (storage.type === 'fs') {
-          return {
-            id,
-            name,
-            type: 'fs',
-            location: storage.location,
-          }
-        }
-        return {
-          id,
-          name,
-          cloudStorage: storage.cloudStorage,
-        }
-      })
-    )
-  )
+  liteStorage.setItem(storageDataListKey, JSON.stringify(storageData))
 }
 
 async function prepareStorage(
@@ -1216,17 +1341,22 @@ async function prepareStorage(
         )
   await db.init()
 
+  const foldersToUpdateOrderedIds: string[] = []
+
   const { noteMap, folderMap, tagMap } = await db.getAllDocsMap()
   const attachmentMap = await db.getAttachmentMap()
   const populatedFolderMap = entries(folderMap).reduce<
     ObjectMap<PopulatedFolderDoc>
   >((map, [pathname, folderDoc]) => {
+    if (folderDoc.orderedIds == null && storageData.type == 'fs') {
+      folderDoc.orderedIds = []
+      foldersToUpdateOrderedIds.push(pathname)
+    }
+
     map[pathname] = {
       ...folderDoc,
       pathname,
-      noteIdSet: new Set(),
     }
-
     return map
   }, {})
   const populatedTagMap = entries(tagMap).reduce<ObjectMap<PopulatedTagDoc>>(
@@ -1242,11 +1372,16 @@ async function prepareStorage(
   )
   const bookmarkedIdSet = new Set<string>()
 
+  const folderNoteIds = new Map<string, Set<string>>()
   for (const noteDoc of values(noteMap)) {
     if (noteDoc.trashed) {
       continue
     }
-    populatedFolderMap[noteDoc.folderPathname]!.noteIdSet.add(noteDoc._id)
+    if (!folderNoteIds.has(noteDoc.folderPathname)) {
+      folderNoteIds.set(noteDoc.folderPathname, new Set([noteDoc._id]))
+    } else {
+      folderNoteIds.get(noteDoc.folderPathname)!.add(noteDoc._id)
+    }
     noteDoc.tags.forEach((tag) => {
       populatedTagMap[tag]!.noteIdSet.add(noteDoc._id)
     })
@@ -1257,6 +1392,41 @@ async function prepareStorage(
   const bookmarkedItemIds = [...bookmarkedIdSet]
 
   if (storageData.type === 'fs') {
+    // update folder ordered Ids if needed
+    foldersToUpdateOrderedIds.forEach((parentFolderPathname) => {
+      const subFoldersPathnames: string[] = db.getAllFolderUnderPathname(
+        parentFolderPathname
+      ) as string[]
+
+      subFoldersPathnames
+        .slice(1)
+        .filter((subFolderPathname) =>
+          isDirectSubPathname(parentFolderPathname, subFolderPathname)
+        )
+        .forEach((subFolderPathname: string) => {
+          const subFolderDoc = populatedFolderMap[subFolderPathname]
+          if (subFolderDoc != null) {
+            populatedFolderMap[parentFolderPathname]!.orderedIds!.push(
+              subFolderDoc._realId
+            )
+          }
+        })
+      const noteIDs = folderNoteIds.get(parentFolderPathname)
+      if (noteIDs != null) {
+        populatedFolderMap[parentFolderPathname]?.orderedIds!.push(...noteIDs)
+      }
+
+      // remove any duplicates even though there should not be any!
+      populatedFolderMap[parentFolderPathname]!.orderedIds! = removeDuplicates(
+        populatedFolderMap[parentFolderPathname]!.orderedIds!
+      )
+    })
+    foldersToUpdateOrderedIds.forEach((folderPathname) => {
+      const folderDoc = populatedFolderMap[folderPathname]
+      if (folderDoc != null && folderDoc.orderedIds != null) {
+        db.updateFolderOrderedIds(folderDoc._id, folderDoc.orderedIds)
+      }
+    })
     return {
       type: 'fs',
       id,

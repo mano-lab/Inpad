@@ -133,6 +133,7 @@
     "@stripe/react-stripe-js": "^1.2.0",
     "@stripe/stripe-js": "^1.11.0",
     "@types/react-color": "^3.0.4",
+    "array-move": "^2.2.1",
     "aws-amplify": "^4.0.3",
     "chart.js": "^2.9.4",
     "classcat": "^4.0.2",
