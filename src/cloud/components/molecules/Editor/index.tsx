@@ -66,6 +66,7 @@ import {
   focusEditorEventEmitter,
   toggleSplitEditModeEventEmitter,
   togglePreviewModeEventEmitter,
+  focusEditorHeadingEventEmitter,
 } from '../../../lib/utils/events'
 import { ScrollSync, scrollSyncer } from '../../../lib/editor/scrollSync'
 import CodeMirrorEditor from '../../../lib/editor/components/CodeMirrorEditor'
@@ -722,6 +723,36 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
     editorRef.current.focus()
   }, [editorLayout])
 
+  const focusEditorHeading = useCallback(
+    (event: CustomEvent<{ heading: string }>) => {
+      if (editorLayout === 'preview') {
+        return
+      }
+
+      if (editorRef.current == null) {
+        return
+      }
+
+      const heading = event.detail.heading
+      const targetHeadingElement = document.getElementById(
+        `user-content-${heading}`
+      )
+      if (targetHeadingElement == null) {
+        return
+      }
+      const dataLineAttribute = targetHeadingElement.attributes.getNamedItem(
+        'data-line'
+      )
+      if (dataLineAttribute == null) {
+        return
+      }
+      const focusLine: number = parseInt(dataLineAttribute.value)
+      editorRef.current.focus()
+      editorRef.current.setCursor({ line: focusLine - 1, ch: 0 })
+    },
+    [editorLayout]
+  )
+
   const focusTitleInputRef = useRef<() => void>()
   useEffect(() => {
     const handler = () => {
@@ -743,6 +774,13 @@ const Editor = ({ doc, team, user, contributors, backLinks }: EditorProps) => {
       focusEditorEventEmitter.unlisten(focusEditor)
     }
   }, [focusEditor])
+
+  useEffect(() => {
+    focusEditorHeadingEventEmitter.listen(focusEditorHeading)
+    return () => {
+      focusEditorHeadingEventEmitter.unlisten(focusEditorHeading)
+    }
+  }, [focusEditorHeading])
 
   const breadcrumbs = useMemo(() => {
     const breadcrumbs = mapTopbarBreadcrumbs(

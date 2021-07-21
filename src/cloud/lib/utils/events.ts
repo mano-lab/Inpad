@@ -49,6 +49,10 @@ export const focusTitleEventEmitter = createCustomEventEmitter('focus-title')
 
 export const focusEditorEventEmitter = createCustomEventEmitter('focus-editor')
 
+export const focusEditorHeadingEventEmitter = createCustomEventEmitter<{
+  heading: string
+}>('focus-editor-location')
+
 export const togglePreviewModeEventEmitter = createCustomEventEmitter(
   'toggle-preview-mode'
 )

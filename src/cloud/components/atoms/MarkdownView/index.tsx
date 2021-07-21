@@ -44,6 +44,7 @@ import Icon from '../../../../shared/components/atoms/Icon'
 import styled from '../../../../shared/lib/styled'
 import throttle from 'lodash.throttle'
 import CodeFence from '../../../../shared/components/atoms/markdown/CodeFence'
+import { TableOfContents } from '../../molecules/TableOfContents'
 
 const remarkAdmonitionOptions = {
   tag: ':::',
@@ -51,7 +52,7 @@ const remarkAdmonitionOptions = {
   infima: false,
 }
 
-const schema = mergeDeepRight(gh, {
+export const schema = mergeDeepRight(gh, {
   attributes: {
     '*': [
       ...gh.attributes['*'],
@@ -196,6 +197,9 @@ const MarkdownView = ({
         shortcode:
           shortcodeHandler == null
             ? ({ identifier, entityId }: any) => {
+                if (identifier === 'toc') {
+                  return <TableOfContents content={content}></TableOfContents>
+                }
                 return (
                   <Shortcode
                     entity={identifier}
@@ -263,6 +267,7 @@ const MarkdownView = ({
 
     return parser
   }, [
+    content,
     settings,
     updateContent,
     shortcodeHandler,
